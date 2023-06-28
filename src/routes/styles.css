@@ -1,0 +1,154 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&display=swap');
+@import './controls.css';
+:root {
+	/* Fonts */
+	--font-eesti: 'EestiPro', Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+		Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	--font-dmSans: 'DM Sans', sans-serif;
+	/* Colors */
+	--brand-pink: #d5509d;
+	--brand-cyan: #46dffc;
+	--white: #ffffff;
+	--black: #000000;
+	--accent: #6750a3;
+	--badge-flag: #f6e3e3;
+	--primary-purple: #4830c1;
+	--primary-hover: #7b63f4;
+	--primary-light: #f3f1ff;
+	--neutral-1: #f3f3f3;
+	--neutral-2: #d3d3d3;
+	--neutral-3: #a3a3a3;
+	--neutral-4: #808080;
+	--alert-success: #17f06e;
+	--alert-error: #ff0000;
+	--alert-warning: #ffe587;
+	--form-color: #fff;
+	/* Inputs */
+	--input-outline: #e4e4e4;
+	--input-outline-error: #ef4444;
+	--input-bg: #fff;
+	--input-bg-error: #ffefef;
+	--input-text: #5a5a5a;
+	--input-text-error: #ef4444;
+	--input-placeholder: #a9a9a9;
+	--borderColor: #46e1fc;
+	/* Gradients */
+	--gd-main: linear-gradient(90deg, #14dcff 14.89%, #fd369d 80.19%);
+	--gd-linear: linear-gradient(93.02deg, #8863e08f 7.67%, #ffa5d3 99.01%);
+	--gd-icon: linear-gradient(228.39deg, #6750a3 -5.38%, #e14696 107.76%);
+	--gd-mavie: linear-gradient(
+		90deg,
+		var(--brand-cyan) 0%,
+		#6eb6e1 12.5%,
+		var(--brand-pink) 59.01%,
+		#e14696 100.02%
+	);
+	--gd-navbar: linear-gradient(
+		90deg,
+		var(--brand-pink) 0.01%,
+		#a836c5 40.63%,
+		#7f90d9 64.59%,
+		#73acdf 82.83%,
+		var(--brand-cyan) 96.37%
+	);
+	--gd-glassmorphism: linear-gradient(140.49deg, #ffffff9c -0.77%, #ffffff4f 100%);
+	--gd-page: linear-gradient(180deg, #f5f5f5 0%, #f3f5fd 61.98%, #dde0e9 100%);
+
+	/* Shadows */
+	--shadow-section: 0px 16px 88px rgba(0, 0, 0, 0.07);
+	--shadow-icon: 2px 2px 12px #927cce;
+	--shadow-tooltip: 2px 2px 12px #00000062;
+	--shadow-dot: 0px 4px 4px 0px #808080;
+	--shadow-modal: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+* {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+body {
+	min-height: 100vh;
+	margin: 0;
+	background-attachment: fixed;
+	background-color: #fff;
+	background-size: 100vw 100vh;
+}
+a {
+	font-weight: 700;
+	color: var(--primary-purple);
+	text-decoration: none;
+}
+a:hover {
+	color: var(--primary-hover);
+	text-decoration: underline;
+}
+
+h1 {
+	font-family: var(--font-eesti);
+	font-size: 2.5rem;
+	font-weight: 700;
+}
+h2 {
+	font-family: var(--font-eesti);
+	font-size: 2rem;
+	font-weight: 400;
+}
+h3 {
+	font-family: var(--font-eesti);
+	font-size: 1.25rem;
+	font-weight: 500;
+}
+p {
+	font-family: var(--font-dmSans);
+	font-size: 1rem;
+	font-weight: 400;
+	font-style: normal !important;
+}
+
+@font-face {
+	font-family: 'EestiPro';
+	src: url('/fonts/GTEestiProDisplay-UltraBold.woff') format('truetype');
+	font-weight: 900;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'EestiPro';
+	src: url('/fonts/GTEestiProText-Bold.woff') format('truetype');
+	font-weight: 700;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'EestiPro';
+	src: url('/fonts/GTEestiProText-Medium.woff') format('truetype');
+	font-weight: 500;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'EestiPro';
+	src: url('/fonts/GTEestiProText-MediumItalic.ttf') format('truetype');
+	font-weight: 500;
+	font-style: italic;
+}
+@font-face {
+	font-family: 'EestiPro';
+	src: url('/fonts/GTEestiProText-Regular.woff') format('truetype');
+	font-weight: 400;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'EestiPro';
+	src: url('/fonts/GTEestiProText-Light.woff') format('truetype');
+	font-weight: 300;
+	font-style: normal;
+}
+@font-face {
+	font-family: 'EestiPro';
+	src: url('/fonts/GTEestiProText-UltraLight.woff') format('truetype');
+	font-weight: 100;
+	font-style: normal;
+}

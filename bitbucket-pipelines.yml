@@ -1,0 +1,60 @@
+image: node:16
+
+definitions:
+    caches:
+        pnpm: $BITBUCKET_CLONE_DIR/.pnpm-store
+
+pipelines:
+    default:
+        - parallel:
+              - step:
+                    name: 'Build and Test'
+                    script:
+                        - echo "Your build and test goes here..."
+              - step:
+                    name: 'Security and Test'
+                    script:
+                        - echo "Your security goes here..."
+    branches:
+        dev:
+            - step:
+                  name: 'Deployment to Staging'
+                  deployment: staging
+                  script:
+                      - echo COGNITO_APP_CLIENT_ID="${COGNITO_APP_CLIENT_ID}" > .env.local
+                      - echo COGNITO_USER_POOL_ID="${COGNITO_USER_POOL_ID}" >> .env.local
+                      - echo DB_URL="${DB_URL}" >> .env.local
+                      - echo AS_REGION="${AS_REGION}" >> .env.local
+                      - echo AS_ACCESS_KEY_ID="${AS_ACCESS_KEY_ID}" >> .env.local
+                      - echo AS_SECRET_ACCESS_KEY="${AS_SECRET_ACCESS_KEY}" >> .env.local
+                      - echo SECRET_HASH="${SECRET_HASH}" >> .env.local
+                      - npm install
+                      - npx sst deploy --stage dev
+        staging:
+            - step:
+                  name: 'Deployment to Staging'
+                  deployment: staging
+                  script:
+                      - echo COGNITO_APP_CLIENT_ID="${COGNITO_APP_CLIENT_ID}" > .env.local
+                      - echo COGNITO_USER_POOL_ID="${COGNITO_USER_POOL_ID}" >> .env.local
+                      - echo DB_URL="${DB_URL_STAGING}" >> .env.local
+                      - echo AS_REGION="${AS_REGION}" >> .env.local
+                      - echo AS_ACCESS_KEY_ID="${AS_ACCESS_KEY_ID}" >> .env.local
+                      - echo AS_SECRET_ACCESS_KEY="${AS_SECRET_ACCESS_KEY}" >> .env.local
+                      - echo SECRET_HASH="${SECRET_HASH}" >> .env.local
+                      - npm install
+                      - npx sst deploy --stage staging
+        main:
+            - step:
+                  name: 'Deployment to Staging'
+                  deployment: staging
+                  script:
+                      - echo COGNITO_APP_CLIENT_ID="${COGNITO_APP_CLIENT_ID}" > .env.local
+                      - echo COGNITO_USER_POOL_ID="${COGNITO_USER_POOL_ID}" >> .env.local
+                      - echo DB_URL="${DB_URL_STAGING}" >> .env.local
+                      - echo AS_REGION="${AS_REGION}" >> .env.local
+                      - echo AS_ACCESS_KEY_ID="${AS_ACCESS_KEY_ID}" >> .env.local
+                      - echo AS_SECRET_ACCESS_KEY="${AS_SECRET_ACCESS_KEY}" >> .env.local
+                      - echo SECRET_HASH="${SECRET_HASH}" >> .env.local
+                      - npm install
+                      - npx sst deploy --stage prod

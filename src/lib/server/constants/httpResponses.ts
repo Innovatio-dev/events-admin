@@ -1,0 +1,13 @@
+const HttpResponses = {
+    OK_RESPONSE: 200,
+    RESOURCE_CREATED: 201,
+    NO_RESPONSE: 204,
+    BAD_REQUEST: 400,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    METHOD_NOT_ALLOWED: 405,
+    BAR_REQUEST: 422,
+    UNEXPECTED_ERROR: 513
+}
+
+export { HttpResponses }
