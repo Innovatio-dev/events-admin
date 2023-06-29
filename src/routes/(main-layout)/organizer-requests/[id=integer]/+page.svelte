@@ -22,6 +22,7 @@
 	const handleOpenModalApproved = () => {
 		isOpenApproved = true
 	}
+
 	const handleCloseModalApproved = () => {
 		isOpenApproved = false
 	}
@@ -32,33 +33,32 @@
 	const handleOpenModalDenied = () => {
 		isOpenDenied = true
 	}
+
 	const handleCloseModalDennied = () => {
 		isOpenDenied = false
 	}
 
-	const options = [{ id: 'option1', label: 'Deny application option.' }]
-
 	// State
 	let selectedLabel = ''
+	const options = [{ id: 'option1', label: 'Deny application option.' }]
+	let organizer: any = null
+	let loading: boolean = true
 
-	async function setAproved(aprovedValue: number) {
+	const setDenied = async () => {
 		let result = ''
 		let reason = ''
 
 		if (selectedLabel.length) {
 			reason = selectedLabel
-		} else if (aprovedValue == 1) {
+		} else {
 			let day = new Date(Date.now())
-			reason = `Approved in ${day}`
-		} else if (aprovedValue == 2) {
-			let day = new Date(Date.now())
-			reason = `Dennied in ${day}`
+			reason = options[0].label
 		}
 
 		const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
 			method: 'PUT',
 			body: JSON.stringify({
-				status: aprovedValue,
+				status: 2,
 				reason: reason
 			})
 		})
@@ -66,26 +66,35 @@
 		result = JSON.stringify(json)
 	}
 
-	const handleDeniedModal = () => {
+	const setApproved = async () => {
+		let result = ''
+		let reason = ''
+
+		let day = new Date(Date.now())
+		reason = `Approved in ${day}`
+
+		const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
+			method: 'PUT',
+			body: JSON.stringify({
+				status: 1,
+				reason: reason
+			})
+		})
+		const json = await res.json()
+		result = JSON.stringify(json)
+	}
+
+	const handleDeniedModal = async () => {
+		await setDenied()
 		isOpenDenied = false
-		setAproved(2)
 		goto('/organizer-requests')
 	}
 
-	const handleAprovedModal = () => {
+	const handleAprovedModal = async () => {
+		await setApproved()
 		isOpenApproved = false
-		setAproved(1)
 		goto('/organizer-requests')
 	}
-
-	let organizer: any = null
-	let loading: boolean = true
-
-	onMount(async () => {
-		let id = $page.params.id
-		$pageStatus.title = 'Organizer Aplication'
-		await fetchOrganizerRequest(id)
-	})
 
 	async function fetchOrganizerRequest(id) {
 		loading = true
@@ -96,6 +105,12 @@
 		}
 		loading = false
 	}
+
+	onMount(async () => {
+		let id = $page.params.id
+		$pageStatus.title = 'Organizer Aplication'
+		await fetchOrganizerRequest(id)
+	})
 </script>
 
 <div class="w-full">

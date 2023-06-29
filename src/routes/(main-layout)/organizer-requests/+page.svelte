@@ -9,14 +9,7 @@
 	import Board from '$lib/components/icons/Board.svelte'
 	import Ticket from '$lib/components/icons/Ticket.svelte'
 	import Badge from '$lib/components/Badge.svelte'
-	import type { Column } from '$lib/components/SortableTable.svelte'
 	import SortableTable from '$lib/components/SortableTable.svelte'
-	import DateViewer from '$lib/components/table_cell/DateViewer.svelte'
-	import MailViewer from '$lib/components/table_cell/MailViewer.svelte'
-	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
-	import TypeEventViewer from '$lib/components/table_cell/TypeEventViewer.svelte'
-	import StatusViewer from '$lib/components/table_cell/StatusViewer.svelte'
-	import SeeMoreButton from '$lib/components/table_cell/SeeMoreButton.svelte'
 	import EmptyResults from '$lib/components/EmptyResults.svelte'
 	// Utils
 	import { organizerListSchema } from '$lib/utils/validation/schemas'
@@ -31,72 +24,10 @@
 	import Icon from 'svelte-icons-pack'
 	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
+	// Constants
+	import { OrganizerRequestColumns } from '$lib/utils/constants/ListTables'
 
-	let tableColumns: Column[] = [
-		{
-			title: 'ID',
-			sortable: true,
-			dataKey: 'uid',
-			minWidth: '8em',
-			grow: '0'
-		},
-		{
-			title: 'Date Request',
-			sortable: true,
-			dataKey: 'createdAt',
-			grow: '0',
-			minWidth: '11em',
-			cellComponent: DateViewer
-		},
-		{
-			title: 'Organizer Name',
-			sortable: true,
-			dataKey: 'name'
-		},
-		{
-			title: 'Email Address',
-			sortable: true,
-			dataKey: 'email',
-			cellComponent: MailViewer,
-			minWidth: '180px'
-		},
-		{
-			title: 'Country',
-			sortable: true,
-			dataKey: 'country',
-			cellComponent: CountryViewer
-		},
-		{
-			title: 'Type Event',
-			sortable: true,
-			dataKey: 'typeEvent',
-			cellComponent: TypeEventViewer,
-			minWidth: '12em',
-			grow: '0'
-		},
-		{
-			title: 'Mavie ID',
-			sortable: false,
-			dataKey: 'mavieId'
-		},
-		{
-			title: 'Status',
-			sortable: true,
-			dataKey: 'status',
-			grow: '0',
-			minWidth: '5em',
-			cellComponent: StatusViewer
-		},
-		{
-			title: 'Details',
-			sortable: false,
-			cellComponent: SeeMoreButton,
-			minWidth: '8em',
-			grow: '0',
-			dataKey: 'link'
-		}
-	]
-
+	// State
 	let loading: boolean = true
 	let data: any = null
 	let error: any = null
@@ -138,9 +69,9 @@
 				params.typeEvent = mapArrayIntoCollection(params.typeEvent, types, 'value')
 			}
 			if (params.order.length) {
-				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
+				params.order = mapArrayIntoCollectionOrder(params.order, OrganizerRequestColumns)
 			} else {
-				params.order = [{ column: tableColumns[1], index: 1, type: 'desc' }]
+				params.order = [{ column: OrganizerRequestColumns[1], index: 1, type: 'desc' }]
 			}
 		} catch (error) {}
 		await fetchOrganizersRequests()
@@ -315,7 +246,7 @@
 			bind:currentPage={params.page}
 			on:pageChange={onPageChange}
 			on:sortChange={onSortChange}
-			columns={tableColumns}
+			columns={OrganizerRequestColumns}
 			data={data?.results}
 			maxItemsPerPage={itemsPerPage}
 			sortedColumns={params.order}
