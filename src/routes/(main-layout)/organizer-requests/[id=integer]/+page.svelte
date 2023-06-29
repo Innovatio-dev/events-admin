@@ -37,18 +37,31 @@
 	}
 
 	const options = [{ id: 'option1', label: 'Deny application option.' }]
+
+	// State
 	let selectedLabel = ''
 
 	async function setAproved(aprovedValue: number) {
 		let result = ''
+		let reason = ''
+
+		if (selectedLabel.length) {
+			reason = selectedLabel
+		} else if (aprovedValue == 1) {
+			let day = new Date(Date.now())
+			reason = `Approved in ${day}`
+		} else if (aprovedValue == 2) {
+			let day = new Date(Date.now())
+			reason = `Dennied in ${day}`
+		}
+
 		const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
 			method: 'PUT',
 			body: JSON.stringify({
 				status: aprovedValue,
-				reason: selectedLabel
+				reason: reason
 			})
 		})
-
 		const json = await res.json()
 		result = JSON.stringify(json)
 	}
@@ -89,7 +102,7 @@
 	<div class="w-[95%] mx-auto gap-x-12">
 		<OrganizerView {organizer} {loading} />
 	</div>
-	<div class="flex flex-row w-[95%] mx-auto gap-x-6 py-6">
+	<div class="flex flex-row w-[95%] gap-x-6 py-6">
 		{#if organizer?.status === 0}
 			<div class="flex flex-row w-[95%] mx-auto gap-x-6 py-6">
 				<div class="w-fit">
