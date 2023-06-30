@@ -15,6 +15,7 @@ import * as country from './country'
 import * as resource from './resource'
 import * as schedule from './schedule'
 import * as suspension from './suspension'
+import * as mailing from './mailing'
 import { EventPicture, init as initEventPicture } from './eventPicture'
 import { VenuePicture, init as initVenuePicture } from './venuePicture'
 
@@ -38,6 +39,7 @@ const init = (sequelize: Sequelize) => {
 	resource.init(sequelize)
 	venue.init(sequelize)
 	suspension.init(sequelize)
+	mailing.init(sequelize)
 
 	// associations
 	event.Event.belongsTo(user.User, { foreignKey: 'userId', as: 'user' })
@@ -45,6 +47,9 @@ const init = (sequelize: Sequelize) => {
 
 	event.Event.belongsTo(schedule.Schedule, { foreignKey: 'scheduleId', as: 'schedule' })
 	schedule.Schedule.hasMany(event.Event, { foreignKey: 'scheduleId', as: 'event' })
+
+	mailing.Mailing.belongsTo(event.Event, { foreignKey: 'eventId' })
+	event.Event.hasMany(mailing.Mailing, { foreignKey: 'eventId' })
 
 	// Event->Pictures assocications
 	event.Event.belongsTo(resource.Resource, { foreignKey: 'bannerId', as: 'banner' })

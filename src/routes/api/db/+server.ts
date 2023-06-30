@@ -109,7 +109,6 @@ async function createSpeakerSnapshot(speaker: Speaker) {
 
 async function populate(): Promise<any[]> {
 	const user = await User.create({
-		id: 9,
 		cognitoId: 'e7b9e67d-413f-4ae5-aba7-3fe1ec559e58',
 		name: 'Juan Hebert',
 		surname: 'Chable Covarrubias',
@@ -118,7 +117,6 @@ async function populate(): Promise<any[]> {
 	})
 
 	await User.create({
-		id: 1,
 		cognitoId: '56a10f46-6227-4b19-8257-0795f7b247ab',
 		name: 'Edgar',
 		surname: 'Mancillas',
@@ -127,7 +125,6 @@ async function populate(): Promise<any[]> {
 	})
 
 	await User.create({
-		id: 2,
 		cognitoId: '0de66d93-50e5-4483-8d6d-a4be5c5ded3a',
 		name: 'Ivan',
 		surname: 'Tovar',
@@ -135,29 +132,51 @@ async function populate(): Promise<any[]> {
 		role: 1
 	})
 
-
-	const eventMimes = ['webp', 'jpeg', 'jpeg', 'jpeg', 'jpeg', 'png', 'jpeg', 'jpeg', 'png', 'jpeg', 'jpeg', 'webp', 'jpeg', 'jpeg', 'jpeg', 'jpeg', 'jpeg', 'jpeg',]
+	const eventMimes = [
+		'webp',
+		'jpeg',
+		'jpeg',
+		'jpeg',
+		'jpeg',
+		'png',
+		'jpeg',
+		'jpeg',
+		'png',
+		'jpeg',
+		'jpeg',
+		'webp',
+		'jpeg',
+		'jpeg',
+		'jpeg',
+		'jpeg',
+		'jpeg',
+		'jpeg'
+	]
 	const eventResources: Resource[] = []
 
 	for (let index = 0; index < eventMimes.length; index++) {
-		eventResources.push(await Resource.create({
-			originaleName: 'event' + index,
-			refCount: 1,
-			name: 'event' + index,
-			url: `https://dashboard-events.s3.eu-central-1.amazonaws.com/public/event${index}.${eventMimes[index]}`
-		}))
+		eventResources.push(
+			await Resource.create({
+				originaleName: 'event' + index,
+				refCount: 1,
+				name: 'event' + index,
+				url: `https://dashboard-events.s3.eu-central-1.amazonaws.com/public/event${index}.${eventMimes[index]}`
+			})
+		)
 	}
 
 	const venueMimes = ['jpeg', 'jpeg', 'jpeg', 'jpeg', 'jpeg', 'jpeg', 'jpeg', 'jpeg', 'jpeg']
 	const venueResources: Resource[] = []
 
 	for (let index = 0; index < venueMimes.length; index++) {
-		venueResources.push(await Resource.create({
-			originaleName: 'venue' + index,
-			refCount: 1,
-			name: 'venue' + index,
-			url: `https://dashboard-events.s3.eu-central-1.amazonaws.com/public/venue${index}.${venueMimes[index]}`
-		}))
+		venueResources.push(
+			await Resource.create({
+				originaleName: 'venue' + index,
+				refCount: 1,
+				name: 'venue' + index,
+				url: `https://dashboard-events.s3.eu-central-1.amazonaws.com/public/venue${index}.${venueMimes[index]}`
+			})
+		)
 	}
 
 	const continents = [
@@ -244,7 +263,8 @@ async function populate(): Promise<any[]> {
 		},
 		{
 			name: 'Bukit Jalil National Stadium',
-			address: 'Jalan Barat, Bukit Jalil, 57000 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malasia',
+			address:
+				'Jalan Barat, Bukit Jalil, 57000 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malasia',
 			city: 'Malasia',
 			email: 'test@email.com',
 			description: 'test description',
@@ -269,9 +289,8 @@ async function populate(): Promise<any[]> {
 				lat: 50.0804993,
 				lng: 14.387747
 			}
-		},
+		}
 	]
-
 
 	// const businessImages = await generateImageResources(15, faker.image.business, user)
 	const avatarImages = await generateImageResources(10, faker.image.avatar, user)
@@ -331,13 +350,75 @@ async function populate(): Promise<any[]> {
 	}
 
 	const languages = [
-		{ id: 225, iso: 'GB', isoLang: 'EN', nicename: 'United Kingdom', iso3: 'GBR', numcode: 826, phonecode: 44 },
-		{ id: 199, iso: 'ES', isoLang: 'ES', name: 'Spanish', nicename: 'Spain', iso3: 'ESP', numcode: 724, phonecode: 34 },
-		{ id: 105, iso: 'IT', isoLang: 'IT', name: 'Italian', nicename: 'Italy', iso3: 'ITA', numcode: 380, phonecode: 39 },
-		{ id: 107, iso: 'JP', isoLang: 'JP', name: 'Japanese', nicename: 'Japan', iso3: 'JPN', numcode: 392, phonecode: 81 },
-		{ id: 73, iso: 'FR', isoLang: 'FR', name: 'French', nicename: 'France', iso3: 'FRA', numcode: 250, phonecode: 33 },
-		{ id: 172, iso: 'PT', isoLang: 'PT', name: 'Portuguese', nicename: 'Portugal', iso3: 'PRT', numcode: 620, phonecode: 351 },
-		{ id: 44, iso: 'CN', isoLang: 'CN', name: 'Chinese', nicename: 'China', iso3: 'CHN', numcode: 156, phonecode: 86 },
+		{
+			id: 225,
+			iso: 'GB',
+			isoLang: 'EN',
+			nicename: 'United Kingdom',
+			iso3: 'GBR',
+			numcode: 826,
+			phonecode: 44
+		},
+		{
+			id: 199,
+			iso: 'ES',
+			isoLang: 'ES',
+			name: 'Spanish',
+			nicename: 'Spain',
+			iso3: 'ESP',
+			numcode: 724,
+			phonecode: 34
+		},
+		{
+			id: 105,
+			iso: 'IT',
+			isoLang: 'IT',
+			name: 'Italian',
+			nicename: 'Italy',
+			iso3: 'ITA',
+			numcode: 380,
+			phonecode: 39
+		},
+		{
+			id: 107,
+			iso: 'JP',
+			isoLang: 'JP',
+			name: 'Japanese',
+			nicename: 'Japan',
+			iso3: 'JPN',
+			numcode: 392,
+			phonecode: 81
+		},
+		{
+			id: 73,
+			iso: 'FR',
+			isoLang: 'FR',
+			name: 'French',
+			nicename: 'France',
+			iso3: 'FRA',
+			numcode: 250,
+			phonecode: 33
+		},
+		{
+			id: 172,
+			iso: 'PT',
+			isoLang: 'PT',
+			name: 'Portuguese',
+			nicename: 'Portugal',
+			iso3: 'PRT',
+			numcode: 620,
+			phonecode: 351
+		},
+		{
+			id: 44,
+			iso: 'CN',
+			isoLang: 'CN',
+			name: 'Chinese',
+			nicename: 'China',
+			iso3: 'CHN',
+			numcode: 156,
+			phonecode: 86
+		}
 	]
 
 	//Creating events
@@ -382,7 +463,7 @@ async function populate(): Promise<any[]> {
 			email: faker.internet.email(),
 			description: faker.lorem.lines(2),
 			timeZone: faker.address.timeZone(),
-			mailing: faker.internet.email(),
+			mailing: 8,
 			organizerId: organizers[Math.floor(Math.random() * organizers.length)].id,
 			venueId: venue?.id,
 			userId: user.id,
@@ -395,6 +476,7 @@ async function populate(): Promise<any[]> {
 			linkZoom: venue?.region.name == 'Virtual' ? 'https://zoom.com/f24nfkdf234' : null,
 			language: venue?.region.name == 'Virtual' ? language : null,
 			translation: venue?.region.name == 'Virtual' ? translations : null,
+			typeEvent: venue?.region.name == 'Virtual' ? 1 : 0
 		}
 
 		const event = await Event.create(eventBody)

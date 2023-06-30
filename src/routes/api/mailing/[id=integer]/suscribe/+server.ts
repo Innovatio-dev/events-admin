@@ -1,5 +1,6 @@
 import { HttpResponses } from '$lib/server/constants/httpResponses'
 import { Event } from '$lib/server/models/event'
+import { Mailing } from '$lib/server/models/mailing'
 import { error, json, type RequestEvent } from '@sveltejs/kit'
 import { SENDINBLUE_API_KEY } from '$env/static/private'
 import SibApiV3Sdk from 'sib-api-v3-sdk'
@@ -65,6 +66,15 @@ export async function POST(event: RequestEvent) {
 			createContact.COUNTRY = jsonBody.country
 		}
 
+		const mailinig = await Mailing.create({
+			email: jsonBody.email,
+			name: jsonBody.name,
+			surname: jsonBody.surname,
+			mavieId: jsonBody.mavieId,
+			country: jsonBody.country,
+			eventId: result.id
+		})
+
 		//createContact.SIGNUP_DATE = new Date()
 		///////
 		createContact.listIds = [listId]
@@ -74,7 +84,8 @@ export async function POST(event: RequestEvent) {
 			await apiInstance.createContact(createContact)
 			return json(
 				{
-					message: 'Contact email created or updated'
+					message: 'Contact email created or updated',
+					mailinig
 				},
 				{
 					status: HttpResponses.OK_RESPONSE
