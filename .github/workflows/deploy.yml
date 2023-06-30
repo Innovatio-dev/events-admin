@@ -16,14 +16,15 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Echo Environment
-        run: echo ${{ secrets.COGNITO_APP_CLIENT_ID }} > .env
-             echo ${{ secrets.COGNITO_USER_POOL_ID }} >> .env
-             echo ${{ secrets.DB_URL }} >> .env
-             echo ${{ secrets.AS_REGION }} >> .env
-             echo ${{ secrets.AS_ACCESS_KEY_ID }} >> .env
-             echo ${{ secrets.AS_SECRET_ACCESS_KEY }} >> .env
-             echo ${{ secrets.SECRET_HASH }} >> .env
-             echo ${{ secrets.SENDINBLUE_API_KEY }} >> .env
+        run: |
+            echo COGNITO_APP_CLIENT_ID=${{ secrets.COGNITO_APP_CLIENT_ID }} > .env
+            echo COGNITO_USER_POOL_ID=${{ secrets.COGNITO_USER_POOL_ID }} >> .env
+            echo DB_URL=${{ secrets.DB_URL }} >> .env
+            echo AS_REGION=${{ secrets.AS_REGION }} >> .env
+            echo AS_ACCESS_KEY_ID=${{ secrets.AS_ACCESS_KEY_ID }} >> .env
+            echo AS_SECRET_ACCESS_KEY=${{ secrets.AS_SECRET_ACCESS_KEY }} >> .env
+            echo SECRET_HASH=${{ secrets.SECRET_HASH }} >> .env
+            echo SENDINBLUE_API_KEY=${{ secrets.SENDINBLUE_API_KEY }} >> .env
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
