@@ -29,6 +29,7 @@
 
 	// Props
 	export let addOrganizer: Organizer | null = null
+	export let submitAction = (organizer) => {}
 
 	// State
 	let organizer: Organizer = {
@@ -66,7 +67,7 @@
 	}
 
 	export function handleSubmit() {
-		console.log(organizer)
+		submitAction(organizer)
 	}
 
 	const handleCheck = (e: any) => {
@@ -145,7 +146,7 @@
 		<DragAndDrop
 			url="/api/resources"
 			name="file"
-			title="Upload your image"
+			title="Upload your image (Optional)"
 			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 			body="1000x1000"
 		/>

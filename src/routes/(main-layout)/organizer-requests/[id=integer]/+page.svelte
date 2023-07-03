@@ -45,7 +45,6 @@
 	let loading: boolean = true
 
 	const setDenied = async () => {
-		let result = ''
 		let reason = ''
 
 		if (selectedLabel.length) {
@@ -62,26 +61,18 @@
 				reason: reason
 			})
 		})
-		const json = await res.json()
-		result = JSON.stringify(json)
 	}
 
 	const setApproved = async () => {
-		let result = ''
-		let reason = ''
-
 		let day = new Date(Date.now())
-		reason = `Approved in ${day}`
 
 		const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
 			method: 'PUT',
 			body: JSON.stringify({
 				status: 1,
-				reason: reason
+				reason: `Approved in ${day}`
 			})
 		})
-		const json = await res.json()
-		result = JSON.stringify(json)
 	}
 
 	const handleDeniedModal = async () => {
