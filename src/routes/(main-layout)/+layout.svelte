@@ -28,8 +28,8 @@
 		{ path: '/organizers', name: 'Organizer list', icon: User },
 		{ path: '/events', name: 'View events', icon: Ticket },
 		{ path: '/speakers', name: 'Speaker list', icon: Mic },
-		{ path: '/venues', name: 'Venue list', icon: Bank }
-		// { path: '/admin', name: 'Admin panel', icon: Checklist }
+		{ path: '/venues', name: 'Venue list', icon: Bank },
+		{ path: '/admin', name: 'Admin panel', icon: Checklist }
 	]
 
 	let activeIndex = null
