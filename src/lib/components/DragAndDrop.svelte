@@ -24,6 +24,7 @@
 	export let subtitle: string = ''
 	export let body: string = ''
 	export let multiple: boolean = true
+	export let uploaded: number[] = []
 
 	let files: FileUpload[] = []
 	let inputRef: HTMLInputElement
@@ -144,7 +145,7 @@
 		reader.readAsDataURL(file)
 	}
 
-	$: uploaded = files.filter((item) => item.resourceId != null).map((item) => item.resourceId)
+	$: uploaded = files.filter((item) => item.status == 1).map((item) => item.resourceId as number)
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -267,6 +268,7 @@
 		aspect-ratio: calc(16 / 9);
 		background-color: #616161;
 		border-radius: 0.7em;
+		overflow: hidden;
 		.thumbnail {
 			width: 100%;
 			height: 100%;

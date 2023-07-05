@@ -16,6 +16,8 @@
 	export let placeholder: string = ''
 	export let errorMessages: string[] = []
 	export let validationSchema: Joi.AnySchema | null = null
+	export let domElement: HTMLElement
+
 	let currentType: InputType = type
 
 	let inputRef: any = null
@@ -58,7 +60,7 @@
 	}
 </script>
 
-<label class="flex flex-col w-full gap-2">
+<label bind:this={domElement} class="flex flex-col w-full gap-2">
 	{#if label}
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{label}
@@ -77,7 +79,10 @@
 			{name}
 			{placeholder}
 			{value}
-			on:focus={() => (isFocused = true)}
+			on:focus={(ev) => {
+				isFocused = true
+				dispatch('focus', ev)
+			}}
 			on:blur={() => (isFocused = false)}
 			on:input={handleChange}
 			on:keypress={handleKeyPress}

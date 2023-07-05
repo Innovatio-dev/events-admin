@@ -8,12 +8,10 @@ import { foreignKeyOf } from '$lib/server/validation/schemas'
 import { createSchema, filterSchema } from '$lib/utils/validation/speakerSchema'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import sequelize, { Op } from 'sequelize'
-interface DynamicObject {
-	[key: string]: string | number
-}
+
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
-	const where: DynamicObject = {}
+	const where: any = {}
 	if (filter.search) {
 		const search = `%${filter.search}%`
 

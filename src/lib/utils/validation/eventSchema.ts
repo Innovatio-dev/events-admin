@@ -52,7 +52,8 @@ export const createSchema = Joi.object({
 	organizerId: Joi.number().required(),
 	schedule: Joi.object({
 		startTime: Joi.date().required(),
-		endTime: Joi.date()
+		endTime: Joi.date(),
+		visibleAt: Joi.date()
 	}).required()
 })
 

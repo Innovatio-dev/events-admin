@@ -47,7 +47,7 @@ export const foreignKeyOf = (model: any, column = 'id') => {
 		return value
 	})
 }
-export const uniqueKeyOf = (model: Mode, column = 'email') => {
+export const uniqueKeyOf = (model: any, column = 'email') => {
 	return Joi.any().external(async (value, helpers) => {
 		const whereOptions: any = {
 			[column]: value

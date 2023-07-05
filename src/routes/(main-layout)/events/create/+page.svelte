@@ -1,4 +1,5 @@
 <script lang="ts">
+	import DatePicker from '$lib/components/DatePicker.svelte'
 	import DragAndDrop from '$lib/components/DragAndDrop.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
 	import Input from '$lib/components/Input.svelte'
@@ -34,7 +35,14 @@
 		typeEvent: null,
 		isFeatured: 0,
 		title: '',
-		description: ''
+		description: '',
+		bannerId: [],
+		pictures: []
+	}
+	const schedule = {
+		startTime: null,
+		endTime: null,
+		visibleAt: null
 	}
 
 	onMount(() => {
@@ -116,6 +124,7 @@
 			<div>
 				<SectionHeader>Event Photo</SectionHeader>
 				<DragAndDrop
+					bind:uploaded={event.pictures}
 					url="/api/resources"
 					name="file"
 					title="Upload your image"
@@ -126,6 +135,7 @@
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
 				<DragAndDrop
+					bind:uploaded={event.bannerId}
 					url="/api/resources"
 					name="file"
 					title="Upload your image"
@@ -136,7 +146,8 @@
 			<div>
 				<SectionHeader>Schedule</SectionHeader>
 				<div>
-					<LabelInput>Location</LabelInput>
+					<LabelInput>Date starts</LabelInput>
+					<DatePicker />
 				</div>
 			</div>
 		{/if}

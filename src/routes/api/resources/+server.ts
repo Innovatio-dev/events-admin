@@ -12,6 +12,7 @@ const schema = Joi.object({
 })
 
 export async function POST(event: RequestEvent) {
+	const user = event.locals.user
 	const params = await validateBody(event, schema)
 	try {
 		const parts = params.name.split('.')
@@ -27,6 +28,7 @@ export async function POST(event: RequestEvent) {
 		const resource = await Resource.create({
 			originalName: params.name,
 			name: newFilename,
+			userId: user?.id,
 			url: `https://${s3BucketName}.${s3Region}.amazonaws.com/public/${newFilename}`
 		})
 		return json({ uploadUrl: response, resource })
