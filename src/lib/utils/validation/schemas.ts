@@ -94,3 +94,10 @@ export const createUserSchema = Joi.object({
 	role: Joi.number().required(),
 	password: passwordSchema
 })
+
+export const createSuperAdminSchema = Joi.object({
+	name: Joi.string().min(1).required(),
+	surname: Joi.string().min(1).required(),
+	email: emailSchema,
+	password: passwordSchema
+})
