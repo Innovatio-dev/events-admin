@@ -67,7 +67,13 @@
 	}
 
 	export function handleSubmit() {
-		submitAction(organizer)
+		const socialsUris = {
+			twitter: 'https://twitter.com/' + organizer.twitter.replace(/\s/g, '_'),
+			facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
+			instagram: 'https://instagram.com/' + organizer.instagram.replace(/\s/g, '_'),
+			youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_')
+		}
+		submitAction({ ...organizer, ...socialsUris })
 	}
 
 	const handleCheck = (e: any) => {
@@ -98,11 +104,11 @@
 			<ToggleButtton bind:checked={organizer.isMember} id="tid1" text right="Yes" left="No" />
 		</div>
 		<div>
-			<Input label="Mavie Id:" type="number" bind:value={organizer.mavieId} />
+			<Input required label="Mavie Id:" type="number" bind:value={organizer.mavieId} />
 		</div>
 	</div>
-	<Input label="Organizer full name:" type="text" bind:value={organizer.name} />
-	<Input label="Organizer company name:" type="text" bind:value={organizer.company} />
+	<Input required label="Organizer full name:" type="text" bind:value={organizer.name} />
+	<Input required label="Organizer company name:" type="text" bind:value={organizer.company} />
 	<div class="flex items-end gap-5">
 		<select class="max-w-[6rem]" name="" id="">
 			{#each COUNTRIES as country}
@@ -111,8 +117,8 @@
 				</option>
 			{/each}
 		</select>
-		<Input label="Phone:" type="tel" bind:value={organizer.phone} />
-		<Input label="E-mail:" type="email" bind:value={organizer.email} />
+		<Input required label="Phone:" type="tel" bind:value={organizer.phone} />
+		<Input required label="E-mail:" type="email" bind:value={organizer.email} />
 	</div>
 	<div class="flex flex-col w-full">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
@@ -122,6 +128,7 @@
 			{#each REGIONS as region}
 				<label class="flex w-full gap-2">
 					<input
+						required
 						checked={organizerHasRegion(region.id)}
 						value={region.id}
 						on:click={handleCheck}
@@ -134,12 +141,12 @@
 			{/each}
 		</div>
 	</div>
-	<Input label="Country:" type="text" bind:value={organizer.country.name} />
-	<Input label="Twitter:" type="text" bind:value={organizer.twitter} />
-	<Input label="Website:" type="url" bind:value={organizer.website} />
-	<Input label="Facebook:" type="text" bind:value={organizer.facebook} />
-	<Input label="Instagram:" type="text" bind:value={organizer.instagram} />
-	<Input label="Youtube:" type="text" bind:value={organizer.youtube} />
+	<Input required label="Country:" type="text" bind:value={organizer.country.name} />
+	<Input required label="Twitter:" type="text" bind:value={organizer.twitter} />
+	<Input required label="Website:" type="url" bind:value={organizer.website} />
+	<Input required label="Facebook:" type="text" bind:value={organizer.facebook} />
+	<Input required label="Instagram:" type="text" bind:value={organizer.instagram} />
+	<Input required label="Youtube:" type="text" bind:value={organizer.youtube} />
 	{#if addOrganizer}
 		<UploadedImage image={addOrganizer.logo.url} />
 	{:else}
@@ -178,11 +185,11 @@
 		&:focus {
 			border: 2px solid var(--input-text);
 		}
-		&.error {
-			border: 2px solid var(--input-text-error);
-			background-color: var(--input-bg-error);
-			color: var(--input-text-error);
-		}
+		// &.error {
+		// 	border: 2px solid var(--input-text-error);
+		// 	background-color: var(--input-bg-error);
+		// 	color: var(--input-text-error);
+		// }
 	}
 	textarea,
 	select::placeholder {
@@ -198,27 +205,27 @@
 	select:-webkit-autofill {
 		-webkit-text-fill-color: var(--input-text) !important;
 	}
-	.actions {
-		position: absolute;
-		height: 100%;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 10px;
-		top: 0;
-		right: 0;
-		padding: 0.7rem calc(0.6rem * 20 / 12);
-		color: var(--input-placeholder);
-		transition: color 0.3s ease-in-out;
-		&.focused {
-			color: var(--input-text);
-		}
-		&.error {
-			color: var(--input-text-error);
-		}
-		.icon {
-			cursor: pointer;
-			font-size: 22px;
-		}
-	}
+	// .actions {
+	// 	position: absolute;
+	// 	height: 100%;
+	// 	display: flex;
+	// 	align-items: center;
+	// 	justify-content: center;
+	// 	gap: 10px;
+	// 	top: 0;
+	// 	right: 0;
+	// 	padding: 0.7rem calc(0.6rem * 20 / 12);
+	// 	color: var(--input-placeholder);
+	// 	transition: color 0.3s ease-in-out;
+	// 	&.focused {
+	// 		color: var(--input-text);
+	// 	}
+	// 	&.error {
+	// 		color: var(--input-text-error);
+	// 	}
+	// 	.icon {
+	// 		cursor: pointer;
+	// 		font-size: 22px;
+	// 	}
+	// }
 </style>

@@ -16,7 +16,8 @@
 	export let placeholder: string = ''
 	export let errorMessages: string[] = []
 	export let validationSchema: Joi.AnySchema | null = null
-	export let domElement: HTMLElement
+	export let domElement: HTMLElement | null = null
+	export let required = false
 
 	let currentType: InputType = type
 
@@ -86,6 +87,7 @@
 			on:blur={() => (isFocused = false)}
 			on:input={handleChange}
 			on:keypress={handleKeyPress}
+			{required}
 		/>
 		<div class="actions {isFocused ? 'focused' : ''} {inputHasError ? 'error' : ''}">
 			{#if type === 'password'}

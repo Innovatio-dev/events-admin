@@ -68,7 +68,7 @@
 				</div>
 			{:else if organizer}
 				<div class="content">
-					<p>{organizer.phone ? '+' : ''}{organizer.phone ?? '---'}</p>
+					<p>{organizer.phone ?? '---'}</p>
 					<p>{organizer.email ?? '---'}</p>
 				</div>
 			{/if}
@@ -123,11 +123,26 @@
 				</div>
 			{:else if organizer}
 				<div class="content">
-					<p>{organizer.facebook ?? '---'}</p>
-					<p>{organizer.twitter ?? '---'}</p>
-					<p>{organizer.linkedin ?? '---'}</p>
-					<p>{organizer.instagram ?? '---'}</p>
-					<p>{organizer.youtube ?? '---'}</p>
+					<p>
+						{organizer.facebook?.substring(organizer.facebook.lastIndexOf('/') + 1) ??
+							'---'}
+					</p>
+					<p>
+						{organizer.twitter?.substring(organizer.twitter.lastIndexOf('/') + 1) ??
+							'---'}
+					</p>
+					<p>
+						{organizer.linkedin?.substring(organizer.linkedin.lastIndexOf('/') + 1) ??
+							'---'}
+					</p>
+					<p>
+						{organizer.instagram?.substring(organizer.instagram.lastIndexOf('/') + 1) ??
+							'---'}
+					</p>
+					<p>
+						{organizer.youtube?.substring(organizer.youtube.lastIndexOf('/') + 1) ??
+							'---'}
+					</p>
 				</div>
 			{/if}
 		</div>
