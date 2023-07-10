@@ -1,4 +1,5 @@
 import Joi from 'joi'
+import { orderSchema } from './schemas'
 
 export const createSchema = Joi.object({
 	name: Joi.string().required(),
@@ -33,5 +34,6 @@ export const updateSchema = Joi.object({
 export const filterSchema = Joi.object({
 	offset: Joi.number().min(0).default(0),
 	limit: Joi.number().min(0).default(-1),
-	search: Joi.string().optional()
+	search: Joi.string().optional(),
+	order: orderSchema(['name', 'country']).optional()
 })

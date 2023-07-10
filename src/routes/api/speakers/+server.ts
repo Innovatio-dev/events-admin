@@ -7,11 +7,12 @@ import { User } from '$lib/server/models/user'
 import { foreignKeyOf } from '$lib/server/validation/schemas'
 import { createSchema, filterSchema } from '$lib/utils/validation/speakerSchema'
 import { json, type RequestEvent } from '@sveltejs/kit'
-import sequelize, { Op } from 'sequelize'
+import sequelize, { Op, type Order } from 'sequelize'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
 	const where: any = {}
+	const order: Order = []
 	if (filter.search) {
 		const search = `%${filter.search}%`
 
@@ -24,11 +25,22 @@ export async function GET(event: RequestEvent) {
 			})
 		]
 	}
+	if (filter.order) {
+		for (const col of filter.order) {
+			const name = col.name
+			if (col.name == 'country') {
+				order.push([{ model: Country, as: 'country' }, 'name', col.type])
+			} else {
+				order.push([name, col.type])
+			}
+		}
+	}
 	const count = await Speaker.count({ where })
 	const results = await Speaker.scope('mini').findAll({
 		limit: filter.limit > 0 ? filter.limit : undefined,
 		offset: filter.offset,
-		where
+		where,
+		order
 	})
 
 	return json({ count, results })
