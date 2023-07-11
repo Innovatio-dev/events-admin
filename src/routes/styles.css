@@ -63,6 +63,15 @@
 	--shadow-tooltip: 2px 2px 12px #00000062;
 	--shadow-dot: 0px 4px 4px 0px #808080;
 	--shadow-modal: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+	/* styles for date picker */
+	--date-picker-background: #00000000;
+	/* --date-picker-foreground */
+	/* --date-picker-background
+--date-picker-highlight-border
+--date-picker-highlight-shadow
+--date-picker-selected-color
+--date-picker-selected-background */
 }
 
 * {
