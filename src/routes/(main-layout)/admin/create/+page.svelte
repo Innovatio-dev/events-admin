@@ -1,4 +1,6 @@
 <script>
+	import { page } from '$app/stores'
+	import { goto } from '$app/navigation'
 	// Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
@@ -25,7 +27,21 @@
 	}
 
 	async function handleSubmit() {
-		console.log(admin)
+		try {
+			const res = await fetch(`${$page.url.origin}/api/admins`, {
+				method: 'POST',
+				body: JSON.stringify({ ...admin })
+			})
+
+			if (res.ok) {
+				await res.json()
+				goto('/admin')
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
+		}
 	}
 </script>
 
