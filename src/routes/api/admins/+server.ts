@@ -1,10 +1,36 @@
 import { CognitoFacade } from '$lib/server/facades/CognitoFacade'
-import { validateBody } from '$lib/server/middlewares/validator'
+import { validateBody, validateSearchParam } from '$lib/server/middlewares/validator'
 import { User } from '$lib/server/models/user'
 import { createSuperAdminSchema } from '$lib/utils/validation/schemas'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { error } from '@sveltejs/kit'
 import { checkUser } from '$lib/server/middlewares/permission'
+import { filterSchema } from '$lib/utils/validation/eventSchema'
+import { HttpResponses } from '$lib/server/constants/httpResponses'
+
+/**
+ *
+ * @param event
+ * @returns Admin User List
+ */
+export async function GET(event: RequestEvent) {
+	const logedUser = checkUser(event, User.SUPERADMIN)
+	const filter = validateSearchParam(event, filterSchema)
+
+	try {
+		const results = await User.scope('list').findAll({
+			limit: filter.limit >= 0 ? filter.limit : undefined,
+			offset: filter.offset
+		})
+		const count = await User.count()
+		return json({ count, results })
+	} catch (err) {
+		console.log(err)
+		throw error(HttpResponses.UNEXPECTED_ERROR, {
+			message: 'Something happend try again later'
+		})
+	}
+}
 
 /**
  *
@@ -23,7 +49,7 @@ export async function POST(event: RequestEvent) {
 			name: fields.name,
 			surname: fields.surname,
 			email: fields.email,
-			role: User.SUPERADMIN
+			role: fields.role
 		})
 		return json(user)
 	} catch (err) {
