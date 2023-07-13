@@ -3,11 +3,11 @@
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '../MainButton.svelte'
 	import ToggleButtton from '../ToggleButtton.svelte'
+	import DragAndDrop from '../DragAndDrop.svelte'
+	import UploadedImage from './UploadedImage.svelte'
 
 	// Constants
 	import { COUNTRIES, REGIONS } from '$lib/utils/constants/Regions'
-	import DragAndDrop from '../DragAndDrop.svelte'
-	import UploadedImage from './UploadedImage.svelte'
 
 	interface Organizer {
 		logo?: any

@@ -1,4 +1,8 @@
 <script lang="ts">
+	// Sveltec
+	import { page } from '$app/stores'
+
+	// Components
 	import Badge from '$lib/components/Badge.svelte'
 	import FlagBadge from '$lib/components/FlagBadge.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
@@ -8,8 +12,6 @@
 	import Dropdown from '$lib/components/Dropdown.svelte'
 	import SideBarMenu from '$lib/components/SideBarMenu.svelte'
 	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
-
-	import { page } from '$app/stores'
 
 	// Constants
 	import { FLAG_BADGES, BADGES } from '$lib/utils/constants/Showcase'

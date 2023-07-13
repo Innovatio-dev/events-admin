@@ -291,6 +291,7 @@
 	.list {
 		top: calc(100% + 12px);
 		position: absolute;
+		z-index: 1;
 		background: var(--white);
 		border: 1.3px solid #f3f1ff;
 		box-shadow: 0px 3px 12px rgba(51, 51, 51, 0.1);
@@ -299,6 +300,8 @@
 		min-width: 100px;
 		padding: calc(5 / 16 * 1em);
 		cursor: pointer;
+		max-height: 50vh;
+		overflow-y: auto;
 		.item {
 			padding: 0em 0.8em;
 			border-radius: 10px;
