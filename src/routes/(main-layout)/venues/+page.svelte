@@ -1,25 +1,17 @@
 <script lang="ts">
-	import Dropdown from '$lib/components/Dropdown.svelte'
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
 	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
 	import AiOutlinePlus from 'svelte-icons-pack/ai/AiOutlinePlus'
 	import Icon from 'svelte-icons-pack'
-	import Board from '$lib/components/icons/Board.svelte'
-	import Ticket from '$lib/components/icons/Ticket.svelte'
 	import { page } from '$app/stores'
 	import { afterNavigate, goto } from '$app/navigation'
 	import Badge from '$lib/components/Badge.svelte'
 	import type { Column } from '$lib/components/SortableTable.svelte'
 	import SortableTable from '$lib/components/SortableTable.svelte'
-	import DateViewer from '$lib/components/table_cell/DateViewer.svelte'
-	import MailViewer from '$lib/components/table_cell/MailViewer.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
-	import TypeEventViewer from '$lib/components/table_cell/TypeEventViewer.svelte'
-	import StatusViewer from '$lib/components/table_cell/StatusViewer.svelte'
 	import SeeMoreButton from '$lib/components/table_cell/SeeMoreButton.svelte'
-	import { organizerListSchema } from '$lib/utils/validation/schemas'
 	import {
 		createUrl,
 		mapArrayIntoCollection,
@@ -28,7 +20,9 @@
 	} from '$lib/utils/validation/validation'
 	import { createDebouncer } from '$lib/utils/debounce'
 	import LocationViewer from '$lib/components/table_cell/LocationViewer.svelte'
+	import { organizerListSchema } from '$lib/utils/validation/schemas'
 
+	let inputElement
 	let loading: boolean = true
 	let data: any = null
 	let error: any = null
@@ -41,6 +35,10 @@
 		search: null,
 		page: 1
 	}
+	const types = [
+		{ value: 0, title: 'Live Events', variant: 'secondary' },
+		{ value: 1, title: 'Virtual', variant: 'secondary' }
+	]
 
 	let searchDebouncer = createDebouncer(() => {
 		gotoFilter({
@@ -69,16 +67,16 @@
 		},
 		{
 			title: 'City',
-			sortable: true,
+			sortable: false,
 			dataKey: 'city'
 		},
 		{
 			title: 'G maps',
-			sortable: true,
+			sortable: false,
 			dataKey: 'address'
 		},
 		{
-			title: 'Details',
+			title: 'Action',
 			sortable: false,
 			cellComponent: SeeMoreButton,
 			minWidth: '8em',
@@ -89,6 +87,12 @@
 	afterNavigate(async () => {
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
+			if (params.typeEvent.length) {
+				params.typeEvent = mapArrayIntoCollection(params.typeEvent, 'value')
+			}
+			if (params.order.length) {
+				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
+			}
 		} catch (error) {}
 		await fetchVenues()
 	})
@@ -182,6 +186,7 @@
 				on:keypress={onSearchKeypress}
 				on:change={onSearchChange}
 				bind:value={params.search}
+				domElement={inputElement}
 			>
 				<Icon slot="trailing" src={AiOutlineSearch} color="currentColor" />
 			</Input>

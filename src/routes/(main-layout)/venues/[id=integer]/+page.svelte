@@ -3,6 +3,7 @@
 	import { page } from '$app/stores'
 	import { pageStatus } from '$lib/stores/pageStatus'
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
+	import MainButton from '$lib/components/MainButton.svelte'
 
 	let venue: any = null
 	let loading: boolean = true
@@ -86,6 +87,18 @@
 				{/each}
 			</div>
 		{/if}
+	</div>
+	<div class="flex flex-row gap-6">
+		<div class="w-fit">
+			<MainButton href={`/venue/${$page.params.id}/edit`}>
+				{'Edit'}
+			</MainButton>
+		</div>
+		<div class="w-fit">
+			<MainButton>
+				{'Remove'}
+			</MainButton>
+		</div>
 	</div>
 </div>
 
