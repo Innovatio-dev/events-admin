@@ -4,15 +4,15 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 
-	const createNewSpeaker = async (organizer) => {
-		await postSpeaker(organizer)
+	const createNewSpeaker = async (speaker) => {
+		await postSpeaker(speaker)
 	}
 
-	async function postSpeaker(organizer) {
+	async function postSpeaker(speaker) {
 		try {
-			const res = await fetch(`${$page.url.origin}/api/organizers`, {
+			const res = await fetch(`${$page.url.origin}/api/speakers`, {
 				method: 'POST',
-				body: JSON.stringify({ ...organizer })
+				body: JSON.stringify({ ...speaker })
 			})
 
 			if (res.ok) {

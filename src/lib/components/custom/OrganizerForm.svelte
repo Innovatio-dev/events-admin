@@ -147,6 +147,9 @@
 	<Input required label="Facebook:" type="text" bind:value={organizer.facebook} />
 	<Input required label="Instagram:" type="text" bind:value={organizer.instagram} />
 	<Input required label="Youtube:" type="text" bind:value={organizer.youtube} />
+	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
+		{'Organizer photo'}
+	</span>
 	{#if addOrganizer}
 		<UploadedImage image={addOrganizer.logo.url} />
 	{:else}
@@ -162,7 +165,7 @@
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Description:'}
 		</span>
-		<textarea bind:value={organizer.description} />
+		<textarea class="min-h-[150px]" bind:value={organizer.description} />
 	</label>
 	<div class="flex gap-10">
 		<MainButton>Submit</MainButton>
@@ -173,6 +176,7 @@
 <style lang="scss">
 	textarea,
 	select {
+		font-size: 0.9rem;
 		border-radius: 10px;
 		padding: 0.7rem calc(0.6rem * 20 / 12);
 		border: 2px solid var(--input-outline);
@@ -194,7 +198,6 @@
 	textarea,
 	select::placeholder {
 		color: var(--input-placeholder);
-		font-size: 0.8rem;
 	}
 	textarea,
 	select:active {

@@ -3,29 +3,36 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { pageStatus } from '$lib/stores/pageStatus'
+	import { goto } from '$app/navigation'
 	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import ProfilePic from '$lib/components/ProfilePic.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
-    // Icon
+	// Icon
 	import Icon from 'svelte-icons-pack/Icon.svelte'
-    import BiEditAlt from "svelte-icons-pack/bi/BiEditAlt";
-    import BsTrash3 from "svelte-icons-pack/bs/BsTrash3";
-
+	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
+	import BsTrash3 from 'svelte-icons-pack/bs/BsTrash3'
 
 	let speaker: any = null
 	let loading: boolean = true
 	onMount(async () => {
 		let id = $page.params.id
-		$pageStatus.title = 'Speakers Details'
+		$pageStatus.title = 'Speaker Details'
 		await fetchSpeaker(id)
 	})
 
 	async function fetchSpeaker(id) {
 		loading = true
-		let response = await fetch(`/api/speakers/${id}`)
-		if (response.ok) {
-			speaker = await response.json()
+		try {
+			const res = await fetch(`/api/speakers/${id}`)
+			if (res.ok) {
+				speaker = await res.json()
+				console.log(speaker)
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
 		}
 		loading = false
 	}
@@ -67,8 +74,8 @@
 	<div class="w-[10rem] h-[10rem]">
 		<ProfilePic img={speaker?.picture.url} />
 	</div>
-	<div class='flex gap-10'>
-		<MainButton>
+	<div class="flex gap-10 mb-10">
+		<MainButton on:click={() => goto(`${$page.url}/edit`)}>
 			<div class="flex gap-3 items-center">
 				<Icon size="20" src={BiEditAlt} color="gray" />
 				{'Edit'}

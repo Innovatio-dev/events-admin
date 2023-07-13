@@ -1,4 +1,6 @@
 <script lang="ts">
+	// Svelte
+	import { goto } from '$app/navigation'
 	// Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '../MainButton.svelte'
@@ -10,7 +12,7 @@
 	import { COUNTRIES } from '$lib/utils/constants/Regions'
 
 	interface Speaker {
-		logo?: any
+		picture?: any
 		name: string
 		company: string
 		country: any
@@ -30,7 +32,7 @@
 	let speaker: Speaker = {
 		name: '',
 		company: '',
-		country: {},
+		country: '',
 		twitter: '',
 		facebook: '',
 		instagram: '',
@@ -42,7 +44,7 @@
 	if (addSpeaker) {
 		speaker.name = addSpeaker.name
 		speaker.company = addSpeaker.company
-		speaker.country = addSpeaker.country
+		speaker.country = addSpeaker.country.nicename
 		speaker.twitter = addSpeaker.twitter
 		speaker.facebook = addSpeaker.facebook
 		speaker.instagram = addSpeaker.instagram
@@ -51,14 +53,18 @@
 	}
 
 	export function handleSubmit() {
-		const socialsUris = {
+		const formattedData = {
 			twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
 			facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
 			instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
 			linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
-			youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_')
+			youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
+			country: [speaker.country]
 		}
-		submitAction({ ...speaker, ...socialsUris })
+		submitAction({ ...speaker, ...formattedData })
+	}
+	const onCancel = () => {
+		goto('/speakers')
 	}
 </script>
 
@@ -68,16 +74,15 @@
 		{'Country'}
 	</span>
 	<Dropdown
+		selected={addSpeaker
+			? { value: speaker.country, title: speaker.country }
+			: { value: '', title: 'Select a country' }}
 		width="100%"
 		bind:value={speaker.country}
 		items={COUNTRIES.map((country) => {
 			return { value: country.country, title: country.country }
 		})}
-	>
-		<span slot="title">
-			{'Select a country'}
-		</span>
-	</Dropdown>
+	/>
 	<Input label="Speaker company:" type="text" bind:value={speaker.company} />
 	<Input label="Rol / Position" type="text" bind:value={speaker.company} />
 	<label class="flex flex-col w-full gap-2">
@@ -103,7 +108,7 @@
 			</h2>
 		</div>
 		{#if addSpeaker}
-			<UploadedImage image={addSpeaker.logo.url} />
+			<UploadedImage image={addSpeaker.picture.url} />
 		{:else}
 			<DragAndDrop
 				url="/api/resources"
@@ -116,12 +121,13 @@
 	</div>
 	<div class="flex gap-10">
 		<MainButton>Save</MainButton>
-		<MainButton>cancel</MainButton>
+		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>
 
 <style lang="scss">
 	textarea {
+		font-size: 0.9rem;
 		border-radius: 10px;
 		padding: 0.7rem calc(0.6rem * 20 / 12);
 		border: 2px solid var(--input-outline);
