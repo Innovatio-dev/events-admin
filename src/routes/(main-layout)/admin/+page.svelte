@@ -13,8 +13,13 @@
 	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 	import Input from '$lib/components/Input.svelte'
 	import { createDebouncer } from '$lib/utils/debounce'
-	import { createUrl } from '$lib/utils/validation/validation'
-	import { goto } from '$app/navigation'
+	import {
+		createUrl,
+		mapArrayIntoCollectionOrder,
+		validateUrlSearchParams
+	} from '$lib/utils/validation/validation'
+	import { afterNavigate, goto } from '$app/navigation'
+	import { organizerListSchema } from '$lib/utils/validation/schemas'
 
 	let data: any = null
 	let loading = false
@@ -29,15 +34,35 @@
 		page: 1
 	}
 
-	onMount(() => {
-		getAdmins()
+	afterNavigate(async () => {
+		try {
+			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
+			// if (params.status.length) {
+			// 	params.status = mapArrayIntoCollection(params.status, statuses, 'value')
+			// }
+			// if (params.typeEvent.length) {
+			// 	params.typeEvent = mapArrayIntoCollection(params.typeEvent, types, 'value')
+			// }
+			if (params.order.length) {
+				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
+			}
+		} catch (error) {}
+		await getAdmins()
 	})
 
 	async function getAdmins() {
 		try {
 			loading = true
 			error = false
-			const res = await fetch(`${$page.url.origin}/api/admins`)
+			const url = new URL('/api/admins', window.location.origin)
+			const cUrl = createUrl(url, {
+				search: params.search,
+				order: params.order.map(
+					(sortedCol) =>
+						`${sortedCol.type == 'asc' ? '' : '-'}${sortedCol.column.dataKey}`
+				)
+			})
+			const res = await fetch(cUrl)
 			if (res.ok) {
 				data = await res.json()
 			}
