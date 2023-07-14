@@ -61,7 +61,7 @@
 			facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
 			instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
 			linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
-			youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
+			youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_')
 		}
 		submitAction({ ...speaker, ...formattedData })
 		goto('/speakers')
@@ -77,7 +77,10 @@
 		{'Country'}
 	</span>
 	<Dropdown
-		selected={{ value: speaker.countryId, title: countries[speaker.countryId]?.nicename ?? '' }}
+		selected={{
+			value: speaker.countryId,
+			title: countries[speaker.countryId]?.nicename ?? 'Choose the country speaker'
+		}}
 		width="100%"
 		bind:value={speaker.countryId}
 		items={countries.map((country) => {
@@ -109,7 +112,7 @@
 			</h2>
 		</div>
 		{#if addSpeaker}
-			<UploadedImage image={addSpeaker.picture.url} />
+			<UploadedImage image={addSpeaker.picture?.url ?? ''} />
 		{:else}
 			<DragAndDrop
 				url="/api/resources"

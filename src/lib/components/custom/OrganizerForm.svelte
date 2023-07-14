@@ -7,7 +7,7 @@
 	import UploadedImage from './UploadedImage.svelte'
 
 	// Constants
-	import { COUNTRIES, REGIONS } from '$lib/utils/constants/Regions'
+	import { countries, REGIONS } from '$lib/utils/constants/Regions'
 
 	interface Organizer {
 		logo?: any
@@ -111,9 +111,9 @@
 	<Input required label="Organizer company name:" type="text" bind:value={organizer.company} />
 	<div class="flex items-end gap-5">
 		<select class="max-w-[6rem]" name="" id="">
-			{#each COUNTRIES as country}
-				<option value={country.code}>
-					{'+'}{country.code}
+			{#each countries as country}
+				<option value={country.phonecode}>
+					{'+'}{country.phonecode}
 				</option>
 			{/each}
 		</select>

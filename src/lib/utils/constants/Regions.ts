@@ -1794,7 +1794,7 @@ export const countries = [
 		id: 200,
 		iso: 'LK',
 		name: 'SRI LANKA',
-		icename: 'Srin Lanka',
+		nicename: 'Srin Lanka',
 		iso3: 'LKA',
 		numcode: 144,
 		phonecode: 94
