@@ -3,5 +3,5 @@
 </script>
 
 <div class="w-full overflow-hidden text-ellipsis text-center underline">
-	<a target="_blank" href={`${value.url}`}>Photo</a>
+	<a target="_blank" href={`${value?.url}`}>Photo</a>
 </div>

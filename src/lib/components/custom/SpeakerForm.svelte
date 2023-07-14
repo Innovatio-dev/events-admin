@@ -9,13 +9,14 @@
 	import Dropdown from '../Dropdown.svelte'
 
 	// Constants
-	import { COUNTRIES } from '$lib/utils/constants/Regions'
+	import { countries } from '$lib/utils/constants/Regions'
 
 	interface Speaker {
 		picture?: any
 		name: string
 		company: string
-		country: any
+		jobRole: string
+		countryId: any
 		twitter: string
 		facebook: string
 		instagram: string
@@ -32,7 +33,8 @@
 	let speaker: Speaker = {
 		name: '',
 		company: '',
-		country: '',
+		jobRole: '',
+		countryId: '',
 		twitter: '',
 		facebook: '',
 		instagram: '',
@@ -44,7 +46,8 @@
 	if (addSpeaker) {
 		speaker.name = addSpeaker.name
 		speaker.company = addSpeaker.company
-		speaker.country = addSpeaker.country.nicename
+		speaker.jobRole = addSpeaker.jobRole
+		speaker.countryId = addSpeaker.countryId
 		speaker.twitter = addSpeaker.twitter
 		speaker.facebook = addSpeaker.facebook
 		speaker.instagram = addSpeaker.instagram
@@ -59,9 +62,9 @@
 			instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
 			linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
 			youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
-			country: [speaker.country]
 		}
 		submitAction({ ...speaker, ...formattedData })
+		goto('/speakers')
 	}
 	const onCancel = () => {
 		goto('/speakers')
@@ -74,17 +77,15 @@
 		{'Country'}
 	</span>
 	<Dropdown
-		selected={addSpeaker
-			? { value: speaker.country, title: speaker.country }
-			: { value: '', title: 'Select a country' }}
+		selected={{ value: speaker.countryId, title: countries[speaker.countryId]?.nicename ?? '' }}
 		width="100%"
-		bind:value={speaker.country}
-		items={COUNTRIES.map((country) => {
-			return { value: country.country, title: country.country }
+		bind:value={speaker.countryId}
+		items={countries.map((country) => {
+			return { value: country.id, title: country.nicename ?? '' }
 		})}
 	/>
 	<Input label="Speaker company:" type="text" bind:value={speaker.company} />
-	<Input label="Rol / Position" type="text" bind:value={speaker.company} />
+	<Input label="Rol / Position" type="text" bind:value={speaker.jobRole} />
 	<label class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Description:'}

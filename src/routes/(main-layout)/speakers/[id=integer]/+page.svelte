@@ -12,6 +12,8 @@
 	import Icon from 'svelte-icons-pack/Icon.svelte'
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
 	import BsTrash3 from 'svelte-icons-pack/bs/BsTrash3'
+	// Constants
+	import { countries } from '$lib/utils/constants/Regions'
 
 	let speaker: any = null
 	let loading: boolean = true
@@ -59,7 +61,7 @@
 		{:else if speaker}
 			<div class="content">
 				<p>{speaker.name ?? '-'}</p>
-				<p>{speaker.country.nicename ?? '-'}</p>
+				<p>{countries[speaker.countryId]?.nicename ?? '-'}</p>
 				<p>{speaker.company ?? '-'}</p>
 				<p>{speaker.jobRole ?? '-'}</p>
 				<p>{speaker.twitter ?? '-'}</p>
@@ -72,7 +74,7 @@
 		{/if}
 	</div>
 	<div class="w-[10rem] h-[10rem]">
-		<ProfilePic img={speaker?.picture.url} />
+		<ProfilePic img={speaker?.picture?.url} />
 	</div>
 	<div class="flex gap-10 mb-10">
 		<MainButton on:click={() => goto(`${$page.url}/edit`)}>

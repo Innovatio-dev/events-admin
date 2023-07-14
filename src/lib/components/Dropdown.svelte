@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
 	export interface IDropDownItem {
 		value: string | number
-		title: string
+		title: string 
 		subtitle?: string
 		image?: string
 	}
