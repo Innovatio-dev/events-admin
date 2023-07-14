@@ -11,7 +11,8 @@ export const filterSchema = Joi.object({
 	dateMin: Joi.date().optional(),
 	dateMax: Joi.date().optional(),
 	order: Joi.string().optional(),
-	organizerId: Joi.number()
+	organizerId: Joi.number(),
+	search: Joi.string().optional()
 })
 
 export const createSchema = Joi.object({

@@ -7,6 +7,7 @@ import { error } from '@sveltejs/kit'
 import { checkUser } from '$lib/server/middlewares/permission'
 import { filterSchema } from '$lib/utils/validation/eventSchema'
 import { HttpResponses } from '$lib/server/constants/httpResponses'
+import sequelize from 'sequelize'
 
 /**
  *
@@ -16,9 +17,23 @@ import { HttpResponses } from '$lib/server/constants/httpResponses'
 export async function GET(event: RequestEvent) {
 	const logedUser = checkUser(event, User.SUPERADMIN)
 	const filter = validateSearchParam(event, filterSchema)
+	let where: any = {}
+
+	if (filter.search) {
+		// const search = `%${filter.search}%`
+		const search = `${filter.search}`
+		where = {
+			[sequelize.Op.or]: [
+				{ name: { [sequelize.Op.iLike]: `%${search}%` } },
+				{ surname: { [sequelize.Op.iLike]: `%${search}%` } },
+				{ email: { [sequelize.Op.iLike]: `%${search}%` } }
+			]
+		}
+	}
 
 	try {
 		const results = await User.scope('list').findAll({
+			where,
 			limit: filter.limit >= 0 ? filter.limit : undefined,
 			offset: filter.offset
 		})
