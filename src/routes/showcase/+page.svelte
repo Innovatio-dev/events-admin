@@ -1,25 +1,15 @@
 <script lang="ts">
-	// Sveltec
+	// Svelte
 	import { page } from '$app/stores'
-
+	import { onMount } from 'svelte'
 	// Components
 	import Badge from '$lib/components/Badge.svelte'
 	import FlagBadge from '$lib/components/FlagBadge.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
 	import SecondaryButton from '$lib/components/SecondaryButton.svelte'
-	import AiOutlineUser from 'svelte-icons-pack/ai/AiOutlineUser'
-	import FaBrandsXbox from 'svelte-icons-pack/fa/FaBrandsXbox'
 	import Dropdown from '$lib/components/Dropdown.svelte'
 	import SideBarMenu from '$lib/components/SideBarMenu.svelte'
 	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
-
-	// Constants
-	import { FLAG_BADGES, BADGES } from '$lib/utils/constants/Showcase'
-	// Icons
-	import Icon from 'svelte-icons-pack/Icon.svelte'
-	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
-	import Input from '$lib/components/Input.svelte'
-	import { passwordSchema } from '$lib/utils/validation/schemas'
 	import ToggleButtton from '$lib/components/ToggleButtton.svelte'
 	import DragAndDrop from '$lib/components/DragAndDrop.svelte'
 	import BreadCrumb from '$lib/components/BreadCrumb.svelte'
@@ -31,8 +21,16 @@
 	import Bank from '$lib/components/icons/Bank.svelte'
 	import Checklist from '$lib/components/icons/Checklist.svelte'
 	import Add from '$lib/components/icons/Add.svelte'
-
-	import { onMount } from 'svelte'
+	// Constants
+	import { FLAG_BADGES, BADGES } from '$lib/utils/constants/Showcase'
+	// Icons
+	import Icon from 'svelte-icons-pack/Icon.svelte'
+	import AiOutlineUser from 'svelte-icons-pack/ai/AiOutlineUser'
+	import FaBrandsXbox from 'svelte-icons-pack/fa/FaBrandsXbox'
+	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
+	import Input from '$lib/components/Input.svelte'
+	// Utils
+	import { passwordSchema } from '$lib/utils/validation/schemas'
 
 	// Modal
 	let isOpen = false

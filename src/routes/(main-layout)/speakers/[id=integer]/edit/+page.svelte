@@ -5,16 +5,12 @@
 	// Components
 	import SpeakerForm from '$lib/components/custom/SpeakerForm.svelte'
 	import ProfileHeader from '$lib/components/custom/ProfileHeader.svelte'
+	// Animations
 	import { Circle3 } from 'svelte-loading-spinners'
 
 	let speaker: any = null
 	let loading: boolean = true
-
-	onMount(async () => {
-		let id = $page.params.id
-		await fetchSpeaker(id)
-	})
-
+	
 	async function fetchSpeaker(id) {
 		loading = true
 		try {
@@ -30,6 +26,12 @@
 		}
 		loading = false
 	}
+
+	onMount(async () => {
+		let id = $page.params.id
+		await fetchSpeaker(id)
+	})
+
 </script>
 
 <section class="w-full">
