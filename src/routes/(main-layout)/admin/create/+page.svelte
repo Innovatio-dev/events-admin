@@ -10,6 +10,9 @@
 	import Icon from 'svelte-icons-pack'
 	import BiRevision from 'svelte-icons-pack/bi/BiRevision'
 
+	let isLoading = false
+	let isError = false
+
 	let admin = {
 		name: '',
 		surname: '',
@@ -28,6 +31,8 @@
 
 	async function handleSubmit() {
 		try {
+			isLoading = true
+			isError = false
 			const res = await fetch(`${$page.url.origin}/api/admins`, {
 				method: 'POST',
 				body: JSON.stringify({ ...admin })
@@ -38,9 +43,13 @@
 				goto('/admin')
 			} else {
 				console.log(await res.json())
+				isError = true
 			}
 		} catch (error) {
 			console.error('Error:', error)
+			isError = true
+		} finally {
+			isLoading = false
 		}
 	}
 </script>
@@ -50,14 +59,27 @@
 		on:submit|preventDefault={handleSubmit}
 		class="w-full max-w-2xl flex flex-col gap-8 mx-auto"
 	>
-		<Input label="Name" type="text" bind:value={admin.name} placeholder="Type the name" />
+		<Input
+			label="Name"
+			type="text"
+			bind:value={admin.name}
+			placeholder="Type the name"
+			required
+		/>
 		<Input
 			label="Surname"
 			type="text"
 			bind:value={admin.surname}
 			placeholder="Type the surname"
+			required
 		/>
-		<Input label="Email" type="text" bind:value={admin.email} placeholder="Type the email" />
+		<Input
+			label="Email"
+			type="text"
+			bind:value={admin.email}
+			placeholder="Type the email"
+			required
+		/>
 		<div class="w-full flex justify-between items-center">
 			<p>Generate a new random password</p>
 			<div class="w-40">
@@ -72,6 +94,7 @@
 			type="password"
 			bind:value={admin.password}
 			placeholder="***********"
+			required
 		/>
 		{#if suggestedPassword !== ''}
 			<div class="w-full flex justify-between items-center text-primary-purple font-dm">
@@ -93,9 +116,15 @@
 			</div>
 		</div>
 
-		<div class="w-full flex items-center gap-8">
-			<SecondaryButton>Create</SecondaryButton>
-			<MainButton>Cancel</MainButton>
+		{#if isError}
+			<p class="bg-alert-error text-sm font-medium text-white font-dm rounded-lg py-2 px-4">
+				An error has occurred, please try again.
+			</p>
+		{/if}
+
+		<div class="w-full grid grid-cols-2 gap-8">
+			<SecondaryButton loading={isLoading}>Create</SecondaryButton>
+			<MainButton href="/admin">Cancel</MainButton>
 		</div>
 	</form>
 </section>
