@@ -2,6 +2,7 @@
 	import DatePicker from '$lib/components/DatePicker.svelte'
 	import DragAndDrop from '$lib/components/DragAndDrop.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
+	import DropdownFetcher from '$lib/components/DropdownFetcher.svelte'
 	import Input from '$lib/components/Input.svelte'
 	import LabelInput from '$lib/components/LabelInput.svelte'
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
@@ -44,6 +45,8 @@
 		endTime: null,
 		visibleAt: null
 	}
+
+	let mainSpeaker: any = null
 
 	onMount(() => {
 		$pageStatus.title = 'Create an Event'
@@ -107,7 +110,7 @@
 			</div>
 		</div>
 		{#if event.typeEvent !== null}
-			<div>
+			<div class="input-set">
 				<SectionHeader>Event Information</SectionHeader>
 				<div>
 					<LabelInput>Event title</LabelInput>
@@ -143,11 +146,30 @@
 					body="600x500"
 				/>
 			</div>
-			<div>
+			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
 				<div>
 					<LabelInput>Date starts</LabelInput>
-					<DatePicker />
+					<DatePicker placeholder="Choose the start date" />
+				</div>
+				<div>
+					<LabelInput>Date ends</LabelInput>
+					<DatePicker placeholder="Choose the end date" />
+				</div>
+			</div>
+			<div class="input-set">
+				<SectionHeader>Speakers</SectionHeader>
+				<div>
+					<LabelInput>Primary Speaker</LabelInput>
+					<DropdownFetcher
+						filterPlaceholder={'Search'}
+						bind:selected={mainSpeaker}
+						placeholder={'Select the main speaker'}
+						searchField={'search'}
+						valueField={'id'}
+						titleField={'name'}
+						url={'/api/speakers'}
+					/>
 				</div>
 			</div>
 		{/if}
@@ -163,6 +185,11 @@
 			width: 100%;
 			max-width: 720px;
 			padding: 1em;
+			display: flex;
+			flex-flow: column;
+			gap: 1em;
+		}
+		.input-set {
 			display: flex;
 			flex-flow: column;
 			gap: 1em;

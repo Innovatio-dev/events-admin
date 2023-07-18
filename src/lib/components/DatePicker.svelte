@@ -1,75 +1,87 @@
 <script lang="ts">
-	import { DatePicker, localeFromDateFnsLocale } from 'date-picker-svelte'
-	import { hy } from 'date-fns/locale'
 	import Input from './Input.svelte'
 	import Icon from 'svelte-icons-pack'
 	import AiOutlineCalendar from 'svelte-icons-pack/ai/AiOutlineCalendar'
-	import AiOutlineFieldTime from 'svelte-icons-pack/ai/AiOutlineFieldTime'
+	import SveltyPicker from 'svelty-picker'
 
 	import Popup from './Popup.svelte'
 	import MainButton from './MainButton.svelte'
-	let date = new Date()
-	let locale = localeFromDateFnsLocale(hy)
+
+	export let placeholder: string = ''
+	export let value: Date | null = null
+	function formatDateToCustomString(date) {
+		// Obtiene los componentes de la fecha
+		const year = date.getFullYear()
+		const month = String(date.getMonth() + 1).padStart(2, '0')
+		const day = String(date.getDate()).padStart(2, '0')
+		const hours = String(date.getHours()).padStart(2, '0')
+		const minutes = String(date.getMinutes()).padStart(2, '0')
+
+		// Crea la cadena de formato personalizado "yyyy-mm-dd hh:ii"
+		const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`
+
+		return formattedDate
+	}
+	function parseDateStringToDate(dateString) {
+		const [datePart, timePart] = dateString.split(' ')
+		const [year, month, day] = datePart.split('-')
+		const [hours, minutes] = timePart.split(':')
+
+		// Ten en cuenta que el mes en JavaScript comienza en 0 (enero es 0, febrero es 1, etc.)
+		const date = new Date(year, month - 1, day, hours, minutes)
+		return date
+	}
+	let date: string | null = null
+	$: {
+		date = value ? formatDateToCustomString(value) : ''
+	}
 	let inputRef: HTMLElement
 	let popupRef: Popup
-	let currentStep = 0
-	let currentDate: Date = new Date()
-	let currentTime = {
-		hours: 0,
-		minutes: 0,
-		am: true
+	function handleDateChange(ev) {
+		date = ev.detail
 	}
-	let formattedDate: string = ''
 	function handleFocus(ev) {
 		popupRef.show()
 	}
-	$: {
-		formattedDate = new Intl.DateTimeFormat('en-US', {
-			day: '2-digit',
-			month: 'short'
-		}).format(currentDate)
+
+	function handleSave() {
+		if (date) {
+			value = parseDateStringToDate(date)
+		} else {
+			value = null
+		}
+		popupRef.hide()
 	}
 </script>
 
-<Input bind:domElement={inputRef} placeholder="date here" on:focus={handleFocus}>
+<Input
+	bind:domElement={inputRef}
+	bind:placeholder
+	on:focus={handleFocus}
+	value={value ? formatDateToCustomString(value) : ''}
+	readOnly={true}
+>
 	<Icon slot="trailing" src={AiOutlineCalendar} color="currentColor" />
 </Input>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <Popup bind:this={popupRef} trigger={inputRef}>
 	<div class="date-container">
-		<div class="tabs">
-			<div class="date" on:click={() => (currentStep = 0)} class:selected={currentStep == 0}>
-				{formattedDate}
-			</div>
-			<div class="time">
-				<span on:click={() => (currentStep = 1)} class:selected={currentStep == 1}>
-					{currentTime.hours.toString().padStart(2, '0')}
-				</span>
-				<span>:</span>
-				<span on:click={() => (currentStep = 2)} class:selected={currentStep == 2}>
-					{currentTime.minutes.toString().padStart(2, '0')}
-				</span>
-				<span class="meridian">
-					<div on:click={() => (currentTime.am = true)} class:selected={currentTime.am}>
-						AM
-					</div>
-					<div on:click={() => (currentTime.am = false)} class:selected={!currentTime.am}>
-						PM
-					</div>
-				</span>
-			</div>
+		<div class="header">
+			{date ? date : 'Date is empty'}
 		</div>
-		<div class="tab-content">
-			{#if currentStep == 0}
-				<DatePicker bind:value={currentDate} on:select={(ev) => (currentStep = 1)} />
-			{:else if currentStep > 0}
-				<div class="clock" />
-			{/if}
+		<div class="body">
+			<SveltyPicker
+				pickerOnly={true}
+				inputClasses="form-control"
+				format="yyyy-mm-dd hh:ii"
+				value={date}
+				on:change={handleDateChange}
+			/>
 		</div>
 		<div class="actions">
-			<MainButton>Cancel</MainButton>
-			<MainButton>Ok</MainButton>
+			<MainButton on:click={() => popupRef.hide()}>Cancel</MainButton>
+			<MainButton on:click={handleSave}>Ok</MainButton>
 		</div>
 	</div>
 </Popup>
@@ -80,52 +92,16 @@
 		align-items: center;
 		justify-content: center;
 		flex-flow: column;
-		width: 500px;
-		height: 400px;
-		.tabs {
+		width: fit-content;
+		height: fit-content;
+		background: #fff;
+		.header {
+			padding: 1em;
 			width: 100%;
-			background-color: var(--accent);
-			color: #ffffffbf;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			gap: 1rem;
-			padding: 0.6em;
-			font-size: 1em;
-			.selected {
-				color: #fff;
-			}
-			.date {
-				font-size: 3em;
-				cursor: pointer;
-				transition: color 0.3s ease-in-out;
-			}
-			.time {
-				display: flex;
-				gap: 0.2em;
-				font-size: 3em;
-				> span {
-					display: flex;
-					align-items: center;
-					justify-content: center;
-					cursor: pointer;
-
-					transition: color 0.3s ease-in-out;
-				}
-				.meridian {
-					display: flex;
-					flex-flow: column;
-					align-items: center;
-					font-size: 0.4em;
-					gap: 0.2em;
-					justify-content: center;
-					> div {
-						line-height: 0.8em;
-					}
-				}
-			}
+			background: var(--brand-pink);
+			color: #fff;
 		}
-		.tab-content {
+		.body {
 			height: 100%;
 			display: flex;
 			align-items: center;
@@ -137,11 +113,5 @@
 			gap: 0.5em;
 			padding: 0.5rem;
 		}
-	}
-	.clock {
-		width: 200px;
-		height: 200px;
-		border-radius: 50%;
-		background-color: #00000020;
 	}
 </style>
