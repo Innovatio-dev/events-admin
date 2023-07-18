@@ -80,8 +80,8 @@
 	</span>
 	<Dropdown
 		selected={{
-			value: speaker.country?.id ?? 0,
-			title: speaker.country?.nicename ?? 'Choose the country speaker'
+			value: speaker.countryId ?? 0,
+			title: countries[speaker.countryId - 1].nicename ?? 'Choose the country speaker'
 		}}
 		width="100%"
 		bind:value={speaker.countryId}
