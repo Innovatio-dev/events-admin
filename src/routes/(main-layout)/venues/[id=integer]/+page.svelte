@@ -83,10 +83,10 @@
 		{:else if venue}
 			<div class="content">
 				<p>{venue.name ?? '---'}</p>
-				<p>{venue.region.name ?? '---'}</p>
-				<p>{venue.country.name ?? '---'}</p>
+				<p>{venue.region?.name ?? '---'}</p>
+				<p>{venue.country?.name ?? '---'}</p>
 				<p>{venue.city ?? '---'}</p>
-				<p>{venue.addres ?? '---'}</p>
+				<p>{venue.address ?? '---'}</p>
 				<a href={gMapsLink(venue.location.lat, venue.location.lng)} target="_blank">
 					<p>Abrir mapa</p>
 				</a>
@@ -104,7 +104,11 @@
 			</div>
 		{:else if venue}
 			<div class="min-w-[280px] min-h-[160px] flex">
-				<img src={venue.pictures[0].url} alt={venue.pictures[0].name} class="rounded-lg" />
+				<img
+					src={venue.pictures[0]?.url ?? ''}
+					alt={venue.pictures[0]?.name ?? ''}
+					class="rounded-lg"
+				/>
 			</div>
 		{/if}
 	</div>

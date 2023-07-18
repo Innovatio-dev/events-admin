@@ -7,8 +7,8 @@
 	import DragAndDrop from '../DragAndDrop.svelte'
 	import UploadedImage from './UploadedImage.svelte'
 	import Icon from 'svelte-icons-pack/Icon.svelte'
+	import LocationInput from './LocationInput.svelte'
 	// Constants
-	import { countries } from '$lib/utils/constants/Regions'
 	import ToggleButtton from '../ToggleButtton.svelte'
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
@@ -18,8 +18,7 @@
 		country: string
 		city: string
 		address: string
-		location: string
-		email: string
+		location: {}
 		description: string
 		pictures?: any
 	}
@@ -34,9 +33,14 @@
 		country: '',
 		city: '',
 		address: '',
-		location: '',
-		email: '',
+		location: { lat: '', lng: '' },
 		description: ''
+	}
+	let geoData = {
+		country: '',
+		city: '',
+		address: '',
+		location: { lat: '', lng: '' }
 	}
 
 	if (addVenue) {
@@ -46,12 +50,12 @@
 		venue.city = addVenue.city
 		venue.address = addVenue.address
 		venue.location = addVenue.location
-		venue.email = addVenue.email
 		venue.description = addVenue.description
 	}
 
 	export function handleSubmit() {
-		submitAction(venue)
+		// console.log({ ...venue, ...geoData })
+		submitAction({ ...venue, ...geoData })
 		goto('/venues')
 	}
 	const onCancel = () => {
@@ -61,10 +65,16 @@
 
 <form on:submit|preventDefault={handleSubmit} class="flex min-w-[500px] flex-col w-full gap-5">
 	<Input required label="Venue name" type="text" bind:value={venue.name} />
-	<Input label="Venue country" type="text" bind:value={venue.country} />
-	<Input label="Venue city" type="text" bind:value={venue.city} />
-	<Input label="Venue address" type="text" bind:value={venue.address} />
-	<Input required label="Venue location" type="text" bind:value={venue.location} />
+	<LocationInput bind:data={geoData} />
+	<Input label="Venue country" type="text" bind:value={geoData.country} />
+	<Input label="Venue city" type="text" bind:value={geoData.city} />
+	<Input label="Venue address" type="text" bind:value={geoData.address} />
+	<Input
+		required
+		label="Venue location"
+		type="text"
+		value={`${geoData.location.lat}, ${geoData.location.lng}`}
+	/>
 	<label class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Venue Description'}
@@ -81,7 +91,7 @@
 			</h2>
 		</div>
 		{#if addVenue}
-			<UploadedImage image={addVenue?.pictures[0].url ?? ''} />
+			<UploadedImage image={addVenue.pictures[0]?.url ?? ''} />
 		{:else}
 			<DragAndDrop
 				url="/api/resources"
@@ -114,7 +124,9 @@
 			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 			body="1000x1000"
 		/>
-		<span class="w-full h-10 rounded-xl bg-alert-warning my-3 text-sm flex items-center pl-5 gap-3">
+		<span
+			class="w-full h-10 rounded-xl bg-alert-warning my-3 text-sm flex items-center pl-5 gap-3"
+		>
 			<Icon src={FiAlertOctagon} />
 			{'Remember It is mandatory to upload at least 3 photos'}
 		</span>
