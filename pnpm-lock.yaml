@@ -52,6 +52,9 @@ dependencies:
   svelte-loading-spinners:
     specifier: ^0.3.4
     version: 0.3.4
+  svelty-picker:
+    specifier: ^3.6.0
+    version: 3.6.0
   uuid:
     specifier: ^9.0.0
     version: 9.0.0
@@ -8603,6 +8606,10 @@ packages:
   /svelte@3.59.2:
     resolution: {integrity: sha512-vzSyuGr3eEoAtT/A6bmajosJZIUWySzY2CzB3w2pgPvnkUjGqlDnsNnA0PMO+mMAhuyMul6C2uuZzY6ELSkzyA==}
     engines: {node: '>= 8'}
+
+  /svelty-picker@3.6.0:
+    resolution: {integrity: sha512-XSoby5Xhe42QWXRqo4uNuIuVZKD88tde3FSU3XmVqFvVPJVhNWC/OIYZjrFFwXupkyb6RpufZMWdQ87zkNntEA==}
+    dev: false
 
   /table@6.8.1:
     resolution: {integrity: sha512-Y4X9zqrCftUhMeH2EptSSERdVKt/nEdijTOacGD/97EKjhQ/Qs8RTlEGABSJNNN8lac9kheH+af7yAkEWlgneA==}

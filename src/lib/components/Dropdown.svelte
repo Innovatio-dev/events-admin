@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
 	export interface IDropDownItem {
 		value: string | number
-		title: string 
+		title: string
 		subtitle?: string
 		image?: string
 	}
@@ -20,11 +20,14 @@
 	import Input from './Input.svelte'
 	import Search from './icons/Search.svelte'
 	import { createEventDispatcher, tick } from 'svelte'
+	import { Circle3 } from 'svelte-loading-spinners'
 
 	export let items: IDropDownItem[] = []
 	export let selected: IDropDownItem[] | IDropDownItem | null = null
 	export let multiselect: boolean = false
 	export let filterable: boolean = false
+	export let manualFilter: boolean = false
+	export let loading: boolean = false
 	export let filterPlaceholder: string = 'Filter'
 	export let width: string = 'fit-content'
 	export let name: string = ''
@@ -73,7 +76,7 @@
 	}
 	// Filter the internal items when the filter is changed
 	$: {
-		if (filter.length > 0) {
+		if (filter.length > 0 && !manualFilter) {
 			internalItems = internalItems.map((internalItem) => ({
 				...internalItem,
 				filtered: !internalItem.item.title.toLowerCase().includes(filter.toLowerCase())
@@ -134,6 +137,10 @@
 			opened = false
 		}
 	}
+
+	function handleFilterChange(event) {
+		eventDispatcher('filterChange', filter)
+	}
 </script>
 
 <svelte:window on:click={handleClickOutside} />
@@ -172,6 +179,7 @@
 				<Input
 					bind:this={filterRef}
 					bind:value={filter}
+					on:change={handleFilterChange}
 					placeholder={filterPlaceholder}
 					type="text"
 				>
@@ -179,24 +187,38 @@
 				</Input>
 				<div class="w-full h-[1px] bg-neutral-1d mt-2 mb-2" />
 			{/if}
-			{#each internalItems as internalItem, index}
-				{#if !internalItem.filtered}
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<div class="item" on:click={() => handleClickItem(index)}>
-						<div class="text">{internalItem.item.title}</div>
-						{#if internalItem.item.image}
-							<div class="image">
-								<img alt={internalItem.item.title} src={internalItem.item.image} />
-							</div>
-						{/if}
-						<div class="check">
-							{#if internalItem.selected}
-								<Check />
+			{#if loading}
+				<div class="loader">
+					<Circle3
+						ballBottomLeft={'#14dcff'}
+						ballBottomRight={'#fd369d'}
+						ballTopRight={'#8863e08f'}
+						ballTopLeft={'#ffa5d3'}
+					/>
+				</div>
+			{:else}
+				{#each internalItems as internalItem, index}
+					{#if !internalItem.filtered}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
+						<div class="item" on:click={() => handleClickItem(index)}>
+							<div class="text">{internalItem.item.title}</div>
+							{#if internalItem.item.image}
+								<div class="image">
+									<img
+										alt={internalItem.item.title}
+										src={internalItem.item.image}
+									/>
+								</div>
 							{/if}
+							<div class="check">
+								{#if internalItem.selected}
+									<Check />
+								{/if}
+							</div>
 						</div>
-					</div>
-				{/if}
-			{/each}
+					{/if}
+				{/each}
+			{/if}
 		</div>
 	{/if}
 </div>
@@ -302,6 +324,13 @@
 		cursor: pointer;
 		max-height: 50vh;
 		overflow-y: auto;
+
+		.loader {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: 100px;
+		}
 		.item {
 			padding: 0em 0.8em;
 			border-radius: 10px;
