@@ -14,21 +14,24 @@
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
 
 	interface Venue {
+		id: number
 		name: string
 		country: string
 		city: string
 		address: string
-		location: {}
+		location: { lat: string; lng: string }
 		description: string
-		pictures?: any
+		pictures?: string[]
 	}
 
 	// Props
-	export let addVenue: Venue | null = null
+	export let addVenue: any = null
+	export let updateAction: any = null
 	export let submitAction = (venue) => {}
 
 	// State
 	let venue: Venue = {
+		id: 0,
 		name: '',
 		country: '',
 		city: '',
@@ -42,35 +45,51 @@
 		address: '',
 		location: { lat: '', lng: '' }
 	}
+	let updatedVenue = {}
 
 	if (addVenue) {
+		venue.id = addVenue.id
 		venue.name = addVenue.name
-		venue.country = addVenue.country
+		geoData.country = addVenue.country.nicename
 		venue.name = addVenue.name
-		venue.city = addVenue.city
-		venue.address = addVenue.address
-		venue.location = addVenue.location
+		geoData.city = addVenue.city
+		geoData.address = addVenue.address
+		geoData.location.lng = addVenue.location.lng
+		geoData.location.lat = addVenue.location.lat
 		venue.description = addVenue.description
 	}
 
 	export function handleSubmit() {
-		// console.log({ ...venue, ...geoData })
-		submitAction({ ...venue, ...geoData })
+		if (updateAction) {
+			updateAction(venue.id, updatedVenue)
+		} else {
+			submitAction({ ...venue, ...geoData })
+		}
 		goto('/venues')
 	}
+
+	const updateVenue = (e) => {
+		updatedVenue[e.target.name] = e.target.value
+	}
+
 	const onCancel = () => {
 		goto('/venues')
 	}
 </script>
 
-<form on:submit|preventDefault={handleSubmit} class="flex min-w-[500px] flex-col w-full gap-5">
-	<Input required label="Venue name" type="text" bind:value={venue.name} />
+<form
+	on:change={updateVenue}
+	on:submit|preventDefault={handleSubmit}
+	class="flex min-w-[500px] flex-col w-full gap-5"
+>
+	<Input required label="Venue name" type="text" name="name" bind:value={venue.name} />
 	<LocationInput bind:data={geoData} />
-	<Input label="Venue country" type="text" bind:value={geoData.country} />
-	<Input label="Venue city" type="text" bind:value={geoData.city} />
-	<Input label="Venue address" type="text" bind:value={geoData.address} />
+	<Input label="Venue country" type="text" name="country" bind:value={geoData.country} />
+	<Input label="Venue city" type="text" name="city" bind:value={geoData.city} />
+	<Input label="Venue address" type="text" name="address" bind:value={geoData.address} />
 	<Input
 		required
+		disabled
 		label="Venue location"
 		type="text"
 		value={`${geoData.location.lat}, ${geoData.location.lng}`}
@@ -79,7 +98,12 @@
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Venue Description'}
 		</span>
-		<textarea required class="min-h-[150px]" bind:value={venue.description} />
+		<textarea
+			required
+			class="min-h-[150px]"
+			name="description"
+			bind:value={venue.description}
+		/>
 	</label>
 	<div class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
