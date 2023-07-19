@@ -1857,7 +1857,7 @@ export const countries = [
 		id: 207,
 		iso: 'SY',
 		name: 'SYRIAN ARAB REPUBLIC',
-		icename: 'Syrian Arabn Republic',
+		nicename: 'Syrian Arabn Republic',
 		iso3: 'SYR',
 		numcode: 760,
 		phonecode: 963
