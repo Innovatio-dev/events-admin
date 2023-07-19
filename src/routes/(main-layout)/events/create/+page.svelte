@@ -150,11 +150,14 @@
 				<SectionHeader>Schedule</SectionHeader>
 				<div>
 					<LabelInput>Date starts</LabelInput>
-					<DatePicker placeholder="Choose the start date" />
+					<DatePicker
+						placeholder="Choose the start date"
+						bind:value={schedule.startTime}
+					/>
 				</div>
 				<div>
 					<LabelInput>Date ends</LabelInput>
-					<DatePicker placeholder="Choose the end date" />
+					<DatePicker placeholder="Choose the end date" bind:value={schedule.endTime} />
 				</div>
 			</div>
 			<div class="input-set">

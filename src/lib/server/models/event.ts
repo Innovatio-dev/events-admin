@@ -19,10 +19,10 @@ export const init = (sequelize: Sequelize) => {
 			uid: {
 				type: DataTypes.VIRTUAL,
 				get() {
-					return `#${this.id}`
+					return `E${this.id.toString().padStart(4, '0')}`
 				},
 				set(value) {
-					throw Error('this field is read only')
+					throw Error('this field is readonly')
 				}
 			},
 			slug: {

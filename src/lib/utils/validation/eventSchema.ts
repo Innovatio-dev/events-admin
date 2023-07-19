@@ -1,5 +1,5 @@
 import Joi from 'joi'
-import { emailSchema } from './schemas'
+import { emailSchema, orderSchema } from './schemas'
 
 export const filterSchema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
@@ -10,7 +10,15 @@ export const filterSchema = Joi.object({
 	city: Joi.string(),
 	dateMin: Joi.date().optional(),
 	dateMax: Joi.date().optional(),
-	order: Joi.string().optional(),
+	order: orderSchema([
+		'id',
+		'uid',
+		'title',
+		'createdAt',
+		'country',
+		'typeEvent',
+		'status'
+	]).optional(),
 	organizerId: Joi.number(),
 	search: Joi.string().optional()
 })
