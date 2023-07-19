@@ -19,6 +19,8 @@
 	export let domElement: HTMLElement | null = null
 	export let readOnly: boolean = false
 	export let required = false
+	export let disabled = false
+	
 
 	let currentType: InputType = type
 
@@ -90,6 +92,7 @@
 			on:input={handleChange}
 			on:keypress={handleKeyPress}
 			{required}
+			{disabled}
 		/>
 		<div class="actions {isFocused ? 'focused' : ''} {inputHasError ? 'error' : ''}">
 			{#if type === 'password'}

@@ -23,6 +23,7 @@
 		linkedin: string
 		youtube: string
 		description: string
+		country?: { id: number; nicename: '' }
 	}
 
 	// Props
@@ -47,7 +48,8 @@
 		speaker.name = addSpeaker.name
 		speaker.company = addSpeaker.company
 		speaker.jobRole = addSpeaker.jobRole
-		speaker.countryId = addSpeaker.countryId
+		speaker.countryId = addSpeaker.country?.id
+		speaker.country = addSpeaker.country
 		speaker.twitter = addSpeaker.twitter
 		speaker.facebook = addSpeaker.facebook
 		speaker.instagram = addSpeaker.instagram
@@ -78,8 +80,8 @@
 	</span>
 	<Dropdown
 		selected={{
-			value: speaker.countryId,
-			title: countries[speaker.countryId]?.nicename ?? 'Choose the country speaker'
+			value: speaker.countryId ?? 0,
+			title: countries[speaker.countryId - 1].nicename ?? 'Choose the country speaker'
 		}}
 		width="100%"
 		bind:value={speaker.countryId}

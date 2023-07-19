@@ -28,6 +28,25 @@
 		loading = false
 	}
 
+	async function updateVenue(id,venue) {
+		loading = true
+		try {
+			const res = await fetch(`/api/venues/${id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ ...venue })
+			})
+			if (res.ok) {
+				const data = await res.json()
+				console.log(data)
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
+		}
+		loading = false
+	}
+
 	onMount(async () => {
 		let id = $page.params.id
 		$pageStatus.title = 'Venue Details'
@@ -42,7 +61,7 @@
 		</div>
 	{:else if venue}
 		<div class="py-12">
-			<VenueForm addVenue={venue} />
+			<VenueForm updateAction={updateVenue} addVenue={venue} />
 		</div>
 	{/if}
 </section>

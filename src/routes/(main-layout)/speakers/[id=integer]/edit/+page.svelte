@@ -17,7 +17,7 @@
 			const res = await fetch(`/api/speakers/${id}`)
 			if (res.ok) {
 				speaker = await res.json()
-				// console.log(speaker)
+				console.log(speaker)
 			} else {
 				console.log(await res.json())
 			}
