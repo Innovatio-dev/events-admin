@@ -10,14 +10,33 @@
 
 	let speaker: any = null
 	let loading: boolean = true
-	
+
 	async function fetchSpeaker(id) {
 		loading = true
 		try {
 			const res = await fetch(`/api/speakers/${id}`)
 			if (res.ok) {
 				speaker = await res.json()
-				console.log(speaker)
+				// console.log(speaker)
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
+		}
+		loading = false
+	}
+
+	async function updateSpeaker(id, speaker) {
+		loading = true
+		try {
+			const res = await fetch(`/api/speakers/${id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ ...speaker })
+			})
+			if (res.ok) {
+				const data = await res.json()
+				// console.log(data)
 			} else {
 				console.log(await res.json())
 			}
@@ -31,7 +50,6 @@
 		let id = $page.params.id
 		await fetchSpeaker(id)
 	})
-
 </script>
 
 <section class="w-full">
@@ -42,7 +60,7 @@
 			</div>
 		{:else if speaker}
 			<div class="flex flex-col items-center gap-5">
-				<SpeakerForm addSpeaker={speaker} />
+				<SpeakerForm updateAction={updateSpeaker} addSpeaker={speaker} />
 			</div>
 		{/if}
 	</div>

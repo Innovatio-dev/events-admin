@@ -12,6 +12,7 @@
 	import { countries } from '$lib/utils/constants/Regions'
 
 	interface Speaker {
+		id: number
 		picture?: any
 		name: string
 		company: string
@@ -28,10 +29,12 @@
 
 	// Props
 	export let addSpeaker: Speaker | null = null
+	export let updateAction: any = null
 	export let submitAction = (speaker) => {}
 
 	// State
 	let speaker: Speaker = {
+		id: 0,
 		name: '',
 		company: '',
 		jobRole: '',
@@ -43,8 +46,10 @@
 		youtube: '',
 		description: ''
 	}
+	let updatedSpeaker = {}
 
 	if (addSpeaker) {
+		speaker.id = addSpeaker.id
 		speaker.name = addSpeaker.name
 		speaker.company = addSpeaker.company
 		speaker.jobRole = addSpeaker.jobRole
@@ -57,31 +62,46 @@
 		speaker.description = addSpeaker.description
 	}
 
-	export function handleSubmit() {
-		const formattedData = {
-			twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
-			facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
-			instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
-			linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
-			youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_')
+	const handleSubmit = async () => {
+		if (updateAction) {
+			await updateAction(speaker.id, updatedSpeaker)
+		} else {
+			const formattedData = {
+				twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
+				facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
+				instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
+				linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
+				youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
+				pictureId: speaker.picture[0]
+			}
+			await submitAction({ ...speaker, ...formattedData })
 		}
-		submitAction({ ...speaker, ...formattedData })
 		goto('/speakers')
 	}
+
+	const updateSpeaker = (e) => {
+		updatedSpeaker[e.target.name] = e.target.value
+	}
+
 	const onCancel = () => {
 		goto('/speakers')
 	}
 </script>
 
-<form on:submit|preventDefault={handleSubmit} class="flex min-w-[500px] flex-col w-full gap-5">
-	<Input required label="Speaker full name:" type="text" bind:value={speaker.name} />
+<form
+	on:change={updateSpeaker}
+	on:submit|preventDefault={handleSubmit}
+	class="flex min-w-[500px] flex-col w-full gap-5"
+>
+	<Input required label="Speaker full name:" type="text" name="name" bind:value={speaker.name} />
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 		{'Country'}
 	</span>
 	<Dropdown
+		name="countryId"
 		selected={{
 			value: speaker.countryId ?? 0,
-			title: countries[speaker.countryId - 1].nicename ?? 'Choose the country speaker'
+			title: countries[speaker.countryId - 1]?.nicename ?? 'Choose the country speaker'
 		}}
 		width="100%"
 		bind:value={speaker.countryId}
@@ -89,21 +109,26 @@
 			return { value: country.id, title: country.nicename ?? '' }
 		})}
 	/>
-	<Input label="Speaker company:" type="text" bind:value={speaker.company} />
-	<Input label="Rol / Position" type="text" bind:value={speaker.jobRole} />
+	<Input label="Speaker company:" type="text" name="company" bind:value={speaker.company} />
+	<Input label="Rol / Position" type="text" name="jobRole" bind:value={speaker.jobRole} />
 	<label class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Description:'}
 		</span>
-		<textarea required class="min-h-[150px]" bind:value={speaker.description} />
+		<textarea
+			required
+			class="min-h-[150px]"
+			name="description"
+			bind:value={speaker.description}
+		/>
 	</label>
 	<div class="grid grid-cols-2 gap-5">
-		<Input label="Twitter:" type="text" bind:value={speaker.twitter} />
-		<Input label="Instagram:" type="text" bind:value={speaker.instagram} />
-		<Input label="Linkedin:" type="text" bind:value={speaker.linkedin} />
-		<Input label="Facebook:" type="text" bind:value={speaker.facebook} />
+		<Input label="Twitter:" type="text" name="twitter" bind:value={speaker.twitter} />
+		<Input label="Instagram:" type="text" name="instagram" bind:value={speaker.instagram} />
+		<Input label="Linkedin:" type="text" name="linkedin" bind:value={speaker.linkedin} />
+		<Input label="Facebook:" type="text" name="facebook" bind:value={speaker.facebook} />
 	</div>
-	<Input label="Youtube:" type="text" bind:value={speaker.youtube} />
+	<Input label="Youtube:" type="text" name="youtube" bind:value={speaker.youtube} />
 	<div class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Speaker photo'}
@@ -117,11 +142,12 @@
 			<UploadedImage image={addSpeaker.picture?.url ?? ''} />
 		{:else}
 			<DragAndDrop
+				bind:uploaded={speaker.picture}
 				url="/api/resources"
 				name="file"
 				title="Upload your image"
 				subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-				body="1000x1000"
+				body="600x500"
 			/>
 		{/if}
 	</div>
