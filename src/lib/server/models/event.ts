@@ -131,7 +131,6 @@ export const init = (sequelize: Sequelize) => {
 			exclude: [
 				'regionId',
 				'userId',
-				'organizerId',
 				'countryId',
 				'venueId',
 				'scheduleId',

@@ -3,6 +3,7 @@ import { checkUser } from '$lib/server/middlewares/permission'
 import { validateBody, validateSearchParam } from '$lib/server/middlewares/validator'
 import { Country } from '$lib/server/models/country'
 import { Event } from '$lib/server/models/event'
+import { Organizer } from '$lib/server/models/organizer'
 import { Region } from '$lib/server/models/region'
 import { Schedule } from '$lib/server/models/schedule'
 import { Venue } from '$lib/server/models/venue'
@@ -43,8 +44,8 @@ export async function GET(event: RequestEvent) {
 		}
 	}
 
-	if (filter.type) {
-		where.type = filter.type
+	if (filter.typeEvent) {
+		where.typeEvent = filter.typeEvent
 	}
 
 	if (filter.order) {
@@ -67,6 +68,9 @@ export async function GET(event: RequestEvent) {
 				[sequelize.Op.iLike]: search
 			})
 		]
+	}
+	if (filter.countryId) {
+		whereCountry.id = filter.countryId
 	}
 	// Count events based on filter conditions and associations
 	const count = await Event.count({
