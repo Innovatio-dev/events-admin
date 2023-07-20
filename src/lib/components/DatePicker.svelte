@@ -65,7 +65,7 @@
 </Input>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<Popup bind:this={popupRef} trigger={inputRef}>
+<Popup bind:this={popupRef} trigger={inputRef} desiredWidth={'fit-content'}>
 	<div class="date-container">
 		<div class="header">
 			{date ? date : 'Date is empty'}
