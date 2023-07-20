@@ -21,7 +21,7 @@
 		address: string
 		location: { lat: string; lng: string }
 		description: string
-		pictures?: string[]
+		pictures?: number[]
 	}
 
 	// Props
@@ -59,11 +59,11 @@
 		venue.description = addVenue.description
 	}
 
-	export function handleSubmit() {
+	const handleSubmit = async () => {
 		if (updateAction) {
-			updateAction(venue.id, updatedVenue)
+			await updateAction(venue.id, updatedVenue)
 		} else {
-			submitAction({ ...venue, ...geoData })
+			await submitAction({ ...venue, ...geoData })
 		}
 		goto('/venues')
 	}
@@ -142,11 +142,12 @@
 			</h2>
 		</div>
 		<DragAndDrop
+			bind:uploaded={venue.pictures}
 			url="/api/resources"
 			name="file"
 			title="Upload your image"
 			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-			body="1000x1000"
+			body="600x500"
 		/>
 		<span
 			class="w-full h-10 rounded-xl bg-alert-warning my-3 text-sm flex items-center pl-5 gap-3"
