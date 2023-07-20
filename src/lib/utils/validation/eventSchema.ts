@@ -20,7 +20,7 @@ export const filterSchema = Joi.object({
 		'status'
 	]).optional(),
 	organizerId: Joi.number(),
-	search: Joi.string().optional()
+	search: Joi.string().optional().allow('')
 })
 
 export const createSchema = Joi.object({

@@ -34,6 +34,6 @@ export const updateSchema = Joi.object({
 export const filterSchema = Joi.object({
 	offset: Joi.number().min(0).default(0),
 	limit: Joi.number().min(0).default(-1),
-	search: Joi.string().optional(),
+	search: Joi.string().optional().allow(''),
 	order: orderSchema(['name', 'country']).optional()
 })

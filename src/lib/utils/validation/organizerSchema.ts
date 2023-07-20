@@ -39,7 +39,7 @@ export const filterSchema = Joi.object({
 		'typeEvent',
 		'status'
 	]).optional(),
-	search: Joi.string().optional()
+	search: Joi.string().optional().allow('')
 })
 
 export const updateSchema = Joi.object({

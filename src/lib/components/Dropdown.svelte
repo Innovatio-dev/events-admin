@@ -21,6 +21,7 @@
 	import Search from './icons/Search.svelte'
 	import { createEventDispatcher, tick } from 'svelte'
 	import { Circle3 } from 'svelte-loading-spinners'
+	import Popup from './Popup.svelte'
 
 	export let items: IDropDownItem[] = []
 	export let selected: IDropDownItem[] | IDropDownItem | null = null
@@ -30,27 +31,20 @@
 	export let loading: boolean = false
 	export let filterPlaceholder: string = 'Filter'
 	export let width: string = 'fit-content'
+	export let height: string = 'fit-content'
 	export let name: string = ''
 	export let value: string = ''
+	export let scrollerRef: HTMLDivElement | null = null
+
 	let style: string = ''
 	let opened = false
 	let containerElement: HTMLElement
+	let popupRef: Popup
 	let filter: string = ''
 	let filterRef: Input | null = null
 	let internalItems: InternalItem[]
 
 	const eventDispatcher = createEventDispatcher()
-
-	// Define a function to handle opening and closing the dropdown menu
-	const handleOpen = async () => {
-		opened = !opened
-		if (opened) {
-			await tick()
-			if (filterRef) {
-				filterRef.focus()
-			}
-		}
-	}
 
 	function updateSelected(
 		items: IDropDownItem[],
@@ -93,12 +87,6 @@
 		style = `width: ${width}; min-width: ${width}`
 	}
 
-	// Define a function to handle clicking outside of the dropdown menu
-	const handleClickOutside = (event: MouseEvent) => {
-		if (!containerElement.contains(event.target as HTMLElement)) {
-			opened = false
-		}
-	}
 	// Define a function to handle clicking on an item in the dropdown menu, if event is cancelled no changes are reflected
 	const handleClickItem = (index: number) => {
 		if (multiselect) {
@@ -134,7 +122,7 @@
 				})
 				selected = internalItems[index].item
 			}
-			opened = false
+			popupRef.hide()
 		}
 	}
 
@@ -143,12 +131,17 @@
 	}
 </script>
 
-<svelte:window on:click={handleClickOutside} />
+<!-- <svelte:window on:click={handleClickOutside} /> -->
 
 <div bind:this={containerElement} class="container" {style}>
 	<input {name} class="input" type="hidden" {value} />
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
-	<div class="active" class:opened class:hasSelections={hasSelection} on:click={handleOpen}>
+	<div
+		class="active"
+		class:opened
+		class:hasSelections={hasSelection}
+		on:click={() => popupRef.show()}
+	>
 		{#if $$slots.leading}
 			<div class="leading">
 				<slot name="leading" />
@@ -172,10 +165,26 @@
 			<Arrow />
 		</div>
 	</div>
-
-	{#if opened}
-		<div class="list" transition:slide={{ delay: 0, duration: 300, easing: quintOut }}>
-			{#if filterable}
+</div>
+<Popup
+	bind:this={popupRef}
+	trigger={containerElement}
+	on:hide={() => (opened = false)}
+	on:show={() => {
+		opened = true
+		if (filterRef) {
+			filterRef.focus()
+		}
+	}}
+>
+	<div
+		class="list"
+		style={`height:${height};`}
+		bind:this={scrollerRef}
+		transition:slide={{ delay: 0, duration: 300, easing: quintOut }}
+	>
+		{#if filterable}
+			<div class="sticky top-0 bg-white z-10">
 				<Input
 					bind:this={filterRef}
 					bind:value={filter}
@@ -185,43 +194,40 @@
 				>
 					<Search slot="trailing" />
 				</Input>
-				<div class="w-full h-[1px] bg-neutral-1d mt-2 mb-2" />
-			{/if}
-			{#if loading}
-				<div class="loader">
-					<Circle3
-						ballBottomLeft={'#14dcff'}
-						ballBottomRight={'#fd369d'}
-						ballTopRight={'#8863e08f'}
-						ballTopLeft={'#ffa5d3'}
-					/>
-				</div>
-			{:else}
-				{#each internalItems as internalItem, index}
-					{#if !internalItem.filtered}
-						<!-- svelte-ignore a11y-click-events-have-key-events -->
-						<div class="item" on:click={() => handleClickItem(index)}>
-							<div class="text">{internalItem.item.title}</div>
-							{#if internalItem.item.image}
-								<div class="image">
-									<img
-										alt={internalItem.item.title}
-										src={internalItem.item.image}
-									/>
-								</div>
-							{/if}
-							<div class="check">
-								{#if internalItem.selected}
-									<Check />
-								{/if}
-							</div>
+				<div class="w-full h-[1px] bg-neutral-1 mt-2 mb-2" />
+			</div>
+		{/if}
+
+		{#each internalItems as internalItem, index}
+			{#if !internalItem.filtered}
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div class="item" on:click={() => handleClickItem(index)}>
+					<div class="text">{internalItem.item.title}</div>
+					{#if internalItem.item.image}
+						<div class="image">
+							<img alt={internalItem.item.title} src={internalItem.item.image} />
 						</div>
 					{/if}
-				{/each}
+					<div class="check">
+						{#if internalItem.selected}
+							<Check />
+						{/if}
+					</div>
+				</div>
 			{/if}
-		</div>
-	{/if}
-</div>
+		{/each}
+		{#if loading}
+			<div class="loader">
+				<Circle3
+					ballBottomLeft={'#14dcff'}
+					ballBottomRight={'#fd369d'}
+					ballTopRight={'#8863e08f'}
+					ballTopLeft={'#ffa5d3'}
+				/>
+			</div>
+		{/if}
+	</div>
+</Popup>
 
 <style lang="scss">
 	.active {
@@ -311,19 +317,11 @@
 		user-select: none;
 	}
 	.list {
-		top: calc(100% + 12px);
-		position: absolute;
-		z-index: 1;
 		background: var(--white);
-		border: 1.3px solid #f3f1ff;
-		box-shadow: 0px 3px 12px rgba(51, 51, 51, 0.1);
-		border-radius: 10px;
 		width: 100%;
-		min-width: 100px;
-		padding: calc(5 / 16 * 1em);
-		cursor: pointer;
-		max-height: 50vh;
+		padding: 0.5em;
 		overflow-y: auto;
+		cursor: pointer;
 
 		.loader {
 			display: flex;
