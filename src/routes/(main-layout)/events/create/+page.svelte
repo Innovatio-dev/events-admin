@@ -6,10 +6,12 @@
 	import Input from '$lib/components/Input.svelte'
 	import LabelInput from '$lib/components/LabelInput.svelte'
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
+	import DropdownOrganizer from '$lib/components/custom/data_viewer/DropdownOrganizer.svelte'
+	import DropdownOrganizerSelected from '$lib/components/custom/data_viewer/DropdownOrganizerSelected.svelte'
+	import SpeakerSelectedViewer from '$lib/components/custom/data_viewer/SpeakerSelectedViewer.svelte'
+	import SpeakerViewer from '$lib/components/custom/data_viewer/SpeakerViewer.svelte'
 	import { pageStatus } from '$lib/stores/pageStatus'
 	import { onMount } from 'svelte'
-
-	export let data
 
 	const typeEvents = [
 		{
@@ -60,20 +62,16 @@
 	<div class="form-container">
 		<LabelInput>Select Organizer</LabelInput>
 		<div class="z-50">
-			<Dropdown
+			<DropdownFetcher
 				name="organizerId"
-				width="100%"
-				filterable={true}
 				filterPlaceholder={'Search'}
+				itemViewer={DropdownOrganizer}
+				selectedViewer={DropdownOrganizerSelected}
+				bind:selected={mainSpeaker}
 				bind:value={event.organizerId}
-				items={data.organizers.results.map((organizer) => ({
-					title: organizer.name,
-					image: organizer.logo?.url,
-					value: organizer.id
-				}))}
-			>
-				<svelte:fragment slot="title">Select the organizer</svelte:fragment></Dropdown
-			>
+				placeholder={'Select the organizer for this event'}
+				url={'/api/organizers'}
+			/>
 		</div>
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
 			<div class="w-full">
@@ -166,11 +164,12 @@
 					<LabelInput>Primary Speaker</LabelInput>
 					<DropdownFetcher
 						filterPlaceholder={'Search'}
+						itemViewer={SpeakerViewer}
+						selectedViewer={SpeakerSelectedViewer}
 						bind:selected={mainSpeaker}
+						valueGenerator={(item) => item.id}
 						placeholder={'Select the main speaker'}
 						searchField={'search'}
-						valueField={'id'}
-						titleField={'name'}
 						url={'/api/speakers'}
 					/>
 				</div>

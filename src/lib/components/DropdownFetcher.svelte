@@ -1,18 +1,23 @@
 <script lang="ts">
 	import { createDebouncer } from '$lib/utils/debounce'
-	import { onMount } from 'svelte'
-	import Dropdown, { type IDropDownItem } from './Dropdown.svelte'
+	import { SvelteComponent, onMount } from 'svelte'
+	import Dropdown, { type ValueGenerator } from './Dropdown.svelte'
+	import TextWithImageViewer from './custom/data_viewer/TextWithImageViewer.svelte'
+	import SimpleTextViewer from './custom/data_viewer/SimpleTextViewer.svelte'
 	export let filterPlaceholder: string = ''
 	export let placeholder: string = ''
-	export let selected: IDropDownItem | IDropDownItem[] | null
+	export let selected: any | any[] | null
 	export let multiselect: boolean = false
 	export let url: string
-	export let searchField: string
-	export let valueField: string
-	export let titleField: string
+	export let searchField: string = 'search'
 	export let name: string = ''
 	export let value: string = ''
-	let items: IDropDownItem[] = []
+	export let itemViewer: typeof SvelteComponent = TextWithImageViewer
+	export let selectedViewer: typeof SvelteComponent = SimpleTextViewer
+	export let valueGenerator: ValueGenerator = (item) => {
+		return item.id
+	}
+	let items: any[] = []
 	let loading: boolean = false
 	let filter: string = ''
 	let limit = 10
@@ -34,14 +39,7 @@
 	}
 	function handleDropdownScroll() {
 		if (!scrollerRef) return
-		console.log(
-			'onScroll',
-			scrollerRef.scrollHeight,
-			scrollerRef.scrollTop,
-			scrollerRef.clientHeight,
-			loading,
-			limitReach
-		)
+
 		if (
 			scrollerRef.scrollHeight - scrollerRef.scrollTop == scrollerRef.clientHeight &&
 			!loading &&
@@ -64,12 +62,7 @@
 		})
 		let data = await response.json()
 		if (response.ok) {
-			items = items.concat(
-				data.results.map((item) => ({
-					value: item[valueField],
-					title: item[titleField]
-				}))
-			)
+			items = items.concat(data.results)
 			if (items.length >= data.count) {
 				limitReach = true
 			}
@@ -86,13 +79,16 @@
 	filterable={true}
 	manualFilter={true}
 	bind:scrollerRef
-	{loading}
-	{filterPlaceholder}
 	on:filterChange={handleFilterChange}
 	bind:multiselect
 	bind:value
 	{items}
 	bind:selected
+	{itemViewer}
+	{selectedViewer}
+	{loading}
+	{filterPlaceholder}
+	{valueGenerator}
 	height={'300px'}
 >
 	<svelte:fragment slot="title">{placeholder}</svelte:fragment></Dropdown

@@ -1,12 +1,8 @@
 <script lang="ts" context="module">
-	export interface IDropDownItem {
-		value: string | number
-		title: string
-		subtitle?: string
-		image?: string
-	}
+	export type FilterFunction = (item: any, filter: string) => boolean
+	export type ValueGenerator = (item: any) => any
 	interface InternalItem {
-		item: IDropDownItem
+		item: any
 		selected: boolean
 		filtered: boolean
 	}
@@ -19,12 +15,14 @@
 	import Check from './icons/Check.svelte'
 	import Input from './Input.svelte'
 	import Search from './icons/Search.svelte'
-	import { createEventDispatcher, tick } from 'svelte'
+	import { SvelteComponent, createEventDispatcher, tick } from 'svelte'
 	import { Circle3 } from 'svelte-loading-spinners'
 	import Popup from './Popup.svelte'
+	import SimpleTextViewer from './custom/data_viewer/SimpleTextViewer.svelte'
+	import TextWithImageViewer from './custom/data_viewer/TextWithImageViewer.svelte'
 
-	export let items: IDropDownItem[] = []
-	export let selected: IDropDownItem[] | IDropDownItem | null = null
+	export let items: any[] = []
+	export let selected: any[] | any | null = null
 	export let multiselect: boolean = false
 	export let filterable: boolean = false
 	export let manualFilter: boolean = false
@@ -35,6 +33,12 @@
 	export let name: string = ''
 	export let value: string = ''
 	export let scrollerRef: HTMLDivElement | null = null
+	export let itemViewer: typeof SvelteComponent = TextWithImageViewer
+	export let selectedViewer: typeof SvelteComponent = SimpleTextViewer
+	export let valueGenerator: ValueGenerator = (item) => item.value
+	export let filterFunction: FilterFunction | null = (item: any, filter: string) => {
+		return !item.title.toLowerCase().includes(filter)
+	}
 
 	let style: string = ''
 	let opened = false
@@ -46,10 +50,7 @@
 
 	const eventDispatcher = createEventDispatcher()
 
-	function updateSelected(
-		items: IDropDownItem[],
-		selected: IDropDownItem | IDropDownItem[] | null
-	) {
+	function updateSelected(items: any[], selected: any | any[] | null) {
 		return items.map((item, i) => {
 			return {
 				item: item,
@@ -60,20 +61,21 @@
 	}
 	$: hasSelection = Array.isArray(selected) ? selected.length > 0 : selected != null
 	$: value = Array.isArray(selected)
-		? selected.map((item) => item.value).join(',')
+		? selected.map((item) => valueGenerator(item)).join(',')
 		: selected
-		? (selected.value as string)
+		? (valueGenerator(selected) as string)
 		: ''
+
 	// Update the internal items when the items or selected props change
 	$: {
 		internalItems = updateSelected(items, selected)
 	}
 	// Filter the internal items when the filter is changed
 	$: {
-		if (filter.length > 0 && !manualFilter) {
+		if (filter.length > 0 && !manualFilter && filterFunction) {
 			internalItems = internalItems.map((internalItem) => ({
 				...internalItem,
-				filtered: !internalItem.item.title.toLowerCase().includes(filter.toLowerCase())
+				filtered: filterFunction!(internalItem.item, filter)
 			}))
 		} else {
 			internalItems = internalItems.map((internalItem) => ({
@@ -90,7 +92,7 @@
 	// Define a function to handle clicking on an item in the dropdown menu, if event is cancelled no changes are reflected
 	const handleClickItem = (index: number) => {
 		if (multiselect) {
-			const newSelected: IDropDownItem[] = []
+			const newSelected: any[] = []
 			const newItems: InternalItem[] = []
 			for (let i = 0; i < internalItems.length; i++) {
 				newItems.push({
@@ -153,7 +155,7 @@
 			</div>
 		{:else}
 			<div class="text">
-				{selected.title}
+				<svelte:component this={selectedViewer} value={selected} />
 			</div>
 		{/if}
 		<!-- {#if Array.isArray(selected)}
@@ -179,12 +181,15 @@
 >
 	<div
 		class="list"
-		style={`height:${height};`}
+		style={`height:${height};overflow-y:${height == 'fit-content' ? 'unset' : 'auto'}`}
 		bind:this={scrollerRef}
 		transition:slide={{ delay: 0, duration: 300, easing: quintOut }}
 	>
 		{#if filterable}
-			<div class="sticky top-0 bg-white z-10">
+			<div
+				class="sticky bg-white z-10"
+				style={`top: ${height == 'fit-content' ? '0.5em' : '0px'}`}
+			>
 				<Input
 					bind:this={filterRef}
 					bind:value={filter}
@@ -202,12 +207,9 @@
 			{#if !internalItem.filtered}
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div class="item" on:click={() => handleClickItem(index)}>
-					<div class="text">{internalItem.item.title}</div>
-					{#if internalItem.item.image}
-						<div class="image">
-							<img alt={internalItem.item.title} src={internalItem.item.image} />
-						</div>
-					{/if}
+					<div class="viewer">
+						<svelte:component this={itemViewer} value={internalItem.item} />
+					</div>
 					<div class="check">
 						{#if internalItem.selected}
 							<Check />
@@ -330,47 +332,22 @@
 			height: 100px;
 		}
 		.item {
-			padding: 0em 0.8em;
 			border-radius: 10px;
 			height: 3em;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			color: var(--neutral-4);
-			gap: 0.8em;
-			.text {
+			// gap: 0.8em;
+			.viewer {
 				flex-grow: 1;
 			}
-			.image {
-				width: 2em;
-				height: 2em;
-				overflow: hidden;
-				border-radius: 50%;
-				position: relative;
-				&::after {
-					opacity: 1;
-					background: var(--gd-linear);
-					border-radius: 50%;
-					content: '';
-					inset: 0;
-					padding: 1px;
-					position: absolute;
-					z-index: 2;
-					-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-					mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-					-webkit-mask-composite: xor;
-					mask-composite: exclude;
-				}
-				img {
-					width: 100%;
-					height: 100%;
-					object-fit: cover;
-				}
-			}
+
 			.check {
 				color: var(--primary-purple);
 				width: 16px;
 				position: relative;
+				margin-right: 0.8em;
 			}
 			&:hover {
 				background-color: var(--primary-light);
