@@ -5,15 +5,11 @@
 	// Components
 	import SpeakerForm from '$lib/components/custom/SpeakerForm.svelte'
 	import ProfileHeader from '$lib/components/custom/ProfileHeader.svelte'
+	// Animations
 	import { Circle3 } from 'svelte-loading-spinners'
 
 	let speaker: any = null
 	let loading: boolean = true
-
-	onMount(async () => {
-		let id = $page.params.id
-		await fetchSpeaker(id)
-	})
 
 	async function fetchSpeaker(id) {
 		loading = true
@@ -30,6 +26,30 @@
 		}
 		loading = false
 	}
+
+	async function updateSpeaker(id, speaker) {
+		loading = true
+		try {
+			const res = await fetch(`/api/speakers/${id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ ...speaker })
+			})
+			if (res.ok) {
+				const data = await res.json()
+				// console.log(data)
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
+		}
+		loading = false
+	}
+
+	onMount(async () => {
+		let id = $page.params.id
+		await fetchSpeaker(id)
+	})
 </script>
 
 <section class="w-full">
@@ -40,7 +60,7 @@
 			</div>
 		{:else if speaker}
 			<div class="flex flex-col items-center gap-5">
-				<SpeakerForm addSpeaker={speaker} />
+				<SpeakerForm updateAction={updateSpeaker} addSpeaker={speaker} />
 			</div>
 		{/if}
 	</div>

@@ -3,12 +3,13 @@ import { checkUser } from '$lib/server/middlewares/permission'
 import { validateBody, validateSearchParam } from '$lib/server/middlewares/validator'
 import { Country } from '$lib/server/models/country'
 import { Event } from '$lib/server/models/event'
+import { Organizer } from '$lib/server/models/organizer'
 import { Region } from '$lib/server/models/region'
 import { Schedule } from '$lib/server/models/schedule'
 import { Venue } from '$lib/server/models/venue'
 import { createSchema, filterSchema } from '$lib/utils/validation/eventSchema'
 import { json, type RequestEvent } from '@sveltejs/kit'
-import { Op, type Order } from 'sequelize'
+import sequelize, { Op, type Order } from 'sequelize'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
@@ -43,20 +44,33 @@ export async function GET(event: RequestEvent) {
 		}
 	}
 
-	if (filter.type) {
-		where.type = filter.type
+	if (filter.typeEvent) {
+		where.typeEvent = filter.typeEvent
 	}
 
-	// Parse order conditions
 	if (filter.order) {
-		const columns = filter.order.split(',')
-		for (const col of columns) {
-			if (col.startsWith('-')) {
-				order.push([col.substring(1), 'DESC'])
-			} else {
-				order.push([col, 'ASC'])
+		for (const col of filter.order) {
+			let name = col.name
+			if (col.name == 'uid') {
+				name = 'id'
 			}
+			order.push([name, col.type])
 		}
+	}
+	if (filter.search) {
+		const search = `%${filter.search}%`
+
+		where[Op.or] = [
+			sequelize.where(sequelize.fn('unaccent', sequelize.col('Event.title')), {
+				[sequelize.Op.iLike]: sequelize.fn('unaccent', search)
+			}),
+			sequelize.where(sequelize.cast(sequelize.col('Event.id'), 'text'), {
+				[sequelize.Op.iLike]: search
+			})
+		]
+	}
+	if (filter.countryId) {
+		whereCountry.id = filter.countryId
 	}
 	// Count events based on filter conditions and associations
 	const count = await Event.count({

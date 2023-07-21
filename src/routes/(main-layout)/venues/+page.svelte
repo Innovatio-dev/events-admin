@@ -198,7 +198,7 @@
 	</div>
 	<div class="w-full flex py-4 gap-4">
 		<div class="w-fit min-w-fit">
-			<MainButton href="/organizers/new-organizer">
+			<MainButton href="/venues/new-venue">
 				<Icon className="h-6 w-6" src={AiOutlinePlus} />
 				{'Create Venue'}
 			</MainButton>

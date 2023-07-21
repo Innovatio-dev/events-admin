@@ -3,7 +3,6 @@
 	import MainButton from '$lib/components/MainButton.svelte'
 	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
-	import AiOutlinePlus from 'svelte-icons-pack/ai/AiOutlinePlus'
 	import Icon from 'svelte-icons-pack'
 	import { page } from '$app/stores'
 	import { afterNavigate, goto } from '$app/navigation'
@@ -15,15 +14,22 @@
 	import StatusViewer from '$lib/components/table_cell/StatusViewer.svelte'
 	import SeeMoreButton from '$lib/components/table_cell/SeeMoreButton.svelte'
 	import { organizerListSchema } from '$lib/utils/validation/schemas'
-	import { createUrl, validateUrlSearchParams } from '$lib/utils/validation/validation'
+	import {
+		createUrl,
+		mapArrayIntoCollection,
+		mapArrayIntoCollectionOrder,
+		validateUrlSearchParams
+	} from '$lib/utils/validation/validation'
 	import { createDebouncer } from '$lib/utils/debounce'
 	import TextViewer from '$lib/components/table_cell/TextViewer.svelte'
 	import VRegionViewer from '$lib/components/table_cell/VRegionViewer.svelte'
 	import VCountryViewer from '$lib/components/table_cell/VCountryViewer.svelte'
 	import VCityViewer from '$lib/components/table_cell/VCityViewer.svelte'
 	import FeaturedViewer from '$lib/components/table_cell/FeaturedViewer.svelte'
+	import Dropdown from '$lib/components/Dropdown.svelte'
+	import Board from '$lib/components/icons/Board.svelte'
+	import Ticket from '$lib/components/icons/Ticket.svelte'
 
-	let inputElement
 	let loading: boolean = true
 	let data: any = null
 	let error: any = null
@@ -117,14 +123,44 @@
 		}
 	]
 
-	const locations = [{ value: 0, title: '', variant: '' }]
+	const locations = [
+		{ value: 0, title: 'South America', variant: 'secondary' },
+		{ value: 1, title: 'Asia', variant: 'secondary' },
+		{ value: 2, title: 'Europe', variant: 'secondary' },
+		{ value: 3, title: 'Virtual', variant: 'secondary' }
+	]
+
+	const statuses = [
+		{ value: 0, title: 'Inactive', variant: 'alert' },
+		{ value: 1, title: 'Active', variant: 'success' },
+		{ value: 2, title: 'Suspended', variant: 'error' }
+	]
+
+	const types = [
+		{ value: 0, title: 'Live Events', variant: 'secondary' },
+		{ value: 1, title: 'Virtual', variant: 'secondary' }
+	]
+
 	afterNavigate(async () => {
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
+			if (params.locations.length) {
+				params.status = mapArrayIntoCollection(params.status, locations, 'value')
+			}
+			if (params.status.length) {
+				params.status = mapArrayIntoCollection(params.status, statuses, 'value')
+			}
+			if (params.typeEvent.length) {
+				params.typeEvent = mapArrayIntoCollection(params.typeEvent, types, 'value')
+			}
+			if (params.order.length) {
+				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
+			}
 		} catch (error) {}
-		await fetchVenues()
+		await fetchEvents()
 	})
-	async function fetchVenues() {
+
+	async function fetchEvents() {
 		loading = true
 		const url = new URL('/api/events', window.location.origin)
 		const cUrl = createUrl(url, {
@@ -214,10 +250,62 @@
 				on:keypress={onSearchKeypress}
 				on:change={onSearchChange}
 				bind:value={params.search}
-				domElement={inputElement}
 			>
 				<Icon slot="trailing" src={AiOutlineSearch} color="currentColor" />
 			</Input>
+			<Dropdown
+				width="200px"
+				items={locations}
+				bind:selected={params.status}
+				multiselect
+				on:change={(event) => {
+					const selected = event.detail.selected
+					const values = selected.map((status) => status.value)
+					gotoFilter({
+						status: values
+					})
+				}}
+			>
+				<span slot="title">Location</span>
+				<div class="text-xl" slot="leading">
+					<Board />
+				</div>
+			</Dropdown>
+			<Dropdown
+				width="200px"
+				items={statuses}
+				bind:selected={params.status}
+				multiselect
+				on:change={(event) => {
+					const selected = event.detail.selected
+					const values = selected.map((status) => status.value)
+					gotoFilter({
+						status: values
+					})
+				}}
+			>
+				<span slot="title">Status</span>
+				<div class="text-xl" slot="leading">
+					<Board />
+				</div>
+			</Dropdown>
+			<Dropdown
+				items={types}
+				bind:selected={params.typeEvent}
+				multiselect
+				on:change={(event) => {
+					const selected = event.detail.selected
+					const values = selected.map((type) => type.value)
+					gotoFilter({
+						typeEvent: values
+					})
+				}}
+			>
+				<span slot="title">Type Event</span>
+				<div class="text-xl" slot="leading">
+					<Ticket />
+				</div>
+			</Dropdown>
 			<MainButton>
 				<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
 				{'Export CSV'}
@@ -225,12 +313,6 @@
 		</div>
 	</div>
 	<div class="w-full flex py-4 gap-4">
-		<div class="w-fit min-w-fit">
-			<MainButton href="/organizers/new-organizer">
-				<Icon className="h-6 w-6" src={AiOutlinePlus} />
-				{'New Organizer'}
-			</MainButton>
-		</div>
 		<div class="flex-grow flex gap-4 flex-row-reverse flex-wrap">
 			{#each params.typeEvent as type, index}
 				<Badge

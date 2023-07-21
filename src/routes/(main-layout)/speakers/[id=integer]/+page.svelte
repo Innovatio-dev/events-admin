@@ -39,7 +39,7 @@
 			})
 			if (res.ok) {
 				const data = await res.json()
-				console.log(data)
+				// console.log(data)
 			} else {
 				console.log(await res.json())
 			}
@@ -123,7 +123,7 @@
 		</MainButton>
 		<svelte:component this={Modal} {isOpen} handleClose={handleCloseModal} title="">
 			<div class="px-12 py-3 flex justify-center flex-col gap-10">
-				<span class="text-neutral-3 font-light font-eesti">
+				<span class="text-neutral-4 font-light font-eesti">
 					{'Do you really want to remove this speaker?'}
 				</span>
 				<div class="flex w-[90%] gap-5 mx-auto items-center justify-center">

@@ -91,7 +91,6 @@ export async function PUT(event: RequestEvent) {
 
 export async function DELETE(event: RequestEvent) {
 	const { id } = event.params
-
 	try {
 		const result = await Venue.findByPk(id)
 		if (!result) {
@@ -99,32 +98,27 @@ export async function DELETE(event: RequestEvent) {
 			// is not present on the database, perfom a false delete
 			// by just returning the "delete result"
 			return json(
-				{},
 				{
-					status: HttpResponses.NO_RESPONSE
+					message: 'Venue Deleted'
+				},
+				{
+					status: HttpResponses.OK_RESPONSE
 				}
 			)
 		}
 
-		await EventVenue.destroy({
-			where: {
-				venueId: id
-			}
-		})
-
-		Venue.destroy({
-			where: {
-				id
-			}
-		})
-
+		await result.destroy()
 		return json(
-			{},
 			{
-				status: HttpResponses.NO_RESPONSE
+				message: 'Venue Deleted'
+			},
+			{
+				status: HttpResponses.OK_RESPONSE
 			}
 		)
-	} catch {
+	} catch (err) {
+		console.log(err)
+
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
 			message: 'Something happend, try again later'
 		})

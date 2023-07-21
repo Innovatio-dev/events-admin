@@ -1,17 +1,48 @@
 <script lang="ts">
+	// Svelte
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { pageStatus } from '$lib/stores/pageStatus'
+	import { goto } from '$app/navigation'
+
+	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
+	import Modal from '$lib/components/Modal.svelte'
 
 	let venue: any = null
 	let loading: boolean = true
 
-	onMount(async () => {
-		let id = $page.params.id
-		await fetchVenue(id)
-	})
+	// Modal
+	let isOpen = false
+	const handleOpenModal = () => {
+		isOpen = true
+	}
+	const handleCloseModal = () => {
+		isOpen = false
+	}
+
+	const removeVenue = async () => {
+		await deleteVenue(venue.id)
+		goto('/venues')
+	}
+	async function deleteVenue(id) {
+		loading = true
+		try {
+			const res = await fetch(`/api/venues/${id}`, {
+				method: 'DELETE'
+			})
+			if (res.ok) {
+				const data = await res.json()
+				console.log(data)
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
+		}
+		loading = false
+	}
 
 	async function fetchVenue(id) {
 		loading = true
@@ -27,6 +58,11 @@
 		const enlace = `http://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&z=17`
 		return enlace
 	}
+
+	onMount(async () => {
+		let id = $page.params.id
+		await fetchVenue(id)
+	})
 </script>
 
 <div class="w-1/2 p-6">
@@ -47,10 +83,10 @@
 		{:else if venue}
 			<div class="content">
 				<p>{venue.name ?? '---'}</p>
-				<p>{venue.region.name ?? '---'}</p>
-				<p>{venue.country.name ?? '---'}</p>
+				<p>{venue.region?.name ?? '---'}</p>
+				<p>{venue.country?.name ?? '---'}</p>
 				<p>{venue.city ?? '---'}</p>
-				<p>{venue.addres ?? '---'}</p>
+				<p>{venue.address ?? '---'}</p>
 				<a href={gMapsLink(venue.location.lat, venue.location.lng)} target="_blank">
 					<p>Abrir mapa</p>
 				</a>
@@ -68,7 +104,11 @@
 			</div>
 		{:else if venue}
 			<div class="min-w-[280px] min-h-[160px] flex">
-				<img src={venue.pictures[0].url} alt={venue.pictures[0].name} class="rounded-lg" />
+				<img
+					src={venue.pictures[0]?.url ?? ''}
+					alt={venue.pictures[0]?.name ?? ''}
+					class="rounded-lg"
+				/>
 			</div>
 		{/if}
 	</div>
@@ -90,16 +130,39 @@
 	</div>
 	<div class="flex flex-row gap-6">
 		<div class="w-fit">
-			<MainButton href={`/venue/${$page.params.id}/edit`}>
+			<MainButton href={`/venues/${$page.params.id}/edit`}>
 				{'Edit'}
 			</MainButton>
 		</div>
 		<div class="w-fit">
-			<MainButton>
+			<MainButton on:click={handleOpenModal}>
 				{'Remove'}
 			</MainButton>
 		</div>
 	</div>
+	<svelte:component this={Modal} {isOpen} handleClose={handleCloseModal} title="">
+		<div class="px-12 py-3 flex justify-center flex-col gap-10">
+			<span class="text-neutral-4 font-light font-eesti">
+				{'Do you really want to remove this venue?'}
+			</span>
+			<div class="flex w-[90%] gap-5 mx-auto items-center justify-center">
+				<div class="w-20">
+					<MainButton on:click={removeVenue}>
+						<span class="font-light font-eesti text-sm">
+							{'Yes'}
+						</span>
+					</MainButton>
+				</div>
+				<div class="w-20">
+					<MainButton on:click={handleCloseModal}>
+						<span class="font-light font-eesti text-sm">
+							{'Cancel'}
+						</span>
+					</MainButton>
+				</div>
+			</div>
+		</div>
+	</svelte:component>
 </div>
 
 <style lang="postcss">

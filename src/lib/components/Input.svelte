@@ -17,7 +17,10 @@
 	export let errorMessages: string[] = []
 	export let validationSchema: Joi.AnySchema | null = null
 	export let domElement: HTMLElement | null = null
+	export let readOnly: boolean = false
 	export let required = false
+	export let disabled = false
+	
 
 	let currentType: InputType = type
 
@@ -80,6 +83,7 @@
 			{name}
 			{placeholder}
 			{value}
+			readonly={readOnly}
 			on:focus={(ev) => {
 				isFocused = true
 				dispatch('focus', ev)
@@ -88,6 +92,7 @@
 			on:input={handleChange}
 			on:keypress={handleKeyPress}
 			{required}
+			{disabled}
 		/>
 		<div class="actions {isFocused ? 'focused' : ''} {inputHasError ? 'error' : ''}">
 			{#if type === 'password'}

@@ -82,7 +82,8 @@ const postSchema = Joi.object({
 	address: Joi.string(),
 	location: Joi.object(),
 	email: Joi.string(),
-	description: Joi.string()
+	description: Joi.string(),
+	pictures: Joi.array()
 })
 
 export async function POST(event: RequestEvent) {
@@ -91,6 +92,7 @@ export async function POST(event: RequestEvent) {
 
 	try {
 		const result = await Venue.create(validate.value)
+		result.setPictures(validate.value.pictures)
 		return json(result)
 	} catch (err) {
 		console.log(err)
