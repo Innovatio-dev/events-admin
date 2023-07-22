@@ -1,5 +1,5 @@
 <script lang="ts">
-	// Common
+	// Svelte
 	import { afterNavigate, goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	// Components

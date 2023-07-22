@@ -56,10 +56,16 @@
 
 	async function fetchVenue(id) {
 		loading = true
-		let response = await fetch(`/api/venues/${id}`)
-		if (response.ok) {
-			venue = await response.json()
-			$pageStatus.title = venue.name
+		try {
+			let res = await fetch(`/api/venues/${id}`)
+			if (res.ok) {
+				venue = await res.json()
+				$pageStatus.title = venue.name
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
 		}
 		loading = false
 	}
@@ -81,7 +87,6 @@
 			console.error('Error:', error)
 		}
 	}
-
 
 	function gMapsLink(lat, lng) {
 		const enlace = `http://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&z=17`

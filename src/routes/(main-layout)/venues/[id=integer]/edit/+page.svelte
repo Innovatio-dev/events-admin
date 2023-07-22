@@ -49,7 +49,7 @@
 
 	onMount(async () => {
 		let id = $page.params.id
-		$pageStatus.title = 'Venue Details'
+		$pageStatus.title = 'Edit Venue'
 		await fetchVenue(id)
 	})
 </script>

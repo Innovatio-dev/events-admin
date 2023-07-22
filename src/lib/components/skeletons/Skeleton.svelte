@@ -5,12 +5,13 @@
 	export let height: number
 	export let circle: boolean = false
 	export let items: number = 1
+	export let bg: string = 'neutral-2'
 </script>
 
 <div class="flex flex-col w-full h-full justify-around">
 	{#each Array(items) as _, i}
 		<div
-			class={`animate-pulse bg-neutral-2 ${circle ? 'rounded-[50%]' : 'rounded-md'}`}
+			class={`animate-pulse bg-${bg} ${circle ? 'rounded-[50%]' : 'rounded-md'}`}
 			style={`
 				width: ${wFull ? 'full' : `${width}px`}; 
 				height: ${hFull ? 'full' : `${height}px`};

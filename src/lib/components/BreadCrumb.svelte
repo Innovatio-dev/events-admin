@@ -1,10 +1,12 @@
 <script lang="ts">
 	// Svelte
 	import { page } from '$app/stores'
+	// Store
 	import { pageStatus } from '$lib/stores/pageStatus'
 	// Components
+	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
+	// Icons
 	import Arrow from './icons/Arrow.svelte'
-	// Constants
 
 	const ratingColors: Record<number, string> = {
 		0: 'warning',
@@ -15,6 +17,7 @@
 	$: {
 		let currentPage = $page
 		parts = currentPage.url.pathname.split('/').filter((element) => element.trim() !== '')
+		parts[parts.length - 1] = $pageStatus.title ?? ''
 	}
 </script>
 
@@ -44,7 +47,9 @@
 				{#if $pageStatus.title}
 					{$pageStatus.title}
 				{:else}
-					{parts[parts.length - 1].replace(/-/g, ' ')}
+					<div class="w-full h-fit flex">
+						<SimpleSkeleton bg="neutral-4" width={250} height={30} items={1} />
+					</div>
 				{/if}
 			</span>
 			<div class="w-6 h-6 rounded-full bg-alert-{ratingColors[$pageStatus.status ?? 3]}" />

@@ -1,9 +1,10 @@
 <script lang="ts">
-	// Common
+	// Svelte
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import { pageStatus } from '$lib/stores/pageStatus'
 	import { goto } from '$app/navigation'
+	// Store
+	import { pageStatus } from '$lib/stores/pageStatus'
 	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import ProfilePic from '$lib/components/ProfilePic.svelte'
@@ -66,6 +67,7 @@
 			const res = await fetch(`/api/speakers/${id}`)
 			if (res.ok) {
 				speaker = await res.json()
+				$pageStatus.title = speaker.name
 				// console.log(speaker)
 			} else {
 				console.log(await res.json())

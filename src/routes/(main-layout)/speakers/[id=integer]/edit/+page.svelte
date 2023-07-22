@@ -2,6 +2,8 @@
 	// Svelte
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
+	// Store
+	import { pageStatus } from '$lib/stores/pageStatus'
 	// Components
 	import SpeakerForm from '$lib/components/custom/SpeakerForm.svelte'
 	import ProfileHeader from '$lib/components/custom/ProfileHeader.svelte'
@@ -48,6 +50,7 @@
 
 	onMount(async () => {
 		let id = $page.params.id
+		$pageStatus.title = 'Edit Speaker'
 		await fetchSpeaker(id)
 	})
 </script>
