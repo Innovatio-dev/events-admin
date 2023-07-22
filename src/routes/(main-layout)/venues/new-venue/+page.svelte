@@ -6,11 +6,11 @@
 	// Components
 	import VenueForm from '$lib/components/custom/VenueForm.svelte'
 
-	const createNewSpeaker = async (venue) => {
-		await postSpeaker(venue)
+	const createNewVenue = async (venue) => {
+		await postVenue(venue)
 	}
 
-	async function postSpeaker(venue) {
+	async function postVenue(venue) {
 		try {
 			const res = await fetch(`${$page.url.origin}/api/venues`, {
 				method: 'POST',
@@ -35,6 +35,6 @@
 
 <section class="w-full flex justify-center">
 	<div class="py-12">
-		<VenueForm submitAction={createNewSpeaker}/>
+		<VenueForm submitAction={createNewVenue}/>
 	</div>
 </section>

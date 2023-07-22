@@ -29,7 +29,7 @@
 
 	// Props
 	export let addSpeaker: Speaker | null = null
-	export let updateAction: any = null
+	export let updateAction: ((id: number, speaker) => Promise<void> | null) | null = null
 	export let submitAction = (speaker) => {}
 
 	// State
@@ -49,17 +49,8 @@
 	let updatedSpeaker = {}
 
 	if (addSpeaker) {
-		speaker.id = addSpeaker.id
-		speaker.name = addSpeaker.name
-		speaker.company = addSpeaker.company
-		speaker.jobRole = addSpeaker.jobRole
+		speaker = JSON.parse(JSON.stringify(addSpeaker))
 		speaker.countryId = addSpeaker.country?.id
-		speaker.country = addSpeaker.country
-		speaker.twitter = addSpeaker.twitter
-		speaker.facebook = addSpeaker.facebook
-		speaker.instagram = addSpeaker.instagram
-		speaker.youtube = addSpeaker.youtube
-		speaker.description = addSpeaker.description
 	}
 
 	const handleSubmit = async () => {

@@ -9,6 +9,7 @@
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
 	import Modal from '$lib/components/Modal.svelte'
+	import VenueForm from '$lib/components/custom/VenueForm.svelte'
 
 	let venue: any = null
 	let loading: boolean = true
@@ -20,6 +21,15 @@
 	}
 	const handleCloseModal = () => {
 		isOpen = false
+	}
+
+	// Create Modal
+	let isCreateOpen = false
+	const handleCreateOpenModal = () => {
+		isCreateOpen = true
+	}
+	const handleCreateCloseModal = () => {
+		isCreateOpen = false
 	}
 
 	const removeVenue = async () => {
@@ -53,6 +63,25 @@
 		}
 		loading = false
 	}
+
+	async function postVenue(venue) {
+		try {
+			const res = await fetch(`${$page.url.origin}/api/venues`, {
+				method: 'POST',
+				body: JSON.stringify({ ...venue })
+			})
+
+			if (res.ok) {
+				const data = await res.json()
+				console.log(data)
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
+		}
+	}
+
 
 	function gMapsLink(lat, lng) {
 		const enlace = `http://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&z=17`
@@ -139,8 +168,15 @@
 				{'Remove'}
 			</MainButton>
 		</div>
+		<div class="w-fit">
+			<MainButton on:click={handleCreateOpenModal}>
+				<div class="flex gap-3 items-center justify-center w-28">
+					{'Create Modal'}
+				</div>
+			</MainButton>
+		</div>
 	</div>
-	<svelte:component this={Modal} {isOpen} handleClose={handleCloseModal} title="">
+	<Modal {isOpen} handleClose={handleCloseModal}>
 		<div class="px-12 py-3 flex justify-center flex-col gap-10">
 			<span class="text-neutral-4 font-light font-eesti">
 				{'Do you really want to remove this venue?'}
@@ -162,7 +198,15 @@
 				</div>
 			</div>
 		</div>
-	</svelte:component>
+	</Modal>
+	<Modal isOpen={isCreateOpen} handleClose={handleCreateCloseModal}>
+		<div class="flex flex-col items-center gap-5 py-5 px-12">
+			<span class="pb-5">
+				{'Create the venue profile inside the event creation'}
+			</span>
+			<VenueForm submitAction={postVenue} />
+		</div>
+	</Modal>
 </div>
 
 <style lang="postcss">

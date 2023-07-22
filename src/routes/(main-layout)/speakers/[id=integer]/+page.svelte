@@ -9,21 +9,32 @@
 	import ProfilePic from '$lib/components/ProfilePic.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
 	import Modal from '$lib/components/Modal.svelte'
+	import SpeakerForm from '$lib/components/custom/SpeakerForm.svelte'
 	// Icon
 	import Icon from 'svelte-icons-pack/Icon.svelte'
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
 	import BsTrash3 from 'svelte-icons-pack/bs/BsTrash3'
 
+	// State
 	let speaker: any = null
 	let loading: boolean = true
 
-	// Modal
+	//  Modal
 	let isOpen = false
 	const handleOpenModal = () => {
 		isOpen = true
 	}
 	const handleCloseModal = () => {
 		isOpen = false
+	}
+
+	// Create Modal
+	let isCreateOpen = false
+	const handleCreateOpenModal = () => {
+		isCreateOpen = true
+	}
+	const handleCreateCloseModal = () => {
+		isCreateOpen = false
 	}
 
 	const removeSpeaker = async () => {
@@ -63,6 +74,24 @@
 			console.error('Error:', error)
 		}
 		loading = false
+	}
+
+	async function postSpeaker(speaker) {
+		try {
+			const res = await fetch(`${$page.url.origin}/api/speakers`, {
+				method: 'POST',
+				body: JSON.stringify({ ...speaker })
+			})
+
+			if (res.ok) {
+				const data = await res.json()
+				console.log(data)
+			} else {
+				console.log(await res.json())
+			}
+		} catch (error) {
+			console.error('Error:', error)
+		}
 	}
 
 	onMount(async () => {
@@ -121,7 +150,12 @@
 				{'Remove'}
 			</div>
 		</MainButton>
-		<svelte:component this={Modal} {isOpen} handleClose={handleCloseModal} title="">
+		<MainButton on:click={handleCreateOpenModal}>
+			<div class="flex gap-3 items-center justify-center w-28">
+				{'Create Modal'}
+			</div>
+		</MainButton>
+		<Modal {isOpen} handleClose={handleCloseModal}>
 			<div class="px-12 py-3 flex justify-center flex-col gap-10">
 				<span class="text-neutral-4 font-light font-eesti">
 					{'Do you really want to remove this speaker?'}
@@ -143,7 +177,15 @@
 					</div>
 				</div>
 			</div>
-		</svelte:component>
+		</Modal>
+		<Modal isOpen={isCreateOpen} handleClose={handleCreateCloseModal}>
+			<div class="flex flex-col items-center gap-5 py-5 px-12">
+				<span class="pb-5">
+					{'Create a speaker profile inside the event'}
+				</span>
+				<SpeakerForm submitAction={postSpeaker} />
+			</div>
+		</Modal>
 	</div>
 </div>
 
