@@ -65,6 +65,15 @@
 			const res = await fetch(cUrl)
 			if (res.ok) {
 				data = await res.json()
+				if (data.results) {
+					data.results = data.results.map((item) => ({
+						...item,
+						link: `/admin/${item.id}`
+					}))
+					pageCount = Math.ceil(data.count / itemsPerPage)
+				}
+			} else {
+				error = true
 			}
 		} catch (error) {
 			console.log(error)
@@ -196,6 +205,7 @@
 			columns={tableColumns}
 			data={data?.results}
 			maxItemsPerPage={itemsPerPage}
+			sortedColumns={params.order}
 			{loading}
 			{pageCount}
 		/>
