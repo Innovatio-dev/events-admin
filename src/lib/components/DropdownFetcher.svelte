@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { createDebouncer } from '$lib/utils/debounce'
-	import { SvelteComponent, onMount } from 'svelte'
-	import Dropdown, { type ValueGenerator } from './Dropdown.svelte'
+	import { SvelteComponent, createEventDispatcher, onMount } from 'svelte'
+	import Dropdown, { type ItemGenerator, type ValueGenerator } from './Dropdown.svelte'
 	import TextWithImageViewer from './custom/data_viewer/TextWithImageViewer.svelte'
 	import SimpleTextViewer from './custom/data_viewer/SimpleTextViewer.svelte'
 	export let filterPlaceholder: string = ''
 	export let placeholder: string = ''
-	export let selected: any | any[] | null
+	export let selected: any | any[] | null = null
 	export let multiselect: boolean = false
 	export let url: string
 	export let searchField: string = 'search'
@@ -14,9 +14,11 @@
 	export let value: string = ''
 	export let itemViewer: typeof SvelteComponent = TextWithImageViewer
 	export let selectedViewer: typeof SvelteComponent = SimpleTextViewer
+	export let itemGenerator: ItemGenerator = (item) => ({ title: item.title, image: item.image })
 	export let valueGenerator: ValueGenerator = (item) => {
 		return item.id
 	}
+	let eventDispatcher = createEventDispatcher()
 	let items: any[] = []
 	let loading: boolean = false
 	let filter: string = ''
@@ -71,6 +73,12 @@
 
 		handleDropdownScroll()
 	}
+	function handleOnChange(event) {
+		const canContinue = eventDispatcher('change', event.detail, { cancelable: true })
+		if (!canContinue) {
+			event.preventDefault()
+		}
+	}
 </script>
 
 <Dropdown
@@ -80,6 +88,7 @@
 	manualFilter={true}
 	bind:scrollerRef
 	on:filterChange={handleFilterChange}
+	on:change={handleOnChange}
 	bind:multiselect
 	bind:value
 	{items}
@@ -89,7 +98,7 @@
 	{loading}
 	{filterPlaceholder}
 	{valueGenerator}
-	height={'300px'}
+	{itemGenerator}
 >
 	<svelte:fragment slot="title">{placeholder}</svelte:fragment></Dropdown
 >

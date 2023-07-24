@@ -1,15 +1,10 @@
 <script lang="ts">
 	import DatePicker from '$lib/components/DatePicker.svelte'
 	import DragAndDrop from '$lib/components/DragAndDrop.svelte'
-	import Dropdown from '$lib/components/Dropdown.svelte'
 	import DropdownFetcher from '$lib/components/DropdownFetcher.svelte'
 	import Input from '$lib/components/Input.svelte'
 	import LabelInput from '$lib/components/LabelInput.svelte'
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
-	import DropdownOrganizer from '$lib/components/custom/data_viewer/DropdownOrganizer.svelte'
-	import DropdownOrganizerSelected from '$lib/components/custom/data_viewer/DropdownOrganizerSelected.svelte'
-	import SpeakerSelectedViewer from '$lib/components/custom/data_viewer/SpeakerSelectedViewer.svelte'
-	import SpeakerViewer from '$lib/components/custom/data_viewer/SpeakerViewer.svelte'
 	import { pageStatus } from '$lib/stores/pageStatus'
 	import { onMount } from 'svelte'
 
@@ -48,7 +43,7 @@
 		visibleAt: null
 	}
 
-	let mainSpeaker: any = null
+	let mainSpeakers: any[] = []
 
 	onMount(() => {
 		$pageStatus.title = 'Create an Event'
@@ -65,9 +60,8 @@
 			<DropdownFetcher
 				name="organizerId"
 				filterPlaceholder={'Search'}
-				itemViewer={DropdownOrganizer}
-				selectedViewer={DropdownOrganizerSelected}
-				bind:selected={mainSpeaker}
+				itemGenerator={(item) => ({ title: item.name, image: item.logo?.url })}
+				bind:selected={event.organizerId}
 				bind:value={event.organizerId}
 				placeholder={'Select the organizer for this event'}
 				url={'/api/organizers'}
@@ -164,13 +158,18 @@
 					<LabelInput>Primary Speaker</LabelInput>
 					<DropdownFetcher
 						filterPlaceholder={'Search'}
-						itemViewer={SpeakerViewer}
-						selectedViewer={SpeakerSelectedViewer}
-						bind:selected={mainSpeaker}
+						itemGenerator={(item) => ({ title: item.name, image: item.picture?.url })}
 						valueGenerator={(item) => item.id}
 						placeholder={'Select the main speaker'}
 						searchField={'search'}
 						url={'/api/speakers'}
+						on:change={(e) => {
+							e.preventDefault()
+							const speaker = e.detail.selected
+							if (!mainSpeakers.some((item) => (item.id = speaker.id))) {
+								speaker.push(speaker)
+							}
+						}}
 					/>
 				</div>
 			</div>

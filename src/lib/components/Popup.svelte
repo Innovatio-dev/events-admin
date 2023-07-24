@@ -39,45 +39,40 @@
 		if (window.innerWidth > 600) {
 			const triggerRect = trigger.getBoundingClientRect()
 			const wrapperRect = wrapper.getBoundingClientRect()
-
+			let style = ''
 			const spaceAbove = triggerRect.top
 			const spaceBelow = window.innerHeight - triggerRect.bottom
 			const spaceLeft = triggerRect.left
 			const spaceRight = window.innerWidth - triggerRect.right
-			let top
-			let left
-			let height
-			let width = desiredWidth
-			if (width == 'same') {
-				width = `${triggerRect.width}px`
-			}
+
 			if (desiredPosition == 'bottom') {
 				if (spaceBelow >= wrapperRect.height || spaceBelow >= spaceAbove) {
-					top = triggerRect.bottom
-					height = Math.min(wrapperRect.height, spaceBelow)
+					style = `top: ${triggerRect.bottom}px; max-height: ${spaceBelow}px;`
 				} else {
-					height = Math.min(wrapperRect.height, spaceAbove)
-					top = triggerRect.top - height
+					style = `bottom: ${
+						window.innerHeight - triggerRect.top
+					}px; max-height: ${spaceAbove}px;`
 				}
 			} else {
 				if (spaceAbove >= wrapperRect.height || spaceAbove >= spaceBelow) {
-					height = Math.min(wrapperRect.height, spaceAbove)
-					top = triggerRect.top - height
+					style = `bottom: ${
+						window.innerHeight - triggerRect.top
+					}px; max-height: ${spaceAbove}px;`
 				} else {
-					top = triggerRect.bottom
-					height = Math.min(wrapperRect.height, spaceBelow)
+					style = `top: ${triggerRect.bottom}px; max-height: ${spaceBelow}px;`
 				}
 			}
 			if (desiredAlign == 'left') {
-				left = triggerRect.left
+				style = style + `left: ${triggerRect.left}px;`
 			} else {
-				if (desiredWidth == 'same') {
-					left = triggerRect.left
-				} else {
-					left = triggerRect.right - wrapperRect.width
-				}
+				style = style + `right: ${window.innerWidth - triggerRect.right}px;`
 			}
-			containerStyle = `left: ${left}px; top:${top}px; width:${width};  height: ${height}px;`
+			if (desiredWidth == 'same') {
+				style = style + `width: ${triggerRect.width}px;`
+			} else {
+				style = style + `width: ${desiredWidth};`
+			}
+			containerStyle = style
 		} else {
 			containerStyle = ''
 		}
@@ -122,7 +117,7 @@
 	.scroll-container {
 		overflow-y: auto;
 		position: absolute;
-		box-shadow: 0px 0px 10px #000000a0;
+		box-shadow: 0px 0px 10px #00000056;
 		border-radius: 0.8em;
 		.slot-container {
 			position: relative;
