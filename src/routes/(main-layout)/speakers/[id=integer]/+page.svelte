@@ -98,7 +98,6 @@
 
 	onMount(async () => {
 		let id = $page.params.id
-		$pageStatus.title = 'Speaker Details'
 		await fetchSpeaker(id)
 	})
 </script>

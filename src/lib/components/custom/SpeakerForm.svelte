@@ -12,7 +12,7 @@
 	import { countries } from '$lib/utils/constants/Regions'
 
 	interface Speaker {
-		id: number
+		id?: number
 		picture?: any
 		name: string
 		company: string
@@ -34,7 +34,6 @@
 
 	// State
 	let speaker: Speaker = {
-		id: 0,
 		name: '',
 		company: '',
 		jobRole: '',
@@ -55,7 +54,7 @@
 
 	const handleSubmit = async () => {
 		if (updateAction) {
-			await updateAction(speaker.id, updatedSpeaker)
+			await updateAction(speaker?.id ?? 0, updatedSpeaker)
 		} else {
 			const formattedData = {
 				twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
