@@ -29,7 +29,7 @@ export async function POST(event: RequestEvent) {
 			originalName: params.name,
 			name: newFilename,
 			userId: user?.id,
-			url: `https://${s3BucketName}.${s3Region}.amazonaws.com/public/${newFilename}`
+			url: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/public/${newFilename}`
 		})
 		return json({ uploadUrl: response, resource })
 	} catch (error) {

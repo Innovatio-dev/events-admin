@@ -119,7 +119,7 @@
 			fileUpload.request = uploadRequest
 			files = files
 			uploadRequest.open('PUT', uploadUrl)
-			uploadRequest.send(formData)
+			uploadRequest.send(fileUpload.file)
 		} else {
 			fileUpload.status = 2
 			files = files
@@ -150,7 +150,14 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="mainContainer">
-	<input bind:this={inputRef} on:change={handleInputFile} type="file" hidden {multiple} />
+	<input
+		bind:this={inputRef}
+		on:change={handleInputFile}
+		type="file"
+		accept="images/*"
+		hidden
+		{multiple}
+	/>
 	{#if files.length == 0}
 		<div
 			class="content"
