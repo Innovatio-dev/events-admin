@@ -1,12 +1,19 @@
 <script lang="ts">
+	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
+	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
+	import Modal from '$lib/components/Modal.svelte'
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import { onMount } from 'svelte'
 
+	// Admin data state
 	let isLoading = false
 	let isError = false
 	let admin: any = null
+
+	// Remove admin state
+	let isOpenRemove = false
 
 	$: date = new Date(admin?.createdAt)
 	$: joinDate = date.toLocaleDateString('en-US', {
@@ -35,6 +42,22 @@
 		} finally {
 			isLoading = false
 		}
+	}
+
+	// Handlers
+	const handleRemove = () => {
+		isOpenRemove = true
+	}
+
+	// Remove handlers
+	const handleCloseRemove = () => {
+		isOpenRemove = false
+	}
+
+	const handleAprovedRemove = async () => {
+		// await setApproved()
+		isOpenRemove = false
+		goto('/admin')
 	}
 </script>
 
@@ -65,10 +88,17 @@
 		<div class="grid grid-cols-2 place-content-between gap-x-12 gap-y-6">
 			<MainButton>Change email</MainButton>
 			<MainButton>Reset password</MainButton>
-			<MainButton>Remove</MainButton>
+			<MainButton on:click={handleRemove}>Remove</MainButton>
 			<MainButton>Make super admin</MainButton>
 		</div>
 	</div>
+	<Modal isOpen={isOpenRemove} handleClose={handleCloseRemove} title="">
+		<ApprovedModal
+			text="Do you really want to remove this user?"
+			onCancel={handleCloseRemove}
+			onConfirm={handleAprovedRemove}
+		/>
+	</Modal>
 </section>
 
 <style lang="postcss">
