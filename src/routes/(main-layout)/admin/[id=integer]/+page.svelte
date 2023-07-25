@@ -82,7 +82,33 @@
 		}
 	}
 
-	async function resetPassword() {}
+	async function resetPassword() {
+		try {
+			handleMatchPassword()
+			if (isPasswordUnmatching) {
+				return
+			}
+			isResetLoading = true
+			isResetError = false
+			const res = await fetch(`${$page.url.origin}/api/admins/${$page.params.id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ newPassword: password })
+			})
+
+			if (res.ok) {
+				await res.json()
+				handleCancelPassword()
+			} else {
+				console.log(await res.json())
+				isResetError = true
+			}
+		} catch (error) {
+			console.error('Error:', error)
+			isResetError = true
+		} finally {
+			isResetLoading = false
+		}
+	}
 
 	// Handlers
 	function handleRemove() {
