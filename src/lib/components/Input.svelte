@@ -20,7 +20,6 @@
 	export let readOnly: boolean = false
 	export let required = false
 	export let disabled = false
-	
 
 	let currentType: InputType = type
 
@@ -88,7 +87,10 @@
 				isFocused = true
 				dispatch('focus', ev)
 			}}
-			on:blur={() => (isFocused = false)}
+			on:blur={(ev) => {
+				isFocused = false
+				dispatch('blur', ev)
+			}}
 			on:input={handleChange}
 			on:keypress={handleKeyPress}
 			{required}

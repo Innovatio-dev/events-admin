@@ -44,6 +44,8 @@
 			const spaceBelow = window.innerHeight - triggerRect.bottom
 			const spaceLeft = triggerRect.left
 			const spaceRight = window.innerWidth - triggerRect.right
+			// Obtener el ancho del scrollbar horizontal si está presente
+			const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
 
 			if (desiredPosition == 'bottom') {
 				if (spaceBelow >= wrapperRect.height || spaceBelow >= spaceAbove) {
@@ -65,13 +67,16 @@
 			if (desiredAlign == 'left') {
 				style = style + `left: ${triggerRect.left}px;`
 			} else {
-				style = style + `right: ${window.innerWidth - triggerRect.right}px;`
+				// Ajustar la posición con el ancho del scrollbar si es necesario
+				style = style + `right: ${spaceRight - scrollbarWidth}px;`
 			}
+
 			if (desiredWidth == 'same') {
 				style = style + `width: ${triggerRect.width}px;`
 			} else {
 				style = style + `width: ${desiredWidth};`
 			}
+
 			containerStyle = style
 		} else {
 			containerStyle = ''
