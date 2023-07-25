@@ -13,6 +13,8 @@
 	let admin: any = null
 
 	// Remove admin state
+	let isRemoveLoading = false
+	let isRemoveError = false
 	let isOpenRemove = false
 
 	$: date = new Date(admin?.createdAt)
@@ -26,6 +28,7 @@
 		getAdminDetails()
 	})
 
+	// Requests
 	async function getAdminDetails() {
 		try {
 			isLoading = true
@@ -44,20 +47,41 @@
 		}
 	}
 
+	async function deleteAdmin() {
+		try {
+			isRemoveLoading = true
+			isRemoveError = false
+			const res = await fetch(`${$page.url.origin}/api/admins/${$page.params.id}`, {
+				method: 'DELETE'
+			})
+			if (res.ok) {
+				isOpenRemove = false
+				goto('/admin')
+			} else {
+				isRemoveError = true
+				throw new Error(await res.json())
+			}
+		} catch (error) {
+			console.log(error)
+			isRemoveError = true
+		} finally {
+			isRemoveLoading = false
+		}
+	}
+
 	// Handlers
-	const handleRemove = () => {
+	function handleRemove() {
 		isOpenRemove = true
 	}
 
 	// Remove handlers
-	const handleCloseRemove = () => {
+	function handleCloseRemove() {
 		isOpenRemove = false
+		isRemoveError = false
 	}
 
-	const handleAprovedRemove = async () => {
-		// await setApproved()
-		isOpenRemove = false
-		goto('/admin')
+	function handleAprovedRemove() {
+		deleteAdmin()
 	}
 </script>
 
@@ -95,9 +119,16 @@
 	<Modal isOpen={isOpenRemove} handleClose={handleCloseRemove} title="">
 		<ApprovedModal
 			text="Do you really want to remove this user?"
+			yesButtonText={isRemoveLoading ? '...' : 'Yes'}
+			isLoading={isRemoveLoading}
 			onCancel={handleCloseRemove}
 			onConfirm={handleAprovedRemove}
 		/>
+		{#if isRemoveError}
+			<p class="bg-alert-error text-sm font-medium text-white font-dm rounded-lg py-2 px-4">
+				An error has occurred, please try again.
+			</p>
+		{/if}
 	</Modal>
 </section>
 
