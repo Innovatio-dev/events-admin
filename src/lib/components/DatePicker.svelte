@@ -98,7 +98,7 @@
 		.header {
 			padding: 1em;
 			width: 100%;
-			background: var(--brand-pink);
+			background: var(--gd-icon);
 			color: #fff;
 		}
 		.body {

@@ -17,7 +17,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.8em;
-
+		width: 100%;
 		padding: 0em 0.8em;
 		.text {
 			flex-grow: 1;
