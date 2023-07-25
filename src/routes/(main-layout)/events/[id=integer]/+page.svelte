@@ -2,7 +2,9 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { pageStatus } from '$lib/stores/pageStatus'
+	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
+	// Icons
 	import Icon from 'svelte-icons-pack'
 	import BiLogoFacebookCircle from 'svelte-icons-pack/bi/BiLogoFacebookCircle'
 	import BiLogoInstagramAlt from 'svelte-icons-pack/bi/BiLogoInstagramAlt'
@@ -54,8 +56,8 @@
 				</div>
 			{:else if events.venue}
 				<div class="content">
-					<p>{events.status ?? '---'}</p>
-					<p>{events.id ?? '---'}</p>
+					<p>{events.status === 0 ? 'Inactive ' : 'Active'}</p>
+					<p>{events.uid ?? '---'}</p>
 					<p>{events.venue.country.name ?? '---'}</p>
 					<p>{events.venue.addres ?? '---'}</p>
 				</div>
@@ -96,8 +98,8 @@
 				</div>
 			{:else if events.venue}
 				<div class="content">
-					<p>{events.typeEvent ?? '---'}</p>
-					<p>{events.isFeatured ?? '---'}</p>
+					<p>{events.typeEvent === 0 ? 'Virtual' : 'Live'}</p>
+					<p>{events.isFeatured ? 'Featured' : 'Regular'}</p>
 					<p>{events.title ?? '---'}</p>
 					<p>{events.description ?? '---'}</p>
 				</div>
@@ -274,7 +276,7 @@
 			{:else if events.venue}
 				<div class="content">
 					<p>{events.venue.name ?? '---'}</p>
-					<p>{events.venue.country.name ?? '---'}</p>
+					<p>{events.venue.country.nicename ?? '---'}</p>
 					<p>{events.venue.addres ?? '---'}</p>
 				</div>
 			{/if}
@@ -315,6 +317,21 @@
 				</div>
 			{/if}
 		</div>
+		<div class="grid grid-cols-2 min-w-[400px] mb-8">
+			<div class="field">
+				<p>Organizer full name:</p>
+			</div>
+			{#if loading}
+				<div class="w-full h-full flex">
+					<SimpleSkeleton width={200} height={20} items={1} />
+				</div>
+			{:else if events.venue}
+				<div class="content">
+					<p>{events.organizer.name ?? '---'}</p>
+				</div>
+			{/if}
+		</div>
+		
 	</div>
 </div>
 
