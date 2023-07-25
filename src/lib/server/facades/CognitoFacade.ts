@@ -16,7 +16,8 @@ import {
 	AdminCreateUserCommand,
 	ConfirmSignUpCommand,
 	RespondToAuthChallengeCommand,
-	AdminSetUserPasswordCommand
+	AdminSetUserPasswordCommand,
+	AdminUpdateUserAttributesCommand
 } from '@aws-sdk/client-cognito-identity-provider'
 
 export class CognitoFacade {
@@ -175,6 +176,26 @@ export class CognitoFacade {
 			Session: session,
 			ChallengeResponses: challengeResponses
 		})
+		return await this.client.send(command)
+	}
+
+	async changeUserEmail(email: string, newEmail: string) {
+		const params = {
+			UserPoolId: this.userPoolId,
+			Username: email,
+			UserAttributes: [
+				{
+					Name: 'email',
+					Value: newEmail
+				},
+				{
+					Name: 'email_verified',
+					Value: 'true'
+				}
+			]
+		}
+
+		const command = new AdminUpdateUserAttributesCommand(params)
 		return await this.client.send(command)
 	}
 }
