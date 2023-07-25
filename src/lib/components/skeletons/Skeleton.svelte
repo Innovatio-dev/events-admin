@@ -2,7 +2,7 @@
 	export let wFull: boolean = false
 	export let hFull: boolean = false
 	export let width: number | null = null
-	export let height: number
+	export let height: number | null = null
 	export let circle: boolean = false
 	export let items: number = 1
 	export let bg: string = 'neutral-2'
@@ -14,7 +14,7 @@
 			class={`animate-pulse bg-${bg} ${circle ? 'rounded-[50%]' : 'rounded-md'}`}
 			style={`
 				width: ${wFull ? 'full' : `${width}px`}; 
-				height: ${hFull ? 'full' : `${height}px`};
+				height: ${hFull ? '100%' : `${height}px`};
 			`}
 		/>
 	{/each}
