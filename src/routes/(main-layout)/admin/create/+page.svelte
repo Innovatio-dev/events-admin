@@ -33,9 +33,15 @@
 		try {
 			isLoading = true
 			isError = false
+
+			const { superadmin, ...restAdmin } = admin
+			const payload = {
+				role: superadmin ? 1 : 2,
+				...restAdmin
+			}
 			const res = await fetch(`${$page.url.origin}/api/admins`, {
 				method: 'POST',
-				body: JSON.stringify({ ...admin })
+				body: JSON.stringify({ ...payload })
 			})
 
 			if (res.ok) {
@@ -75,7 +81,7 @@
 		/>
 		<Input
 			label="Email"
-			type="text"
+			type="email"
 			bind:value={admin.email}
 			placeholder="Type the email"
 			required
@@ -83,10 +89,14 @@
 		<div class="w-full flex justify-between items-center">
 			<p>Generate a new random password</p>
 			<div class="w-40">
-				<MainButton on:click={generateRandomPassword}>
+				<button
+					type="button"
+					class="hover:bg-gd-icon hover:!text-white hover:!fill-white hover:border-neutral-1 border-2 border-neutral-2 text-neutral-4 fill-neutral-4 p-2 flex w-full justify-evenly gap-2 rounded-lg font-medium transition-all ease-in-out px-4 py-2 items-center"
+					on:click={generateRandomPassword}
+				>
 					<Icon size="22px" src={BiRevision} />
 					<span>Generate</span>
-				</MainButton>
+				</button>
 			</div>
 		</div>
 		<Input
