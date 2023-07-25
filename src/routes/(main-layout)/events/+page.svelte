@@ -1,11 +1,13 @@
 <script lang="ts">
+	//Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
-	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
-	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
-	import Icon from 'svelte-icons-pack'
-	import { page } from '$app/stores'
-	import { afterNavigate, goto } from '$app/navigation'
+	import TextViewer from '$lib/components/table_cell/TextViewer.svelte'
+	import VRegionViewer from '$lib/components/table_cell/VRegionViewer.svelte'
+	import VCountryViewer from '$lib/components/table_cell/VCountryViewer.svelte'
+	import VCityViewer from '$lib/components/table_cell/VCityViewer.svelte'
+	import FeaturedViewer from '$lib/components/table_cell/FeaturedViewer.svelte'
+	import Dropdown from '$lib/components/Dropdown.svelte'
 	import Badge from '$lib/components/Badge.svelte'
 	import type { Column } from '$lib/components/SortableTable.svelte'
 	import SortableTable from '$lib/components/SortableTable.svelte'
@@ -13,6 +15,16 @@
 	import TypeEventViewer from '$lib/components/table_cell/TypeEventViewer.svelte'
 	import StatusViewer from '$lib/components/table_cell/StatusViewer.svelte'
 	import SeeMoreButton from '$lib/components/table_cell/SeeMoreButton.svelte'
+	//Icons
+	import Icon from 'svelte-icons-pack'
+	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
+	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
+	import Board from '$lib/components/icons/Board.svelte'
+	import Ticket from '$lib/components/icons/Ticket.svelte'
+	//Utils
+	import { page } from '$app/stores'
+	import { createDebouncer } from '$lib/utils/debounce'
+	import { afterNavigate, goto } from '$app/navigation'
 	import { organizerListSchema } from '$lib/utils/validation/schemas'
 	import {
 		createUrl,
@@ -20,15 +32,6 @@
 		mapArrayIntoCollectionOrder,
 		validateUrlSearchParams
 	} from '$lib/utils/validation/validation'
-	import { createDebouncer } from '$lib/utils/debounce'
-	import TextViewer from '$lib/components/table_cell/TextViewer.svelte'
-	import VRegionViewer from '$lib/components/table_cell/VRegionViewer.svelte'
-	import VCountryViewer from '$lib/components/table_cell/VCountryViewer.svelte'
-	import VCityViewer from '$lib/components/table_cell/VCityViewer.svelte'
-	import FeaturedViewer from '$lib/components/table_cell/FeaturedViewer.svelte'
-	import Dropdown from '$lib/components/Dropdown.svelte'
-	import Board from '$lib/components/icons/Board.svelte'
-	import Ticket from '$lib/components/icons/Ticket.svelte'
 
 	let loading: boolean = true
 	let data: any = null
@@ -145,7 +148,7 @@
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
 			if (params.locations.length) {
-				params.status = mapArrayIntoCollection(params.status, locations, 'value')
+				params.status = mapArrayIntoCollection(params.location, locations, 'value')
 			}
 			if (params.status.length) {
 				params.status = mapArrayIntoCollection(params.status, statuses, 'value')
@@ -192,7 +195,6 @@
 
 	async function gotoFilter(filter: any) {
 		const url = createUrl($page.url, filter)
-
 		await goto(url, {
 			replaceState: true,
 			keepFocus: true
