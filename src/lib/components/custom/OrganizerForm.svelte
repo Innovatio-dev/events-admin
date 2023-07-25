@@ -15,6 +15,7 @@
 	interface Organizer {
 		id?: number
 		logo?: any
+		status?: number
 		isMember: boolean
 		mavieId: string
 		name: string
@@ -30,6 +31,7 @@
 		youtube: string
 		description: string
 		countryId: any
+		logos: number[]
 	}
 
 	// Props
@@ -52,9 +54,13 @@
 		instagram: '',
 		youtube: '',
 		description: '',
-		countryId: ''
+		countryId: '',
+		logos:[]
 	}
-	let updatedOrganizer = {}
+	let updatedOrganizer = {
+		status: addOrganizer?.status,
+		reason: 'Organizer updated'
+	}
 
 	if (addOrganizer) {
 		organizer = JSON.parse(JSON.stringify(addOrganizer))
@@ -70,7 +76,8 @@
 				twitter: 'https://twitter.com/' + organizer.twitter.replace(/\s/g, '_'),
 				facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
 				instagram: 'https://instagram.com/' + organizer.instagram.replace(/\s/g, '_'),
-				youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_')
+				youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_'),
+				logoId: organizer.logos[0]
 			}
 			submitAction({ ...organizer, ...formattedData })
 		}
@@ -117,11 +124,23 @@
 			<ToggleButtton bind:checked={organizer.isMember} id="tid1" text right="Yes" left="No" />
 		</div>
 		<div>
-			<Input label="Mavie Id:" type="number" name='mavieId' bind:value={organizer.mavieId} />
+			<Input label="Mavie Id:" type="number" name="mavieId" bind:value={organizer.mavieId} />
 		</div>
 	</div>
-	<Input required label="Organizer full name:" type="text" name='name' bind:value={organizer.name} />
-	<Input required label="Organizer company name:" type="text" name='company' bind:value={organizer.company} />
+	<Input
+		required
+		label="Organizer full name:"
+		type="text"
+		name="name"
+		bind:value={organizer.name}
+	/>
+	<Input
+		required
+		label="Organizer company name:"
+		type="text"
+		name="company"
+		bind:value={organizer.company}
+	/>
 	<div class="flex items-end gap-5">
 		<select class="max-w-[6rem]" name="" id="">
 			{#each countries as country}
@@ -130,8 +149,8 @@
 				</option>
 			{/each}
 		</select>
-		<Input required label="Phone:" type="tel" name='phone'  bind:value={organizer.phone} />
-		<Input required label="E-mail:" type="email" name='email' bind:value={organizer.email} />
+		<Input required label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
+		<Input required label="E-mail:" type="email" name="email" bind:value={organizer.email} />
 	</div>
 	<div class="flex flex-col w-full">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
@@ -154,6 +173,9 @@
 		</div>
 	</div>
 	<!-- <Input required label="Country:" type="text" bind:value={organizer.country.name} /> -->
+	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
+		{'Country:'}
+	</span>
 	<Dropdown
 		name="countryId"
 		selected={{
@@ -166,11 +188,17 @@
 			return { value: country.id, title: country.nicename ?? '' }
 		})}
 	/>
-	<Input required name='twitter' label="Twitter:" type="text" bind:value={organizer.twitter} />
-	<Input required name='website' label="Website:" type="url" bind:value={organizer.website} />
-	<Input required name='facebook' label="Facebook:" type="text" bind:value={organizer.facebook} />
-	<Input required name='instagram' label="Instagram:" type="text" bind:value={organizer.instagram} />
-	<Input required name='youtube' label="Youtube:" type="text" bind:value={organizer.youtube} />
+	<Input required name="twitter" label="Twitter:" type="text" bind:value={organizer.twitter} />
+	<Input required name="website" label="Website:" type="url" bind:value={organizer.website} />
+	<Input required name="facebook" label="Facebook:" type="text" bind:value={organizer.facebook} />
+	<Input
+		required
+		name="instagram"
+		label="Instagram:"
+		type="text"
+		bind:value={organizer.instagram}
+	/>
+	<Input required name="youtube" label="Youtube:" type="text" bind:value={organizer.youtube} />
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 		{'Organizer photo'}
 	</span>
@@ -178,6 +206,7 @@
 		<UploadedImage image={addOrganizer.logo?.url ?? ''} />
 	{:else}
 		<DragAndDrop
+			bind:uploaded={organizer.logos}
 			url="/api/resources"
 			name="file"
 			title="Upload your image (Optional)"
@@ -213,11 +242,6 @@
 		&:focus {
 			border: 2px solid var(--input-text);
 		}
-		// &.error {
-		// 	border: 2px solid var(--input-text-error);
-		// 	background-color: var(--input-bg-error);
-		// 	color: var(--input-text-error);
-		// }
 	}
 	textarea,
 	select::placeholder {
@@ -232,27 +256,4 @@
 	select:-webkit-autofill {
 		-webkit-text-fill-color: var(--input-text) !important;
 	}
-	// .actions {
-	// 	position: absolute;
-	// 	height: 100%;
-	// 	display: flex;
-	// 	align-items: center;
-	// 	justify-content: center;
-	// 	gap: 10px;
-	// 	top: 0;
-	// 	right: 0;
-	// 	padding: 0.7rem calc(0.6rem * 20 / 12);
-	// 	color: var(--input-placeholder);
-	// 	transition: color 0.3s ease-in-out;
-	// 	&.focused {
-	// 		color: var(--input-text);
-	// 	}
-	// 	&.error {
-	// 		color: var(--input-text-error);
-	// 	}
-	// 	.icon {
-	// 		cursor: pointer;
-	// 		font-size: 22px;
-	// 	}
-	// }
 </style>
