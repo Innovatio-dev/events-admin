@@ -5,25 +5,29 @@ import { validateSearchParam } from '$lib/server/middlewares/validator'
 import { Region } from '$lib/server/models/region'
 import { HttpResponses } from '$lib/server/constants/httpResponses'
 import { Country } from '$lib/server/models/country'
-import sequelize from 'sequelize'
+import sequelize, { type Order } from 'sequelize'
+import { orderSchema } from '$lib/utils/validation/schemas'
 
 const schema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
 	regionId: Joi.number().min(0).optional(),
 	limit: Joi.number().min(-1).optional().default(10),
-	search: Joi.string().min(0).optional()
+	search: Joi.string().min(0).optional(),
+	order: orderSchema(['id', 'status', 'city']).optional()
 })
 
-interface DynamicObject {
-	[key: string]: string | number
-}
-
 export async function GET(event: RequestEvent) {
-	const where: DynamicObject = {}
+	const where: any = {}
+	const order: Order = []
 	const filter = validateSearchParam(event, schema)
 
 	if (filter.regionId) {
 		where.regionId = filter.regionId
+	}
+	if (filter.order) {
+		for (const col of filter.order) {
+			order.push([col.name, col.type])
+		}
 	}
 	if (filter.search) {
 		const search = `%${filter.search}%`
@@ -57,6 +61,7 @@ export async function GET(event: RequestEvent) {
 		where,
 		limit: filter.limit >= 0 ? filter.limit : undefined,
 		offset: filter.offset,
+		order,
 		include: [
 			{
 				model: Region,
