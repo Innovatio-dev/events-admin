@@ -1,8 +1,11 @@
 <script>
-	import OrganizerForm from '$lib/components/custom/OrganizerForm.svelte'
-	import { pageStatus } from '$lib/stores/pageStatus'
+	// Svelte
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
+	// Store
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
+	// Components
+	import OrganizerForm from '$lib/components/custom/OrganizerForm.svelte'
 
 	const createNewOrganizerRequest = async (organizer) => {
 		await postOrganizerRequest(organizer)
@@ -17,12 +20,13 @@
 
 			if (res.ok) {
 				const data = await res.json()
-				console.log(data)
+				$pageAlert = { message: 'Success! Organizer added correctly.', status: true }
 			} else {
 				console.log(await res.json())
 			}
 		} catch (error) {
 			console.error('Error:', error)
+			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
 	}
 
