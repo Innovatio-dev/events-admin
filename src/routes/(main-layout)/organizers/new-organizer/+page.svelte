@@ -23,6 +23,10 @@
 				$pageAlert = { message: 'Success! Organizer added correctly.', status: true }
 			} else {
 				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
 			}
 		} catch (error) {
 			console.error('Error:', error)
