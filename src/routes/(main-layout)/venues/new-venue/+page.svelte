@@ -1,8 +1,9 @@
-<script lang='ts'>
+<script lang="ts">
 	// Svelte
-	import { pageStatus } from '$lib/stores/pageStatus'
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
+	// Store
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	// Components
 	import VenueForm from '$lib/components/custom/VenueForm.svelte'
 
@@ -19,12 +20,17 @@
 
 			if (res.ok) {
 				const data = await res.json()
-				console.log(data)
+				$pageAlert = { message: 'Success! Speaker added correctly.', status: true }
 			} else {
 				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
 			}
 		} catch (error) {
 			console.error('Error:', error)
+			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
 	}
 
@@ -35,6 +41,6 @@
 
 <section class="w-full flex justify-center">
 	<div class="py-12">
-		<VenueForm submitAction={createNewVenue}/>
+		<VenueForm submitAction={createNewVenue} />
 	</div>
 </section>

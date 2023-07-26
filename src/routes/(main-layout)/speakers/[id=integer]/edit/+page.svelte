@@ -3,10 +3,9 @@
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
 	// Store
-	import { pageStatus } from '$lib/stores/pageStatus'
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	// Components
 	import SpeakerForm from '$lib/components/custom/SpeakerForm.svelte'
-	import ProfileHeader from '$lib/components/custom/ProfileHeader.svelte'
 	// Animations
 	import { Circle3 } from 'svelte-loading-spinners'
 
@@ -38,12 +37,17 @@
 			})
 			if (res.ok) {
 				const data = await res.json()
-				// console.log(data)
+				$pageAlert = { message: 'Success! Speaker updated correctly.', status: true }
 			} else {
 				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
 			}
 		} catch (error) {
 			console.error('Error:', error)
+			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
 		loading = false
 	}

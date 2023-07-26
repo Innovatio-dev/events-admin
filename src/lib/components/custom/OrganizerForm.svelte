@@ -81,7 +81,7 @@
 			}
 			submitAction({ ...organizer, ...formattedData })
 		}
-		// goto('/organizers')
+		goto('/organizers')
 	}
 
 	const updateOrganizer = (e) => {

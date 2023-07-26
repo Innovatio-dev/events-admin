@@ -4,6 +4,7 @@
 	import logo from '$lib/images/logo.svg'
 	import mavieDoted from '$lib/images/mavie-doted.png'
 	import SideBarMenu from '$lib/components/SideBarMenu.svelte'
+	import Alert from '$lib/components/Alert.svelte'
 
 	import { page } from '$app/stores'
 
@@ -16,7 +17,7 @@
 	import Checklist from '$lib/components/icons/Checklist.svelte'
 	import { afterNavigate, beforeNavigate } from '$app/navigation'
 	import BreadCrumb from '$lib/components/BreadCrumb.svelte'
-	import { pageStatus } from '$lib/stores/pageStatus'
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	import Popup from '$lib/components/Popup.svelte'
 	import SimpleList from '$lib/components/SimpleList.svelte'
 	import AiOutlineUser from 'svelte-icons-pack/ai/AiOutlineUser'
@@ -26,6 +27,24 @@
 
 	let expandedMenu = true
 	let floatingMenu = false
+	let showAlert = false
+
+	const renderAlert = () => {
+		const alert = $pageAlert.message
+		if (alert) {
+			setTimeout(() => {
+				showAlert = true
+			}, 200)
+			setTimeout(() => {
+				showAlert = false
+				$pageAlert = { message: null, status: false }
+				// console.log($pageAlert)
+			}, 5000)
+		}
+	}
+
+	$: $pageAlert, renderAlert()
+
 	let menuPopup
 	let avatarLogo
 
@@ -134,7 +153,9 @@
 			<slot />
 		</div>
 	</div>
-
+	{#if showAlert}
+		<Alert />
+	{/if}
 	<footer />
 </div>
 
