@@ -14,6 +14,35 @@
 	let isChangeLoading = false
 	let isChangeError = false
 
+	// Request
+	async function changeEmail() {
+		try {
+			handleMatchEmail()
+			if (isEmailUnmatching) {
+				return
+			}
+			isChangeLoading = true
+			isChangeError = false
+			const res = await fetch(`${$page.url.origin}/api/admins/${$page.params.id}/email`, {
+				method: 'PUT',
+				body: JSON.stringify({ newEmail: email })
+			})
+
+			if (res.ok) {
+				await res.json()
+				location.reload()
+			} else {
+				console.log(await res.json())
+				isChangeError = true
+			}
+		} catch (error) {
+			console.error('Error:', error)
+			isChangeError = true
+		} finally {
+			isChangeLoading = false
+		}
+	}
+
 	// Handlers
 	function handleMatchEmail() {
 		if (email !== reEmail) {
@@ -23,7 +52,9 @@
 		isEmailUnmatching = false
 	}
 
-	function handleSubmitEmail() {}
+	function handleSubmitEmail() {
+		changeEmail()
+	}
 
 	function handleCancelEmail() {
 		onCancel()
