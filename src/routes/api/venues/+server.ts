@@ -7,6 +7,7 @@ import { HttpResponses } from '$lib/server/constants/httpResponses'
 import { Country } from '$lib/server/models/country'
 import sequelize, { type Order } from 'sequelize'
 import { orderSchema } from '$lib/utils/validation/schemas'
+import { getConnection } from '$lib/server/config/database'
 
 const schema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
@@ -95,12 +96,18 @@ export async function POST(event: RequestEvent) {
 	const data = await event.request.json()
 	const validate = postSchema.validate(data)
 
+	const connection = await getConnection()
+	const transaction = await connection.transaction()
+
 	try {
-		const result = await Venue.create(validate.value)
-		result.setPictures(validate.value.pictures)
+		const result = await Venue.create(validate.value, { transaction })
+		await result.setPictures(validate.value.pictures, { transaction })
+
+		await transaction.commit()
 		return json(result)
 	} catch (err) {
 		console.log(err)
+		await transaction.rollback()
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
 			message: 'Something happend, try again later'
 		})
