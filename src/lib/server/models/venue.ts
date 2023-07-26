@@ -53,7 +53,7 @@ export const init = (sequelize: Sequelize) => {
 		]
 	}))
 	Venue.addScope('list', () => ({
-		attributes: ['id', 'status', 'name', 'city', 'address', 'description'],
+		attributes: ['id', 'status', 'name', 'city', 'address', 'description', 'location'],
 		include: [
 			{
 				model: Region,

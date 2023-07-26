@@ -35,6 +35,9 @@ dependencies:
   joi:
     specifier: ^17.8.4
     version: 17.9.2
+  leaflet:
+    specifier: ^1.9.4
+    version: 1.9.4
   multer:
     specifier: 1.4.5-lts.1
     version: 1.4.5-lts.1
@@ -6635,8 +6638,6 @@ packages:
   /leaflet@1.9.4:
     resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
     requiresBuild: true
-    dev: true
-    optional: true
 
   /leven@2.1.0:
     resolution: {integrity: sha512-nvVPLpIHUxCUoRLrFqTgSxXJ614d8AgQoWl7zPe/2VadE8+1dpU3LBhowRuBAcuwruWtOdD8oYC9jDNJjXDPyA==}

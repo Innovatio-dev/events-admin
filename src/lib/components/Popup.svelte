@@ -24,6 +24,9 @@
 	onMount(() => {
 		const handleBackButton = (event) => {
 			event.preventDefault()
+			if (visible) {
+				hide()
+			}
 		}
 
 		window.addEventListener('popstate', handleBackButton)
@@ -79,7 +82,12 @@
 
 			containerStyle = style
 		} else {
-			containerStyle = ''
+			containerStyle = `position: relative; max-height: 80%;`
+			if (desiredWidth == 'fit-content' || desiredWidth == 'same') {
+				containerStyle = `${containerStyle} max-width: 80%;`
+			} else {
+				containerStyle = `${containerStyle} width: ${desiredWidth}`
+			}
 		}
 	}
 </script>
@@ -114,9 +122,17 @@
 		&.visible {
 			height: 100%;
 		}
+		@media (max-width: 600px) {
+			display: flex;
+			align-items: flex-end;
+			justify-content: center;
+		}
 		.bg {
 			position: absolute;
 			inset: 0;
+			@media (max-width: 600px) {
+				background-color: #00000056;
+			}
 		}
 	}
 	.scroll-container {
@@ -126,6 +142,9 @@
 		border-radius: 0.8em;
 		.slot-container {
 			position: relative;
+		}
+		@media (max-width: 600px) {
+			border-radius: 0.8em 0.8em 0 0;
 		}
 	}
 </style>
