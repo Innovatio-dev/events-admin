@@ -66,7 +66,7 @@
 			}
 			await submitAction({ ...speaker, ...formattedData })
 		}
-		goto('/speakers')
+		// goto('/speakers')
 	}
 
 	const updateSpeaker = (e) => {
@@ -74,7 +74,7 @@
 	}
 
 	const onCancel = () => {
-		goto('/speakers')
+		// goto('/speakers')
 	}
 </script>
 

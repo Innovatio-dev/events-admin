@@ -14,7 +14,7 @@
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
 
 	interface Venue {
-		id: number
+		id?: number
 		name: string
 		country: string
 		city: string
@@ -31,7 +31,6 @@
 
 	// State
 	let venue: Venue = {
-		id: 0,
 		name: '',
 		country: '',
 		city: '',
@@ -61,11 +60,11 @@
 
 	const handleSubmit = async () => {
 		if (updateAction) {
-			await updateAction(venue.id, updatedVenue)
+			await updateAction(venue?.id ?? 0, updatedVenue)
 		} else {
 			await submitAction({ ...venue, ...geoData })
 		}
-		goto('/venues')
+		// goto('/venues')
 	}
 
 	const updateVenue = (e) => {
@@ -73,7 +72,7 @@
 	}
 
 	const onCancel = () => {
-		goto('/venues')
+		// goto('/venues')
 	}
 </script>
 
