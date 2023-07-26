@@ -8,6 +8,7 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import MarkButton from '$lib/components/preview/MarkButton.svelte'
+	import Carousel  from '$lib/components/preview/Carousel.svelte'
 	// Icons
 	import Icon from 'svelte-icons-pack'
 	import FiCopy from 'svelte-icons-pack/fi/FiCopy'
@@ -106,9 +107,9 @@
 							</div>
 						{:else if events}
 							<div
-								class="flex flex-col justify-between bg-black w-[115%] h-[700px] relative -ml-[9%]"
+								class="flex flex-col justify-between bg-black w-[115%] h-fit relative -ml-[9%]"
 							>
-								<div class="flex items-center justify-start gap-x-4 px-6 py-4">
+								<div class="flex items-center justify-start gap-x-4 px-6 py-4 h-fit">
 									<div class="flex items-center justify-center gap-x-2">
 										<Icon src={CgAdd} size={'2rem'} />
 										<div>invite</div>
@@ -130,7 +131,9 @@
 										<Icon src={FiCopy} />
 									</div>
 								</div>
-
+								<div class="w-full h-[500px] overflow-hidden">
+									<Carousel images={events.pictures}/>
+								</div>
 								<div class="flex items-center justify-center w-full mx-auto py-6">
 									<MarkButton text="Mark the date" />
 								</div>
