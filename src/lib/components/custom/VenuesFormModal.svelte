@@ -1,8 +1,9 @@
 <script lang="ts">
+	// Svelte
+	import { createEventDispatcher } from 'svelte'
 	// Store
 	import { page } from '$app/stores'
 	import { pageAlert } from '$lib/stores/pageStatus'
-
 	// Components
 	import Modal from '../Modal.svelte'
 	import VenueForm from './VenueForm.svelte'
@@ -11,8 +12,9 @@
 	export let isOpen: boolean
 	export let handleClose: () => void
 	export let venue: any = null
-	export let response: any = null
 	export let loading: boolean = false
+
+	const dispatch = createEventDispatcher()
 
 	async function postVenue(venue) {
 		loading = true
@@ -24,8 +26,10 @@
 
 			if (res.ok) {
 				const data = await res.json()
-				response = data
 				$pageAlert = { message: 'Success! Venue added correctly.', status: true }
+				dispatch('save', {
+					...data
+				})
 				handleClose()
 			} else {
 				console.log(await res.json())
@@ -38,6 +42,10 @@
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
+			dispatch('save', {
+				error: error
+			})
+			handleClose()
 		}
 		loading = false
 	}
@@ -51,8 +59,11 @@
 			})
 			if (res.ok) {
 				const data = await res.json()
-				response = data
 				$pageAlert = { message: 'Success! Venue updated correctly.', status: true }
+				dispatch('save', {
+					...data
+				})
+				handleClose()
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -63,6 +74,10 @@
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
+			dispatch('save', {
+				error: error
+			})
+			handleClose()
 		}
 		loading = false
 	}
