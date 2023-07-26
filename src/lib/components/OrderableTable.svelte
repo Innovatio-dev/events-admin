@@ -22,6 +22,7 @@
 	export let data: any[] = []
 	export let rowHeight: string = '4em'
 	export let emptyMessage: string = 'There are no items'
+	export let orderable: boolean = true
 	const eventDispatcher = createEventDispatcher()
 	$: orderedData = [...data]
 
@@ -57,10 +58,10 @@
 		<div class="rows-container">
 			{#if data.length}
 				<SortableList class="" animation={150} onSort={handleOnSort}>
-					{#each data as row, index}
+					{#each data as row, index (row.id)}
 						<div
 							class="row"
-							data-id={index}
+							data-id={row.id}
 							style={`height: ${rowHeight}`}
 							in:fly={{
 								duration: 500,
@@ -108,7 +109,6 @@
 		border-radius: 1em 1em 0 0;
 		user-select: none;
 		height: 4em;
-		padding: 0.4em 2em;
 		.header-item {
 			color: var(--white);
 			display: flex;

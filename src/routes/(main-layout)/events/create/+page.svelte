@@ -13,6 +13,9 @@
 	import { goto } from '$app/navigation'
 	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
 	import TextWithImageViewer from '$lib/components/custom/data_viewer/TextWithImageViewer.svelte'
+	import MainButton from '$lib/components/MainButton.svelte'
+	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
+	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
 
 	const typeEvents = [
 		{
@@ -57,20 +60,20 @@
 		{
 			title: '',
 			cellComponent: TextWithIcon,
-			width: 'fit-content',
+			width: '3em',
 			grow: '0',
 			cellDataGenerator: (item) => ({ icon: CgMathEqual })
 		},
 		{
 			title: 'Speaker Name',
-			alignHeader: 'start',
+			alignHeader: 'center',
 			cellComponent: TextWithImageViewer,
 			cellDataGenerator: (item) => ({ title: item.name, image: item.picture?.url })
 		},
 		{
 			title: 'Actions',
 			cellComponent: ActionsViewer,
-			width: 'fit-content',
+			width: '10em',
 			grow: '0',
 			cellDataGenerator: (item) => {
 				return {
@@ -92,20 +95,21 @@
 		{
 			title: '',
 			cellComponent: TextWithIcon,
-			width: 'fit-content',
+			width: '3em',
 			grow: '0',
 			cellDataGenerator: (item) => ({ icon: CgMathEqual })
 		},
 		{
 			title: 'Speaker Name',
-			alignHeader: 'start',
+			alignHeader: 'center',
 			cellComponent: TextWithImageViewer,
 			cellDataGenerator: (item) => ({ title: item.name, image: item.picture?.url })
 		},
 		{
 			title: 'Actions',
 			cellComponent: ActionsViewer,
-			width: 'fit-content',
+			alignHeader: 'center',
+			width: '10em',
 			grow: '0',
 			cellDataGenerator: (item) => {
 				return {
@@ -117,6 +121,51 @@
 						if (index >= 0) {
 							secondarySpeakers.splice(index, 1)
 							secondarySpeakers = secondarySpeakers
+						}
+					}
+				}
+			}
+		}
+	]
+
+	let venueColumns: Column[] = [
+		{
+			title: 'Venue name',
+			alignHeader: 'center',
+			cellComponent: TextWithImageViewer,
+			cellDataGenerator: (item) => ({ title: item.name })
+		},
+		{
+			title: 'Location',
+			alignHeader: 'center',
+			cellComponent: CountryViewer,
+			cellDataGenerator: (item) => item.country
+		},
+		{
+			title: 'Address',
+			alignHeader: 'center',
+			cellComponent: MapViewerPopup,
+			cellDataGenerator: (item) => ({
+				latitude: item.location.lat,
+				longitude: item.location.lng,
+				title: item.name
+			})
+		},
+		{
+			title: 'Actions',
+			cellComponent: ActionsViewer,
+			width: '10em',
+			grow: '0',
+			cellDataGenerator: (item) => {
+				return {
+					onEdit: () => {
+						goto(`/venues/${item.id}/edit`)
+					},
+					onRemove: () => {
+						let index = venues.indexOf(item)
+						if (index >= 0) {
+							venues.splice(index, 1)
+							venues = venues
 						}
 					}
 				}
@@ -234,46 +283,62 @@
 				<SectionHeader>Speakers</SectionHeader>
 				<div>
 					<LabelInput>Primary Speaker</LabelInput>
-					<DropdownFetcher
-						filterPlaceholder={'Search'}
-						itemGenerator={(item) => ({ title: item.name, image: item.picture?.url })}
-						valueGenerator={(item) => item.id}
-						placeholder={'Choose a primary speaker'}
-						searchField={'search'}
-						url={'/api/speakers'}
-						multiselect={false}
-						on:change={(e) => {
-							e.preventDefault()
-							const speaker = e.detail.selected
-							if (!mainSpeakers.some((item) => item.id == speaker.id)) {
-								mainSpeakers.push(speaker)
-								mainSpeakers = mainSpeakers
-							}
-						}}
-					/>
+					<div class="flex gap-2">
+						<div class="w-full">
+							<DropdownFetcher
+								filterPlaceholder={'Search'}
+								itemGenerator={(item) => ({
+									title: item.name,
+									image: item.picture?.url
+								})}
+								valueGenerator={(item) => item.id}
+								placeholder={'Choose a primary speaker'}
+								searchField={'search'}
+								url={'/api/speakers'}
+								multiselect={false}
+								on:change={(e) => {
+									e.preventDefault()
+									const speaker = e.detail.selected
+									if (!mainSpeakers.some((item) => item.id == speaker.id)) {
+										mainSpeakers.push(speaker)
+										mainSpeakers = mainSpeakers
+									}
+								}}
+							/>
+						</div>
+						<MainButton href="/speakers/create">Create</MainButton>
+					</div>
 				</div>
 				<div>
 					<OrderableTable columns={speakerColumns} data={mainSpeakers} />
 				</div>
 				<div>
 					<LabelInput>Secondary Speaker</LabelInput>
-					<DropdownFetcher
-						filterPlaceholder={'Search'}
-						itemGenerator={(item) => ({ title: item.name, image: item.picture?.url })}
-						valueGenerator={(item) => item.id}
-						placeholder={'Choose a secondary speaker'}
-						searchField={'search'}
-						url={'/api/speakers'}
-						multiselect={false}
-						on:change={(e) => {
-							e.preventDefault()
-							const speaker = e.detail.selected
-							if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
-								secondarySpeakers.push(speaker)
-								secondarySpeakers = secondarySpeakers
-							}
-						}}
-					/>
+					<div class="flex gap-2">
+						<div class="w-full">
+							<DropdownFetcher
+								filterPlaceholder={'Search'}
+								itemGenerator={(item) => ({
+									title: item.name,
+									image: item.picture?.url
+								})}
+								valueGenerator={(item) => item.id}
+								placeholder={'Choose a secondary speaker'}
+								searchField={'search'}
+								url={'/api/speakers'}
+								multiselect={false}
+								on:change={(e) => {
+									e.preventDefault()
+									const speaker = e.detail.selected
+									if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
+										secondarySpeakers.push(speaker)
+										secondarySpeakers = secondarySpeakers
+									}
+								}}
+							/>
+						</div>
+						<MainButton href="/speakers/create">Create</MainButton>
+					</div>
 				</div>
 				<div>
 					<OrderableTable columns={speakerColumnsSecondary} data={secondarySpeakers} />
@@ -284,26 +349,28 @@
 				<SectionHeader>Venue</SectionHeader>
 				<div>
 					<LabelInput>Venue</LabelInput>
-					<DropdownFetcher
-						filterPlaceholder={'Search'}
-						itemGenerator={(item) => ({ title: item.name })}
-						valueGenerator={(item) => item.id}
-						placeholder={'Choose a venue'}
-						searchField={'search'}
-						url={'/api/venues'}
-						multiselect={false}
-						on:change={(e) => {
-							e.preventDefault()
-							const venue = e.detail.selected
-							if (!venues.some((item) => item.id == venue.id)) {
-								venues.push(venue)
-								venues = venues
-							}
-						}}
-					/>
+					<div class="flex gap-2">
+						<div class="w-full">
+							<DropdownFetcher
+								filterPlaceholder={'Search'}
+								itemGenerator={(item) => ({ title: item.name })}
+								valueGenerator={(item) => item.id}
+								placeholder={'Choose a venue'}
+								searchField={'search'}
+								url={'/api/venues'}
+								multiselect={false}
+								selected={venues.length ? venues[0] : null}
+								on:change={(e) => {
+									const venue = e.detail.selected
+									venues = [venue]
+								}}
+							/>
+						</div>
+						<MainButton href="/venues/create">Create</MainButton>
+					</div>
 				</div>
 				<div>
-					<!-- <OrderableTable columns={speakerColumns} data={mainSpeakers} /> -->
+					<OrderableTable columns={venueColumns} data={venues} />
 				</div>
 			</div>
 		{/if}

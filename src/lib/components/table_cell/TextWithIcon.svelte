@@ -9,7 +9,7 @@
 <div class="w-full h-full overflow-hidden text-ellipsis justify-center flex items-center gap-2 p-4">
 	{#if value.icon}
 		<div class="icon">
-			<Icon src={value.icon} color="currentColor" size="2em" />
+			<Icon src={value.icon} color="currentColor" size="1.2em" />
 		</div>
 	{/if}
 	{#if value.text}
