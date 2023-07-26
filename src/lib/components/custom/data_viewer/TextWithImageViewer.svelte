@@ -25,6 +25,7 @@
 		.image {
 			width: 2em;
 			height: 2em;
+			min-width: 2em;
 			overflow: hidden;
 			border-radius: 50%;
 			position: relative;

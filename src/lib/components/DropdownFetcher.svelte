@@ -9,12 +9,16 @@
 	export let selected: any | any[] | null = null
 	export let multiselect: boolean = false
 	export let url: string
-	export let searchField: string = 'search'
 	export let name: string = ''
 	export let value: string = ''
 	export let itemViewer: typeof SvelteComponent = TextWithImageViewer
 	export let selectedViewer: typeof SvelteComponent = SimpleTextViewer
 	export let itemGenerator: ItemGenerator = (item) => ({ title: item.title, image: item.image })
+	export let selectedGenerator: ItemGenerator = (item) => ({ title: item.title })
+	export let dataGenerator = (apiResponse: any) => ({
+		count: apiResponse.count,
+		results: apiResponse.results
+	})
 	export let valueGenerator: ValueGenerator = (item) => {
 		return item.id
 	}
@@ -53,21 +57,35 @@
 
 	async function fetchMoreData() {
 		loading = true
-		const params = new URLSearchParams({
-			[searchField]: filter,
-			offset: items.length.toString(),
-			limit: limit.toString()
-		})
-		const generatedUrl = `${url}?${params.toString()}`
+		const params = {}
+		let generatedUrl = url
+		if (generatedUrl.includes('{s}')) {
+			generatedUrl = generatedUrl.replace('{s}', encodeURIComponent(filter))
+		}
+
+		// Reemplazar '{o}' con el valor de la variable global 'offset'
+		if (generatedUrl.includes('{o}')) {
+			generatedUrl = generatedUrl.replace('{o}', encodeURIComponent(items.length.toString()))
+		}
+
+		// Reemplazar '{l}' con el valor de la variable global 'limit'
+		if (generatedUrl.includes('{l}')) {
+			generatedUrl = generatedUrl.replace('{l}', encodeURIComponent(limit.toString()))
+		}
 		let response = await fetch(generatedUrl, {
 			method: 'get'
 		})
 		let data = await response.json()
 		if (response.ok) {
-			items = items.concat(data.results)
-			if (items.length >= data.count) {
+			const parsedResult = dataGenerator(data)
+			if (parsedResult.results) {
+				items = items.concat(parsedResult.results)
+			}
+			if (!parsedResult.count || items.length >= parsedResult.count) {
 				limitReach = true
 			}
+		} else {
+			limitReach = true
 		}
 		loading = false
 
@@ -99,6 +117,7 @@
 	{filterPlaceholder}
 	{valueGenerator}
 	{itemGenerator}
+	{selectedGenerator}
 >
 	<svelte:fragment slot="title">{placeholder}</svelte:fragment></Dropdown
 >

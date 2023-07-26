@@ -38,6 +38,7 @@
 	export let selectedViewer: typeof SvelteComponent = SimpleTextViewer
 	export let valueGenerator: ValueGenerator = (item) => item.value
 	export let itemGenerator: ItemGenerator = (item) => ({ title: item.title, image: item.image })
+	export let selectedGenerator: ItemGenerator = (item) => ({ title: item.title })
 	export let filterFunction: FilterFunction | null = (item: any, filter: string) => {
 		return !item.title.toLowerCase().includes(filter)
 	}
@@ -157,7 +158,7 @@
 			</div>
 		{:else}
 			<div class="text">
-				<svelte:component this={selectedViewer} value={itemGenerator(selected)} />
+				<svelte:component this={selectedViewer} value={selectedGenerator(selected)} />
 			</div>
 		{/if}
 		<!-- {#if Array.isArray(selected)}

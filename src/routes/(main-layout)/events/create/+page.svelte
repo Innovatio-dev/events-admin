@@ -16,6 +16,9 @@
 	import MainButton from '$lib/components/MainButton.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
+	import Dropdown from '$lib/components/Dropdown.svelte'
+	import { languages } from '$lib/utils/constants/Languages'
+	import Badge from '$lib/components/Badge.svelte'
 
 	const typeEvents = [
 		{
@@ -37,14 +40,28 @@
 			value: 0
 		}
 	]
-	const event = {
+	const event: {
+		organizerId: string
+		typeEvent: string | null
+		isFeatured: number
+		title: string
+		description: string
+		bannerId: any[]
+		pictures: any[]
+		linkZoom: any
+		language: any
+		translation: { name: string; flagIso: string }[]
+	} = {
 		organizerId: '',
 		typeEvent: null,
 		isFeatured: 0,
 		title: '',
 		description: '',
 		bannerId: [],
-		pictures: []
+		pictures: [],
+		linkZoom: null,
+		language: null,
+		translation: []
 	}
 	const schedule = {
 		startTime: null,
@@ -189,9 +206,10 @@
 				name="organizerId"
 				filterPlaceholder={'Search'}
 				itemGenerator={(item) => ({ title: item.name, image: item.logo?.url })}
+				selectedGenerator={(item) => ({ title: item.name })}
 				bind:value={event.organizerId}
 				placeholder={'Select the organizer for this event'}
-				url={'/api/organizers'}
+				url={'/api/organizers?search={s}&limit={l}&offset={o}'}
 			/>
 		</div>
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
@@ -278,6 +296,13 @@
 					<LabelInput>Date ends</LabelInput>
 					<DatePicker placeholder="Choose the end date" bind:value={schedule.endTime} />
 				</div>
+				<div>
+					<LabelInput>Event registration date opens</LabelInput>
+					<DatePicker
+						placeholder="Choose the start date"
+						bind:value={schedule.visibleAt}
+					/>
+				</div>
 			</div>
 			<div class="input-set">
 				<SectionHeader>Speakers</SectionHeader>
@@ -291,10 +316,10 @@
 									title: item.name,
 									image: item.picture?.url
 								})}
+								selectedGenerator={(item) => ({ title: item.name })}
 								valueGenerator={(item) => item.id}
 								placeholder={'Choose a primary speaker'}
-								searchField={'search'}
-								url={'/api/speakers'}
+								url={'/api/speakers?search={s}&limit={l}&offset={o}'}
 								multiselect={false}
 								on:change={(e) => {
 									e.preventDefault()
@@ -322,10 +347,10 @@
 									title: item.name,
 									image: item.picture?.url
 								})}
+								selectedGenerator={(item) => ({ title: item.name })}
 								valueGenerator={(item) => item.id}
 								placeholder={'Choose a secondary speaker'}
-								searchField={'search'}
-								url={'/api/speakers'}
+								url={'/api/speakers?search={s}&limit={l}&offset={o}'}
 								multiselect={false}
 								on:change={(e) => {
 									e.preventDefault()
@@ -343,6 +368,11 @@
 				<div>
 					<OrderableTable columns={speakerColumnsSecondary} data={secondarySpeakers} />
 				</div>
+				<div>
+					<LabelInput>Insert the invitation zoom link</LabelInput>
+
+					<Input bind:value={event.linkZoom} placeholder="Insert zoom link" />
+				</div>
 			</div>
 
 			<div class="input-set">
@@ -355,8 +385,8 @@
 								filterPlaceholder={'Search'}
 								itemGenerator={(item) => ({ title: item.name })}
 								valueGenerator={(item) => item.id}
+								selectedGenerator={(item) => ({ title: item.name })}
 								placeholder={'Choose a venue'}
-								searchField={'search'}
 								url={'/api/venues'}
 								multiselect={false}
 								selected={venues.length ? venues[0] : null}
@@ -371,6 +401,65 @@
 				</div>
 				<div>
 					<OrderableTable columns={venueColumns} data={venues} />
+				</div>
+			</div>
+
+			<div class="input-set">
+				<SectionHeader>Language</SectionHeader>
+				<div>
+					<LabelInput>Primary Language</LabelInput>
+					<Dropdown
+						width="100%"
+						items={languages}
+						itemViewer={CountryViewer}
+						bind:selected={event.language}
+						selectedGenerator={(item) => ({ title: item.name })}
+						itemGenerator={(item) => ({
+							iso: item.flagIso,
+							nicename: item.name,
+							align: 'left'
+						})}
+					>
+						<div slot="title">Select the main language</div>
+					</Dropdown>
+				</div>
+				<div>
+					<LabelInput>Translated to</LabelInput>
+					<Dropdown
+						width="100%"
+						items={languages}
+						itemViewer={CountryViewer}
+						multiselect={true}
+						bind:selected={event.translation}
+						selectedGenerator={(item) => ({ title: item.name })}
+						itemGenerator={(item) => ({
+							iso: item.flagIso,
+							nicename: item.name,
+							align: 'left'
+						})}
+					>
+						<div slot="title">Select languages to translate</div>
+					</Dropdown>
+				</div>
+				<div class="flex-grow flex gap-4 flex-wrap">
+					{#each event.translation as translation, index}
+						<Badge
+							type="light"
+							hideOnClose={false}
+							onClose={() => {
+								event.translation.splice(index, 1)
+								event.translation = event.translation
+							}}
+						>
+							<CountryViewer
+								value={{
+									iso: translation.flagIso,
+									nicename: translation.name,
+									padding: '0'
+								}}
+							/>
+						</Badge>
+					{/each}
 				</div>
 			</div>
 		{/if}

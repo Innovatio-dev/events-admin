@@ -18,7 +18,8 @@
 		primary: 'bg-alert-warning text-neutral-4 fill-neutral-4',
 		secondary: 'bg-primary-hover text-white fill-white',
 		success: 'bg-alert-success text-white fill-white',
-		error: 'bg-alert-error text-white fill-white'
+		error: 'bg-alert-error text-white fill-white',
+		light: 'bg-primary-light text-neutral-4 fill-neutral-4'
 	}
 
 	const handleClick = () => {
