@@ -2,25 +2,55 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import { pageStatus } from '$lib/stores/pageStatus'
+	import { format } from 'date-fns'
 	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
+	import Socials from '$lib/components/preview/Socials.svelte'
+	import ProfilePic from '$lib/components/ProfilePic.svelte'
+	import MainButton from '$lib/components/MainButton.svelte'
+	import * as Flag from 'svelte-flag-icons'
 	// Icons
 	import Icon from 'svelte-icons-pack'
-	import BiLogoFacebookCircle from 'svelte-icons-pack/bi/BiLogoFacebookCircle'
-	import BiLogoInstagramAlt from 'svelte-icons-pack/bi/BiLogoInstagramAlt'
-	import BiLogoTwitter from 'svelte-icons-pack/bi/BiLogoTwitter'
-	import AiFillLinkedin from 'svelte-icons-pack/ai/AiFillLinkedin'
-	import FiYoutube from 'svelte-icons-pack/fi/FiYoutube'
+	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
+	import IoClose from 'svelte-icons-pack/io/IoClose'
+	import SpeakerBadge from '$lib/components/SpeakerBadge.svelte'
 
 	let events: any = null
 	let loading: boolean = true
 	let primarySpeakers: any[] = []
 	let secondarySpeakers: any[] = []
+	let eventPhoto: string
 
 	onMount(async () => {
 		let id = $page.params.id
 		await fetchEvents(id)
 	})
+
+	function gMapsLink(lat, lng) {
+		const enlace = `http://maps.google.com/maps?q=${lat},${lng}&ll=${lat},${lng}&z=17`
+		return enlace
+	}
+
+	function formatDate(date) {
+		return format(new Date(date), 'MMM dd, yyyy')
+	}
+
+	function formatTime(dateString) {
+		const date = new Date(dateString)
+		let hoursValue = date.getHours()
+		const minutes = date.getMinutes()
+		let ampm = 'AM'
+		if (hoursValue > 12) {
+			hoursValue -= 12
+			ampm = 'PM'
+		}
+		const hours = hoursValue.toString().padStart(2, '0')
+		return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`
+	}
+
+	function capText(texto) {
+		return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
+	}
 
 	async function fetchEvents(id) {
 		loading = true
@@ -35,6 +65,7 @@
 				}
 			}
 			$pageStatus.title = events.title
+			eventPhoto = events.venue.pictures[0].url
 		}
 		loading = false
 	}
@@ -99,7 +130,18 @@
 			{:else if events.venue}
 				<div class="content">
 					<p>{events.typeEvent === 0 ? 'Virtual' : 'Live'}</p>
-					<p>{events.isFeatured ? 'Featured' : 'Regular'}</p>
+					<p
+						class={`flex items-center gap-x-2 ${
+							events.isFeatured ? '!text-primary-purple' : ''
+						} `}
+					>
+						<span
+							class={`w-3 h-3 rounded-full  ${
+								events.isFeatured ? 'bg-primary-purple' : 'bg-neutral-3'
+							}`}
+						/>
+						{events.isFeatured ? 'Featured' : 'Regular'}
+					</p>
 					<p>{events.title ?? '---'}</p>
 					<p>{events.description ?? '---'}</p>
 				</div>
@@ -130,11 +172,23 @@
 					<p>{events.venue.region.name ?? '---'}</p>
 					<p>{events.venue.country.nicename ?? '---'}</p>
 					<p>{events.venue.city ?? '---'}</p>
-					<p>{events.photo ?? '---'}</p>
-					<p>{events.pin ?? '---'}</p>
-					<p>{events.schedule.startTime ?? '---'}</p>
-					<p>{events.schedule.endTime ?? '---'}</p>
-					<p>{events.schedule.startTime ?? '---'}</p>
+					{#if events.venue.pictures}
+						<div class="text-ellipsis underline">
+							<a target="_blank" href={`${eventPhoto}`}> Event Photo </a>
+						</div>
+					{:else}
+						<p>{'---'}</p>
+					{/if}
+					{#if events.venue.pictures}
+						<div class="text-ellipsis underline">
+							<a target="_blank" href={`${eventPhoto}`}> Pin Photo </a>
+						</div>
+					{:else}
+						<p>{'---'}</p>
+					{/if}
+					<p>{formatDate(events.schedule.startTime) ?? '---'}</p>
+					<p>{formatDate(events.schedule.endTime) ?? '---'}</p>
+					<p>{formatTime(events.schedule.startTime) ?? '---'}</p>
 					<p>{events.schedule.timeZone ?? '---'}</p>
 				</div>
 			{/if}
@@ -144,119 +198,57 @@
 	<div>
 		<h2>Speakers</h2>
 		{#each primarySpeakers as speaker}
-			<div class="grid grid-cols-2 min-w-[400px] mb-8">
-				<div class="field">
-					<p>Primary Speaker:</p>
-				</div>
-				{#if loading}
-					<div class="w-full h-full flex">
-						<SimpleSkeleton width={200} height={20} items={1} />
+			<div class="flex flex-col my-6">
+				<div class="grid grid-cols-2 min-w-[400px] mb-8">
+					<div class="field">
+						<p>Primary Speaker:</p>
 					</div>
-				{:else if events}
-					<div class="flex content">
-						<p class="!w-fit pr-4">{speaker.name}</p>
-						<div class=" flex items-center justify-center gap-x-2 my-auto !p-0">
-							{#if speaker.facebook}
-								<a
-									href={`https://www.facebook.com/${speaker.facebook}`}
-									class="text-black"
-								>
-									<Icon src={BiLogoFacebookCircle} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.instagram}
-								<a
-									href={`https://www.instagram.com/${speaker.instagram}`}
-									class="text-black"
-								>
-									<Icon src={BiLogoInstagramAlt} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.twitter}
-								<a
-									href={`https://www.twitter.com/${speaker.twitter}`}
-									class="text-black"
-								>
-									<Icon src={BiLogoTwitter} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.linkedin}
-								<a
-									href={`https://www.linkedin.com/${speaker.linkedin}`}
-									class="text-black"
-								>
-									<Icon src={AiFillLinkedin} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.youtube}
-								<a
-									href={`https://www.youtube.com/${speaker.youtube}`}
-									class="text-black"
-								>
-									<Icon src={FiYoutube} className="w-6 h-6" />
-								</a>
-							{/if}
+					{#if loading}
+						<div class="w-full h-full flex">
+							<SimpleSkeleton width={200} height={20} items={1} />
 						</div>
-					</div>
-				{/if}
+					{:else if events}
+						<div class="flex content">
+							<p class="!w-fit pr-4">{speaker.name}</p>
+							<Socials {speaker} color={'#000'} />
+						</div>
+					{/if}
+				</div>
+				<div class="w-full h-[100px]">
+					<SpeakerBadge
+						size={'80'}
+						image={speaker.picture.url}
+						jobRole={speaker.jobRole}
+						company={speaker.company}
+					/>
+				</div>
 			</div>
 		{/each}
 		{#each secondarySpeakers as speaker}
-			<div class="grid grid-cols-2 min-w-[400px] mb-8">
-				<div class="field">
-					<p>Secondary Speaker:</p>
-				</div>
-				{#if loading}
-					<div class="w-full h-full flex">
-						<SimpleSkeleton width={200} height={20} items={1} />
+			<div class="flex flex-col my-2">
+				<div class="grid grid-cols-2 min-w-[400px] mb-8">
+					<div class="field">
+						<p>Secondary Speaker:</p>
 					</div>
-				{:else if events}
-					<div class="flex content">
-						<p class="!w-fit pr-4">{speaker.name}</p>
-						<div class=" flex items-center justify-center gap-x-2 my-auto !p-0">
-							{#if speaker.facebook}
-								<a
-									href={`https://www.facebook.com/${speaker.facebook}`}
-									class="text-black"
-								>
-									<Icon src={BiLogoFacebookCircle} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.instagram}
-								<a
-									href={`https://www.instagram.com/${speaker.instagram}`}
-									class="text-black"
-								>
-									<Icon src={BiLogoInstagramAlt} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.twitter}
-								<a
-									href={`https://www.twitter.com/${speaker.twitter}`}
-									class="text-black"
-								>
-									<Icon src={BiLogoTwitter} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.linkedin}
-								<a
-									href={`https://www.linkedin.com/${speaker.linkedin}`}
-									class="text-black"
-								>
-									<Icon src={AiFillLinkedin} className="w-6 h-6" />
-								</a>
-							{/if}
-							{#if speaker.youtube}
-								<a
-									href={`https://www.youtube.com/${speaker.youtube}`}
-									class="text-black"
-								>
-									<Icon src={FiYoutube} className="w-6 h-6" />
-								</a>
-							{/if}
+					{#if loading}
+						<div class="w-full h-full flex">
+							<SimpleSkeleton width={200} height={20} items={1} />
 						</div>
-					</div>
-				{/if}
+					{:else if events}
+						<div class="flex content">
+							<p class="!w-fit pr-4">{speaker.name}</p>
+							<Socials {speaker} color={'#000'} />
+						</div>
+					{/if}
+				</div>
+				<div class="w-full h-[60px]">
+					<SpeakerBadge
+						size={'60'}
+						image={speaker.picture.url}
+						jobRole={speaker.jobRole}
+						company={speaker.company}
+					/>
+				</div>
 			</div>
 		{/each}
 	</div>
@@ -277,7 +269,21 @@
 				<div class="content">
 					<p>{events.venue.name ?? '---'}</p>
 					<p>{events.venue.country.nicename ?? '---'}</p>
-					<p>{events.venue.addres ?? '---'}</p>
+					{#if events.venue.location}
+						<div class="text-ellipsis underline">
+							<a
+								target="_blank"
+								href={`${gMapsLink(
+									events.venue.location.lat,
+									events.venue.location.lng
+								)}`}
+							>
+								Abrir Mapa
+							</a>
+						</div>
+					{:else}
+						<p>{'---'}</p>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -317,6 +323,7 @@
 				</div>
 			{/if}
 		</div>
+		<!-- Organizer -->
 		<div class="grid grid-cols-2 min-w-[400px] mb-8">
 			<div class="field">
 				<p>Organizer full name:</p>
@@ -325,13 +332,88 @@
 				<div class="w-full h-full flex">
 					<SimpleSkeleton width={200} height={20} items={1} />
 				</div>
-			{:else if events.venue}
+			{:else if events.organizer}
 				<div class="content">
 					<p>{events.organizer.name ?? '---'}</p>
 				</div>
 			{/if}
 		</div>
-		
+		<div class="w-[600px] min-h-[100px] text-neutral-3">
+			{#if loading}
+				<div class="h-[100px]">
+					<SimpleSkeleton width={600} height={20} items={4} />
+				</div>
+			{:else if events.organizer}
+				<p>{events.organizer.description ?? '---'}</p>
+			{/if}
+		</div>
+		<div class="grid grid-cols-2 min-w-[400px] mb-8">
+			<div class="field">
+				<p>Photo</p>
+			</div>
+			{#if loading}
+				<div class="w-full h-full flex">
+					<SimpleSkeleton width={200} height={20} items={1} />
+				</div>
+			{:else if events.organizer}
+				<div class="text-ellipsis underline">
+					<a target="_blank" href={`${events.organizer.logo.url}`}> Organizer Photo </a>
+				</div>
+			{/if}
+		</div>
+		<div class="grid grid-cols-2 min-w-[400px] mb-8">
+			<div class="flex items-center justify-center w-[200px] h-[200px]">
+				<ProfilePic img={events?.organizer.logo.url} />
+			</div>
+			{#if loading}
+				<div class="w-full h-full flex">
+					<SimpleSkeleton width={200} height={20} items={1} />
+				</div>
+			{:else if events.organizer}
+				<div class="flex flex-col gap-y-4">
+					<Socials speaker={events.organizer} color={'#000'} />
+					<div class="flex gap-x-2">
+						<div
+							class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+						>
+							{#if events.organizer}
+								<svelte:component
+									this={Flag[capText(events.organizer.country.iso)]}
+									size="20"
+								/>
+								{events.organizer.country.nicename}
+							{/if}
+						</div>
+					</div>
+				</div>
+			{/if}
+		</div>
+		<div class="grid grid-cols-2 min-w-[400px] mb-8">
+			<div class="field">
+				<p>Subscription to event</p>
+			</div>
+			{#if loading}
+				<div class="w-full h-full flex">
+					<SimpleSkeleton width={200} height={20} items={1} />
+				</div>
+			{:else if events.organizer}
+				<p>{events.mailing ?? '---'}</p>
+			{/if}
+		</div>
+		<div class="flex flex-row gap-6 max-w-fit">
+			<MainButton>
+				<div class="flex gap-3 items-center">
+					<Icon size="20" src={BiEditAlt} color="gray" />
+					{'Edit'}
+				</div>
+			</MainButton>
+			<MainButton>
+				<div class="flex gap-3 items-center">
+					<Icon size="20" src={IoClose} color="gray" />
+					{'Suspend'}
+				</div>
+			</MainButton>
+		</div>
 	</div>
 </div>
 
@@ -343,6 +425,9 @@
 		@apply text-neutral-4 font-dm capitalize w-[180px] py-2;
 	}
 	.content p {
+		@apply text-neutral-3 font-thin font-eesti min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
+	}
+	.content div {
 		@apply text-neutral-3 font-thin font-eesti min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
 	}
 </style>

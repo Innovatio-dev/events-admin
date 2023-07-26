@@ -52,7 +52,9 @@ export default {
 			'gd-glassmorphism': 'var(--gd-glassmorphism)',
 			'gd-page': 'var(--gd-page)',
 			'gd-preview':
-				'linear-gradient(360deg, rgba(10, 10, 10, 0.33) 0%, rgba(10, 10, 10, 0.33) 100%)'
+				'linear-gradient(360deg, rgba(10, 10, 10, 0.33) 0%, rgba(10, 10, 10, 0.33) 100%)',
+			'black-gradient-r': 'var(--black-gradient-r)',
+			'black-gradient-l': 'var(--black-gradient-l)'
 		},
 		boxShadow: {
 			section: 'var(--shadow-section)',
