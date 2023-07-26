@@ -81,6 +81,12 @@ export const init = (sequelize: Sequelize) => {
 			},
 			translation: {
 				type: DataTypes.JSON
+			},
+			secondaryOrganizer: {
+				type: DataTypes.STRING
+			},
+			secondaryOrganizerDescription: {
+				type: DataTypes.STRING
 			}
 		},
 		{
@@ -220,7 +226,9 @@ export const init = (sequelize: Sequelize) => {
 			'mailing',
 			'linkZoom',
 			'language',
-			'translation'
+			'translation',
+			'secondaryOrganizer',
+			'secondaryOrganizerDescription'
 		],
 		include: [
 			{

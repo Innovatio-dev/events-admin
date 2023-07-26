@@ -172,7 +172,4 @@
 			left: 250px;
 		}
 	}
-	.list {
-		width: 200px;
-	}
 </style>

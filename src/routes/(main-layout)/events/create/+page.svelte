@@ -19,6 +19,7 @@
 	import Dropdown from '$lib/components/Dropdown.svelte'
 	import { languages } from '$lib/utils/constants/Languages'
 	import Badge from '$lib/components/Badge.svelte'
+	import ToggleButtton from '$lib/components/ToggleButtton.svelte'
 
 	const typeEvents = [
 		{
@@ -40,6 +41,7 @@
 			value: 0
 		}
 	]
+	let organizerInfoEnabled: boolean = false
 	const event: {
 		organizerId: string
 		typeEvent: string | null
@@ -51,6 +53,8 @@
 		linkZoom: any
 		language: any
 		translation: { name: string; flagIso: string }[]
+		secondaryOrganizer: string | null
+		secondaryOrganizerDescription: string | null
 	} = {
 		organizerId: '',
 		typeEvent: null,
@@ -61,7 +65,9 @@
 		pictures: [],
 		linkZoom: null,
 		language: null,
-		translation: []
+		translation: [],
+		secondaryOrganizer: null,
+		secondaryOrganizerDescription: null
 	}
 	const schedule = {
 		startTime: null,
@@ -461,6 +467,38 @@
 						</Badge>
 					{/each}
 				</div>
+			</div>
+
+			<div class="input-set">
+				<SectionHeader>Organizer Assigned</SectionHeader>
+				<div>
+					<LabelInput>Organizer Info</LabelInput>
+					<div class="w-[10em]">
+						<ToggleButtton
+							id="asd"
+							left={'no'}
+							right={'yes'}
+							text
+							bind:checked={organizerInfoEnabled}
+						/>
+					</div>
+				</div>
+				{#if organizerInfoEnabled}
+					<div>
+						<LabelInput>Type organizer name</LabelInput>
+						<Input
+							placeholder="Organizer Assigned to this event"
+							bind:value={event.secondaryOrganizer}
+						/>
+					</div>
+					<div>
+						<LabelInput>Description</LabelInput>
+						<Input
+							placeholder="Organizer Assigned to this event"
+							bind:value={event.secondaryOrganizerDescription}
+						/>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
