@@ -2,8 +2,8 @@
 	// Svelte
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import { pageStatus } from '$lib/stores/pageStatus'
-	import { goto } from '$app/navigation'
+	// Store
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	// Components
 	import VenueForm from '$lib/components/custom/VenueForm.svelte'
 	// Animations
@@ -28,7 +28,7 @@
 		loading = false
 	}
 
-	async function updateVenue(id,venue) {
+	async function updateVenue(id, venue) {
 		loading = true
 		try {
 			const res = await fetch(`/api/venues/${id}`, {
@@ -37,12 +37,17 @@
 			})
 			if (res.ok) {
 				const data = await res.json()
-				console.log(data)
+				$pageAlert = { message: 'Success! Venue updated correctly.', status: true }
 			} else {
 				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
 			}
 		} catch (error) {
 			console.error('Error:', error)
+			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
 		loading = false
 	}

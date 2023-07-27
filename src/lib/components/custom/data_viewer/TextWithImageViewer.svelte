@@ -17,7 +17,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 0.8em;
-
+		width: 100%;
 		padding: 0em 0.8em;
 		.text {
 			flex-grow: 1;
@@ -25,6 +25,7 @@
 		.image {
 			width: 2em;
 			height: 2em;
+			min-width: 2em;
 			overflow: hidden;
 			border-radius: 50%;
 			position: relative;

@@ -1,12 +1,30 @@
 <script lang="ts">
+	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
+	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
+	import Input from '$lib/components/Input.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
+	import Modal from '$lib/components/Modal.svelte'
+	import ChangeEmailAdminForm from '$lib/components/custom/ChangeEmailAdminForm.svelte'
+	import ResetPasswordAdminForm from '$lib/components/custom/ResetPasswordAdminForm.svelte'
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import { onMount } from 'svelte'
 
+	// Admin data state
 	let isLoading = false
 	let isError = false
 	let admin: any = null
+
+	// Remove admin state
+	let isRemoveLoading = false
+	let isRemoveError = false
+	let isOpenRemove = false
+
+	// Reset password state
+	let isResetFormShow = false
+
+	// Change email state
+	let isChangeFormShow = false
 
 	$: date = new Date(admin?.createdAt)
 	$: joinDate = date.toLocaleDateString('en-US', {
@@ -19,6 +37,7 @@
 		getAdminDetails()
 	})
 
+	// Requests
 	async function getAdminDetails() {
 		try {
 			isLoading = true
@@ -35,6 +54,59 @@
 		} finally {
 			isLoading = false
 		}
+	}
+
+	async function deleteAdmin() {
+		try {
+			isRemoveLoading = true
+			isRemoveError = false
+			const res = await fetch(`${$page.url.origin}/api/admins/${$page.params.id}`, {
+				method: 'DELETE'
+			})
+			if (res.ok) {
+				isOpenRemove = false
+				goto('/admin')
+			} else {
+				isRemoveError = true
+				throw new Error(await res.json())
+			}
+		} catch (error) {
+			console.log(error)
+			isRemoveError = true
+		} finally {
+			isRemoveLoading = false
+		}
+	}
+
+	// Handlers
+	function handleRemove() {
+		isOpenRemove = true
+	}
+
+	function handleResetPassword() {
+		isResetFormShow = true
+	}
+
+	function handleCloseResetPassword() {
+		isResetFormShow = false
+	}
+
+	function handleChangeEmail() {
+		isChangeFormShow = true
+	}
+
+	function handleCloseChangeEmail() {
+		isChangeFormShow = false
+	}
+
+	// Remove handlers
+	function handleCloseRemove() {
+		isOpenRemove = false
+		isRemoveError = false
+	}
+
+	function handleAprovedRemove() {
+		deleteAdmin()
 	}
 </script>
 
@@ -62,13 +134,35 @@
 				</div>
 			{/if}
 		</div>
-		<div class="grid grid-cols-2 place-content-between gap-x-12 gap-y-6">
-			<MainButton>Change email</MainButton>
-			<MainButton>Reset password</MainButton>
-			<MainButton>Remove</MainButton>
-			<MainButton>Make super admin</MainButton>
-		</div>
+		{#if isResetFormShow}
+			<ResetPasswordAdminForm onCancel={handleCloseResetPassword} />
+		{/if}
+		{#if isChangeFormShow}
+			<ChangeEmailAdminForm onCancel={handleCloseChangeEmail} />
+		{/if}
+		{#if !isResetFormShow && !isChangeFormShow}
+			<div class="grid grid-cols-2 place-content-between gap-x-12 gap-y-6">
+				<MainButton on:click={handleChangeEmail}>Change email</MainButton>
+				<MainButton on:click={handleResetPassword}>Reset password</MainButton>
+				<MainButton on:click={handleRemove}>Remove</MainButton>
+				<MainButton>Make super admin</MainButton>
+			</div>
+		{/if}
 	</div>
+	<Modal isOpen={isOpenRemove} handleClose={handleCloseRemove} title="">
+		<ApprovedModal
+			text="Do you really want to remove this user?"
+			yesButtonText={isRemoveLoading ? '...' : 'Yes'}
+			isLoading={isRemoveLoading}
+			onCancel={handleCloseRemove}
+			onConfirm={handleAprovedRemove}
+		/>
+		{#if isRemoveError}
+			<p class="bg-alert-error text-sm font-medium text-white font-dm rounded-lg py-2 px-4">
+				An error has occurred, please try again.
+			</p>
+		{/if}
+	</Modal>
 </section>
 
 <style lang="postcss">

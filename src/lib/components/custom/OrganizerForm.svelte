@@ -1,16 +1,21 @@
 <script lang="ts">
+	// Svelte
+	import { goto } from '$app/navigation'
 	// Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '../MainButton.svelte'
 	import ToggleButtton from '../ToggleButtton.svelte'
 	import DragAndDrop from '../DragAndDrop.svelte'
 	import UploadedImage from './UploadedImage.svelte'
+	import Dropdown from '../Dropdown.svelte'
 
 	// Constants
 	import { countries, REGIONS } from '$lib/utils/constants/Regions'
 
 	interface Organizer {
+		id?: number
 		logo?: any
+		status?: number
 		isMember: boolean
 		mavieId: string
 		name: string
@@ -18,17 +23,20 @@
 		phone: string
 		email: string
 		regions: any[]
-		country: any
+		country?: any
 		twitter: string
 		website: string
 		facebook: string
 		instagram: string
 		youtube: string
 		description: string
+		countryId: any
+		logos: number[]
 	}
 
 	// Props
 	export let addOrganizer: Organizer | null = null
+	export let updateAction: ((id: number, speaker) => Promise<void> | null) | null = null
 	export let submitAction = (organizer) => {}
 
 	// State
@@ -40,40 +48,44 @@
 		phone: '',
 		email: '',
 		regions: [],
-		country: {},
 		twitter: '',
 		website: '',
 		facebook: '',
 		instagram: '',
 		youtube: '',
-		description: ''
+		description: '',
+		countryId: '',
+		logos:[]
+	}
+	let updatedOrganizer = {
+		status: addOrganizer?.status,
+		reason: 'Organizer updated'
 	}
 
 	if (addOrganizer) {
-		organizer.isMember = addOrganizer.isMember
-		organizer.mavieId = addOrganizer.mavieId
-		organizer.name = addOrganizer.name
-		organizer.company = addOrganizer.company
-		organizer.phone = addOrganizer.phone
-		organizer.email = addOrganizer.email
-		organizer.regions = addOrganizer.regions
-		organizer.country = addOrganizer.country
-		organizer.twitter = addOrganizer.twitter
-		organizer.website = addOrganizer.website
-		organizer.facebook = addOrganizer.facebook
-		organizer.instagram = addOrganizer.instagram
-		organizer.youtube = addOrganizer.youtube
-		organizer.description = addOrganizer.description
+		organizer = JSON.parse(JSON.stringify(addOrganizer))
+		organizer.countryId = addOrganizer.country?.id
 	}
 
-	export function handleSubmit() {
-		const socialsUris = {
-			twitter: 'https://twitter.com/' + organizer.twitter.replace(/\s/g, '_'),
-			facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
-			instagram: 'https://instagram.com/' + organizer.instagram.replace(/\s/g, '_'),
-			youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_')
+	const handleSubmit = async () => {
+		if (updateAction) {
+			await updateAction(organizer?.id ?? 0, updatedOrganizer)
+			// console.log(updatedOrganizer)
+		} else {
+			const formattedData = {
+				twitter: 'https://twitter.com/' + organizer.twitter.replace(/\s/g, '_'),
+				facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
+				instagram: 'https://instagram.com/' + organizer.instagram.replace(/\s/g, '_'),
+				youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_'),
+				logoId: organizer.logos[0]
+			}
+			submitAction({ ...organizer, ...formattedData })
 		}
-		submitAction({ ...organizer, ...socialsUris })
+		goto('/organizers')
+	}
+
+	const updateOrganizer = (e) => {
+		updatedOrganizer[e.target.name] = e.target.value
 	}
 
 	const handleCheck = (e: any) => {
@@ -91,9 +103,17 @@
 	function organizerHasRegion(regionId) {
 		return organizer.regions.findIndex((region, index) => region.id == regionId) != -1
 	}
+
+	const onCancel = () => {
+		goto('/organizers')
+	}
 </script>
 
-<form on:submit|preventDefault={handleSubmit} class="flex flex-col w-full gap-5">
+<form
+	on:change={updateOrganizer}
+	on:submit|preventDefault={handleSubmit}
+	class="flex flex-col w-full gap-5"
+>
 	<div class="flex justify-between items-center">
 		<div
 			class="flex w-full items-center gap-12 text-neutral-4 font-light text-sm tracking-[0.5px]"
@@ -104,11 +124,23 @@
 			<ToggleButtton bind:checked={organizer.isMember} id="tid1" text right="Yes" left="No" />
 		</div>
 		<div>
-			<Input required label="Mavie Id:" type="number" bind:value={organizer.mavieId} />
+			<Input label="Mavie Id:" type="number" name="mavieId" bind:value={organizer.mavieId} />
 		</div>
 	</div>
-	<Input required label="Organizer full name:" type="text" bind:value={organizer.name} />
-	<Input required label="Organizer company name:" type="text" bind:value={organizer.company} />
+	<Input
+		required
+		label="Organizer full name:"
+		type="text"
+		name="name"
+		bind:value={organizer.name}
+	/>
+	<Input
+		required
+		label="Organizer company name:"
+		type="text"
+		name="company"
+		bind:value={organizer.company}
+	/>
 	<div class="flex items-end gap-5">
 		<select class="max-w-[6rem]" name="" id="">
 			{#each countries as country}
@@ -117,8 +149,8 @@
 				</option>
 			{/each}
 		</select>
-		<Input required label="Phone:" type="tel" bind:value={organizer.phone} />
-		<Input required label="E-mail:" type="email" bind:value={organizer.email} />
+		<Input required label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
+		<Input required label="E-mail:" type="email" name="email" bind:value={organizer.email} />
 	</div>
 	<div class="flex flex-col w-full">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
@@ -128,7 +160,6 @@
 			{#each REGIONS as region}
 				<label class="flex w-full gap-2">
 					<input
-						required
 						checked={organizerHasRegion(region.id)}
 						value={region.id}
 						on:click={handleCheck}
@@ -141,19 +172,41 @@
 			{/each}
 		</div>
 	</div>
-	<Input required label="Country:" type="text" bind:value={organizer.country.name} />
-	<Input required label="Twitter:" type="text" bind:value={organizer.twitter} />
-	<Input required label="Website:" type="url" bind:value={organizer.website} />
-	<Input required label="Facebook:" type="text" bind:value={organizer.facebook} />
-	<Input required label="Instagram:" type="text" bind:value={organizer.instagram} />
-	<Input required label="Youtube:" type="text" bind:value={organizer.youtube} />
+	<!-- <Input required label="Country:" type="text" bind:value={organizer.country.name} /> -->
+	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
+		{'Country:'}
+	</span>
+	<Dropdown
+		name="countryId"
+		selected={{
+			value: organizer.countryId ?? 0,
+			title: countries[organizer.countryId - 1]?.nicename ?? 'Choose the country organizer'
+		}}
+		width="100%"
+		bind:value={organizer.countryId}
+		items={countries.map((country) => {
+			return { value: country.id, title: country.nicename ?? '' }
+		})}
+	/>
+	<Input required name="twitter" label="Twitter:" type="text" bind:value={organizer.twitter} />
+	<Input required name="website" label="Website:" type="url" bind:value={organizer.website} />
+	<Input required name="facebook" label="Facebook:" type="text" bind:value={organizer.facebook} />
+	<Input
+		required
+		name="instagram"
+		label="Instagram:"
+		type="text"
+		bind:value={organizer.instagram}
+	/>
+	<Input required name="youtube" label="Youtube:" type="text" bind:value={organizer.youtube} />
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 		{'Organizer photo'}
 	</span>
 	{#if addOrganizer}
-		<UploadedImage image={addOrganizer.logo.url} />
+		<UploadedImage image={addOrganizer.logo?.url ?? ''} />
 	{:else}
 		<DragAndDrop
+			bind:uploaded={organizer.logos}
 			url="/api/resources"
 			name="file"
 			title="Upload your image (Optional)"
@@ -169,7 +222,7 @@
 	</label>
 	<div class="flex gap-10">
 		<MainButton>Submit</MainButton>
-		<MainButton>cancel</MainButton>
+		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>
 
@@ -189,11 +242,6 @@
 		&:focus {
 			border: 2px solid var(--input-text);
 		}
-		// &.error {
-		// 	border: 2px solid var(--input-text-error);
-		// 	background-color: var(--input-bg-error);
-		// 	color: var(--input-text-error);
-		// }
 	}
 	textarea,
 	select::placeholder {
@@ -208,27 +256,4 @@
 	select:-webkit-autofill {
 		-webkit-text-fill-color: var(--input-text) !important;
 	}
-	// .actions {
-	// 	position: absolute;
-	// 	height: 100%;
-	// 	display: flex;
-	// 	align-items: center;
-	// 	justify-content: center;
-	// 	gap: 10px;
-	// 	top: 0;
-	// 	right: 0;
-	// 	padding: 0.7rem calc(0.6rem * 20 / 12);
-	// 	color: var(--input-placeholder);
-	// 	transition: color 0.3s ease-in-out;
-	// 	&.focused {
-	// 		color: var(--input-text);
-	// 	}
-	// 	&.error {
-	// 		color: var(--input-text-error);
-	// 	}
-	// 	.icon {
-	// 		cursor: pointer;
-	// 		font-size: 22px;
-	// 	}
-	// }
 </style>

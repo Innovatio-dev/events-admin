@@ -4,6 +4,7 @@
 	import logo from '$lib/images/logo.svg'
 	import mavieDoted from '$lib/images/mavie-doted.png'
 	import SideBarMenu from '$lib/components/SideBarMenu.svelte'
+	import Alert from '$lib/components/Alert.svelte'
 
 	import { page } from '$app/stores'
 
@@ -16,11 +17,36 @@
 	import Checklist from '$lib/components/icons/Checklist.svelte'
 	import { afterNavigate, beforeNavigate } from '$app/navigation'
 	import BreadCrumb from '$lib/components/BreadCrumb.svelte'
-	import { pageStatus } from '$lib/stores/pageStatus'
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
+	import Popup from '$lib/components/Popup.svelte'
+	import SimpleList from '$lib/components/SimpleList.svelte'
+	import AiOutlineUser from 'svelte-icons-pack/ai/AiOutlineUser'
+	import AiOutlineLogout from 'svelte-icons-pack/ai/AiOutlineLogout'
+	import TextWithIcon from '$lib/components/table_cell/TextWithIcon.svelte'
 	export let data
 
 	let expandedMenu = true
 	let floatingMenu = false
+	let showAlert = false
+
+	const renderAlert = () => {
+		const alert = $pageAlert.message
+		if (alert) {
+			setTimeout(() => {
+				showAlert = true
+			}, 200)
+			setTimeout(() => {
+				showAlert = false
+				$pageAlert = { message: null, status: false }
+				// console.log($pageAlert)
+			}, 5000)
+		}
+	}
+
+	$: $pageAlert, renderAlert()
+
+	let menuPopup
+	let avatarLogo
 
 	const items = [
 		{ path: '/events/create', name: 'Create a event', icon: Add },
@@ -70,7 +96,12 @@
 				<span>
 					{data.user.name}
 				</span>
-				<div class="rounded-full overflow-hidden h-[44px] aspect-square">
+				<!-- svelte-ignore a11y-click-events-have-key-events -->
+				<div
+					bind:this={avatarLogo}
+					on:click={() => menuPopup.show()}
+					class="rounded-full overflow-hidden h-[44px] aspect-square cursor-pointer"
+				>
 					<img
 						class="w-full h-full"
 						alt="avatar"
@@ -79,6 +110,21 @@
 						)}&background=0D8ABC&color=fff`}
 					/>
 				</div>
+				<Popup bind:this={menuPopup} desiredWidth="200px" trigger={avatarLogo}>
+					<SimpleList
+						itemViewer={TextWithIcon}
+						items={[
+							{
+								text: 'Profile',
+								icon: AiOutlineUser
+							},
+							{
+								text: 'Log out',
+								icon: AiOutlineLogout
+							}
+						]}
+					/>
+				</Popup>
 			{:else}
 				<a href="/signin">
 					<span>Sign in</span>
@@ -107,7 +153,9 @@
 			<slot />
 		</div>
 	</div>
-
+	{#if showAlert}
+		<Alert />
+	{/if}
 	<footer />
 </div>
 

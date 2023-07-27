@@ -1,22 +1,28 @@
 <script lang="ts">
 	import { createDebouncer } from '$lib/utils/debounce'
-	import { SvelteComponent, onMount } from 'svelte'
-	import Dropdown, { type ValueGenerator } from './Dropdown.svelte'
+	import { SvelteComponent, createEventDispatcher, onMount } from 'svelte'
+	import Dropdown, { type ItemGenerator, type ValueGenerator } from './Dropdown.svelte'
 	import TextWithImageViewer from './custom/data_viewer/TextWithImageViewer.svelte'
 	import SimpleTextViewer from './custom/data_viewer/SimpleTextViewer.svelte'
 	export let filterPlaceholder: string = ''
 	export let placeholder: string = ''
-	export let selected: any | any[] | null
+	export let selected: any | any[] | null = null
 	export let multiselect: boolean = false
 	export let url: string
-	export let searchField: string = 'search'
 	export let name: string = ''
 	export let value: string = ''
 	export let itemViewer: typeof SvelteComponent = TextWithImageViewer
 	export let selectedViewer: typeof SvelteComponent = SimpleTextViewer
+	export let itemGenerator: ItemGenerator = (item) => ({ title: item.title, image: item.image })
+	export let selectedGenerator: ItemGenerator = (item) => ({ title: item.title })
+	export let dataGenerator = (apiResponse: any) => ({
+		count: apiResponse.count,
+		results: apiResponse.results
+	})
 	export let valueGenerator: ValueGenerator = (item) => {
 		return item.id
 	}
+	let eventDispatcher = createEventDispatcher()
 	let items: any[] = []
 	let loading: boolean = false
 	let filter: string = ''
@@ -51,25 +57,45 @@
 
 	async function fetchMoreData() {
 		loading = true
-		const params = new URLSearchParams({
-			[searchField]: filter,
-			offset: items.length.toString(),
-			limit: limit.toString()
-		})
-		const generatedUrl = `${url}?${params.toString()}`
+		const params = {}
+		let generatedUrl = url
+		if (generatedUrl.includes('{s}')) {
+			generatedUrl = generatedUrl.replace('{s}', encodeURIComponent(filter))
+		}
+
+		// Reemplazar '{o}' con el valor de la variable global 'offset'
+		if (generatedUrl.includes('{o}')) {
+			generatedUrl = generatedUrl.replace('{o}', encodeURIComponent(items.length.toString()))
+		}
+
+		// Reemplazar '{l}' con el valor de la variable global 'limit'
+		if (generatedUrl.includes('{l}')) {
+			generatedUrl = generatedUrl.replace('{l}', encodeURIComponent(limit.toString()))
+		}
 		let response = await fetch(generatedUrl, {
 			method: 'get'
 		})
 		let data = await response.json()
 		if (response.ok) {
-			items = items.concat(data.results)
-			if (items.length >= data.count) {
+			const parsedResult = dataGenerator(data)
+			if (parsedResult.results) {
+				items = items.concat(parsedResult.results)
+			}
+			if (!parsedResult.count || items.length >= parsedResult.count) {
 				limitReach = true
 			}
+		} else {
+			limitReach = true
 		}
 		loading = false
 
 		handleDropdownScroll()
+	}
+	function handleOnChange(event) {
+		const canContinue = eventDispatcher('change', event.detail, { cancelable: true })
+		if (!canContinue) {
+			event.preventDefault()
+		}
 	}
 </script>
 
@@ -80,6 +106,7 @@
 	manualFilter={true}
 	bind:scrollerRef
 	on:filterChange={handleFilterChange}
+	on:change={handleOnChange}
 	bind:multiselect
 	bind:value
 	{items}
@@ -89,7 +116,8 @@
 	{loading}
 	{filterPlaceholder}
 	{valueGenerator}
-	height={'300px'}
+	{itemGenerator}
+	{selectedGenerator}
 >
 	<svelte:fragment slot="title">{placeholder}</svelte:fragment></Dropdown
 >

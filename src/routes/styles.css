@@ -11,6 +11,7 @@
 	/* Colors */
 	--brand-pink: #d5509d;
 	--brand-cyan: #46dffc;
+	--brand-gray: #161718;
 	--white: #ffffff;
 	--black: #000000;
 	--accent: #6750a3;
@@ -56,6 +57,8 @@
 	);
 	--gd-glassmorphism: linear-gradient(140.49deg, #ffffff9c -0.77%, #ffffff4f 100%);
 	--gd-page: linear-gradient(180deg, #f5f5f5 0%, #f3f5fd 61.98%, #dde0e9 100%);
+	--black-gradient-r: linear-gradient(90deg, rgba(255, 255, 255, 0) 5%, rgba(0, 0, 0, 80) 100%);
+	--black-gradient-l: linear-gradient(90deg, rgba(0, 0, 0, 80) 0%, rgba(255, 255, 255, 0) 95%);
 
 	/* Shadows */
 	--shadow-section: 0px 16px 88px rgba(0, 0, 0, 0.07);

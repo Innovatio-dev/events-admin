@@ -5,25 +5,30 @@ import { validateSearchParam } from '$lib/server/middlewares/validator'
 import { Region } from '$lib/server/models/region'
 import { HttpResponses } from '$lib/server/constants/httpResponses'
 import { Country } from '$lib/server/models/country'
-import sequelize from 'sequelize'
+import sequelize, { type Order } from 'sequelize'
+import { orderSchema } from '$lib/utils/validation/schemas'
+import { getConnection } from '$lib/server/config/database'
 
 const schema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
 	regionId: Joi.number().min(0).optional(),
 	limit: Joi.number().min(-1).optional().default(10),
-	search: Joi.string().min(0).optional()
+	search: Joi.string().min(0).optional(),
+	order: orderSchema(['id', 'status', 'city']).optional()
 })
 
-interface DynamicObject {
-	[key: string]: string | number
-}
-
 export async function GET(event: RequestEvent) {
-	const where: DynamicObject = {}
+	const where: any = {}
+	const order: Order = []
 	const filter = validateSearchParam(event, schema)
 
 	if (filter.regionId) {
 		where.regionId = filter.regionId
+	}
+	if (filter.order) {
+		for (const col of filter.order) {
+			order.push([col.name, col.type])
+		}
 	}
 	if (filter.search) {
 		const search = `%${filter.search}%`
@@ -57,6 +62,7 @@ export async function GET(event: RequestEvent) {
 		where,
 		limit: filter.limit >= 0 ? filter.limit : undefined,
 		offset: filter.offset,
+		order,
 		include: [
 			{
 				model: Region,
@@ -90,12 +96,18 @@ export async function POST(event: RequestEvent) {
 	const data = await event.request.json()
 	const validate = postSchema.validate(data)
 
+	const connection = await getConnection()
+	const transaction = await connection.transaction()
+
 	try {
-		const result = await Venue.create(validate.value)
-		result.setPictures(validate.value.pictures)
+		const result = await Venue.create(validate.value, { transaction })
+		await result.setPictures(validate.value.pictures, { transaction })
+
+		await transaction.commit()
 		return json(result)
 	} catch (err) {
 		console.log(err)
+		await transaction.rollback()
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
 			message: 'Something happend, try again later'
 		})

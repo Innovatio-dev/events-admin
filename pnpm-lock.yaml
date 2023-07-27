@@ -30,6 +30,7 @@ specifiers:
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-svelte3: ^4.0.0
   joi: ^17.8.4
+  leaflet: ^1.9.4
   leaflet-geosearch: ^3.8.0
   multer: 1.4.5-lts.1
   pg: ^8.10.0
@@ -69,6 +70,7 @@ dependencies:
   date-fns: 2.30.0
   date-picker-svelte: 2.6.0_svelte@3.59.2
   joi: 17.9.2
+  leaflet: 1.9.4
   multer: 1.4.5-lts.1
   pg: 8.11.1_pg-native@3.0.1
   pg-hstore: 2.3.4
@@ -212,6 +214,9 @@ packages:
   /@aws-cdk/cloud-assembly-schema/2.84.0:
     resolution: {integrity: sha512-TLQMexYkev8T1WSevwCibW4Dc9bvm89MUOdv1rJykCg4Vskmmw9WkWBRxW8S4nLgRAsQ0Uw8503sg5FIGjQ7rQ==}
     engines: {node: '>= 14.15.0'}
+    dependencies:
+      jsonschema: 1.4.1
+      semver: 7.5.4
     dev: true
     bundledDependencies:
       - jsonschema
@@ -234,6 +239,7 @@ packages:
     engines: {node: '>= 14.15.0'}
     dependencies:
       '@aws-cdk/cloud-assembly-schema': 2.84.0
+      semver: 7.5.4
     dev: true
     bundledDependencies:
       - semver
@@ -1772,6 +1778,10 @@ packages:
       '@babel/helper-string-parser': 7.22.5
       '@babel/helper-validator-identifier': 7.22.5
       to-fast-properties: 2.0.0
+    dev: true
+
+  /@balena/dockerignore/1.0.2:
+    resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
     dev: true
 
   /@envelop/core/3.0.6:
@@ -3878,7 +3888,17 @@ packages:
       '@aws-cdk/asset-awscli-v1': 2.2.200
       '@aws-cdk/asset-kubectl-v20': 2.1.2
       '@aws-cdk/asset-node-proxy-agent-v5': 2.0.166
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.156
+      fs-extra: 9.1.0
+      ignore: 5.2.4
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.3.0
+      semver: 7.5.4
+      table: 6.8.1
+      yaml: 1.10.2
     dev: true
     bundledDependencies:
       - '@balena/dockerignore'
@@ -3901,7 +3921,17 @@ packages:
       '@aws-cdk/asset-awscli-v1': 2.2.200
       '@aws-cdk/asset-kubectl-v20': 2.1.2
       '@aws-cdk/asset-node-proxy-agent-v5': 2.0.166
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.156
+      fs-extra: 11.1.1
+      ignore: 5.2.4
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.3.0
+      semver: 7.5.4
+      table: 6.8.1
+      yaml: 1.10.2
     dev: true
     bundledDependencies:
       - '@balena/dockerignore'
@@ -4243,6 +4273,11 @@ packages:
 
   /caniuse-lite/1.0.30001517:
     resolution: {integrity: sha512-Vdhm5S11DaFVLlyiKu4hiUTkpZu+y1KA/rZZqVQfOD5YdDT/eQKlkt7NaE0WGOFgX32diqt9MiP9CAiFeRklaA==}
+    dev: true
+
+  /case/1.6.3:
+    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
+    engines: {node: '>= 0.8.0'}
     dev: true
 
   /cdk-assets/2.84.0:
@@ -5783,6 +5818,15 @@ packages:
       universalify: 2.0.0
     dev: true
 
+  /fs-extra/11.1.1:
+    resolution: {integrity: sha512-MGIE4HOvQCeUCzmlHs0vXpih4ysz4wg9qiSAu6cd42lVwPbTM1TjV7RusoyQqMmk/95gdQZX72u+YW+c3eEpFQ==}
+    engines: {node: '>=14.14'}
+    dependencies:
+      graceful-fs: 4.2.11
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: true
+
   /fs-extra/5.0.0:
     resolution: {integrity: sha512-66Pm4RYbjzdyeuqudYqhFiNBbCIuI9kgRqLPSHIlXHidW8NIQtVdkM1yeZ4lXwuhbTETv3EUGMNHAAw6hiundQ==}
     dependencies:
@@ -6607,6 +6651,10 @@ packages:
       graceful-fs: 4.2.11
     dev: true
 
+  /jsonschema/1.4.1:
+    resolution: {integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==}
+    dev: true
+
   /jszip/3.10.1:
     resolution: {integrity: sha512-xXDvecyTpGLrqFrvkrUSoxxfJI5AH7U8zxxtVclpsUtMCq4JQ290LY8AW5c7Ggnr/Y/oK+bQMbqK2qmtk3pN4g==}
     dependencies:
@@ -6697,8 +6745,6 @@ packages:
   /leaflet/1.9.4:
     resolution: {integrity: sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==}
     requiresBuild: true
-    dev: true
-    optional: true
 
   /leven/2.1.0:
     resolution: {integrity: sha512-nvVPLpIHUxCUoRLrFqTgSxXJ614d8AgQoWl7zPe/2VadE8+1dpU3LBhowRuBAcuwruWtOdD8oYC9jDNJjXDPyA==}

@@ -85,9 +85,6 @@
 		if (request.ok) {
 			const { resource, uploadUrl } = await request.json()
 			const uploadRequest = new XMLHttpRequest()
-			const formData = new FormData()
-
-			formData.append('file', fileUpload.file)
 
 			uploadRequest.upload.addEventListener('progress', (event) => {
 				if (event.lengthComputable) {
@@ -119,6 +116,10 @@
 			fileUpload.request = uploadRequest
 			files = files
 			uploadRequest.open('PUT', uploadUrl)
+<<<<<<< HEAD
+=======
+			uploadRequest.setRequestHeader('Content-Type', fileUpload.file.type)
+>>>>>>> 2228f80727efeab88d7644c69b469e2e121e9d7b
 			uploadRequest.send(fileUpload.file)
 		} else {
 			fileUpload.status = 2

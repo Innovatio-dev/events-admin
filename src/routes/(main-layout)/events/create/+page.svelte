@@ -1,17 +1,27 @@
 <script lang="ts">
 	import DatePicker from '$lib/components/DatePicker.svelte'
 	import DragAndDrop from '$lib/components/DragAndDrop.svelte'
-	import Dropdown from '$lib/components/Dropdown.svelte'
 	import DropdownFetcher from '$lib/components/DropdownFetcher.svelte'
 	import Input from '$lib/components/Input.svelte'
 	import LabelInput from '$lib/components/LabelInput.svelte'
+	import OrderableTable, { type Column } from '$lib/components/OrderableTable.svelte'
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
-	import DropdownOrganizer from '$lib/components/custom/data_viewer/DropdownOrganizer.svelte'
-	import DropdownOrganizerSelected from '$lib/components/custom/data_viewer/DropdownOrganizerSelected.svelte'
-	import SpeakerSelectedViewer from '$lib/components/custom/data_viewer/SpeakerSelectedViewer.svelte'
-	import SpeakerViewer from '$lib/components/custom/data_viewer/SpeakerViewer.svelte'
+	import TextWithIcon from '$lib/components/table_cell/TextWithIcon.svelte'
+	import CgMathEqual from 'svelte-icons-pack/cg/CgMathEqual'
 	import { pageStatus } from '$lib/stores/pageStatus'
 	import { onMount } from 'svelte'
+	import { goto } from '$app/navigation'
+	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
+	import TextWithImageViewer from '$lib/components/custom/data_viewer/TextWithImageViewer.svelte'
+	import MainButton from '$lib/components/MainButton.svelte'
+	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
+	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
+	import Dropdown from '$lib/components/Dropdown.svelte'
+	import { languages } from '$lib/utils/constants/Languages'
+	import Badge from '$lib/components/Badge.svelte'
+	import ToggleButtton from '$lib/components/ToggleButtton.svelte'
+	import SpeakersFormModal from '$lib/components/custom/SpeakersFormModal.svelte'
+	import VenuesFormModal from '$lib/components/custom/VenuesFormModal.svelte'
 
 	const typeEvents = [
 		{
@@ -33,14 +43,33 @@
 			value: 0
 		}
 	]
-	const event = {
+	let organizerInfoEnabled: boolean = false
+	const event: {
+		organizerId: string
+		typeEvent: string | null
+		isFeatured: number
+		title: string
+		description: string
+		bannerId: any[]
+		pictures: any[]
+		linkZoom: any
+		language: any
+		translation: { name: string; flagIso: string }[]
+		secondaryOrganizer: string | null
+		secondaryOrganizerDescription: string | null
+	} = {
 		organizerId: '',
 		typeEvent: null,
 		isFeatured: 0,
 		title: '',
 		description: '',
 		bannerId: [],
-		pictures: []
+		pictures: [],
+		linkZoom: null,
+		language: null,
+		translation: [],
+		secondaryOrganizer: null,
+		secondaryOrganizerDescription: null
 	}
 	const schedule = {
 		startTime: null,
@@ -48,13 +77,137 @@
 		visibleAt: null
 	}
 
-	let mainSpeaker: any = null
+	let mainSpeakers: any[] = []
+	let secondarySpeakers: any = []
+	let venues: any[] = []
+
+	let speakerColumns: Column[] = [
+		{
+			title: '',
+			cellComponent: TextWithIcon,
+			width: '3em',
+			grow: '0',
+			cellDataGenerator: (item) => ({ icon: CgMathEqual })
+		},
+		{
+			title: 'Speaker Name',
+			alignHeader: 'center',
+			cellComponent: TextWithImageViewer,
+			cellDataGenerator: (item) => ({ title: item.name, image: item.picture?.url })
+		},
+		{
+			title: 'Actions',
+			cellComponent: ActionsViewer,
+			width: '10em',
+			grow: '0',
+			cellDataGenerator: (item) => {
+				return {
+					onEdit: () => {
+						goto(`/speakers/${item.id}/edit`)
+					},
+					onRemove: () => {
+						let index = mainSpeakers.indexOf(item)
+						if (index >= 0) {
+							mainSpeakers.splice(index, 1)
+							mainSpeakers = mainSpeakers
+						}
+					}
+				}
+			}
+		}
+	]
+	let speakerColumnsSecondary: Column[] = [
+		{
+			title: '',
+			cellComponent: TextWithIcon,
+			width: '3em',
+			grow: '0',
+			cellDataGenerator: (item) => ({ icon: CgMathEqual })
+		},
+		{
+			title: 'Speaker Name',
+			alignHeader: 'center',
+			cellComponent: TextWithImageViewer,
+			cellDataGenerator: (item) => ({ title: item.name, image: item.picture?.url })
+		},
+		{
+			title: 'Actions',
+			cellComponent: ActionsViewer,
+			alignHeader: 'center',
+			width: '10em',
+			grow: '0',
+			cellDataGenerator: (item) => {
+				return {
+					onEdit: () => {
+						goto(`/speakers/${item.id}/edit`)
+					},
+					onRemove: () => {
+						let index = secondarySpeakers.indexOf(item)
+						if (index >= 0) {
+							secondarySpeakers.splice(index, 1)
+							secondarySpeakers = secondarySpeakers
+						}
+					}
+				}
+			}
+		}
+	]
+
+	let venueColumns: Column[] = [
+		{
+			title: 'Venue name',
+			alignHeader: 'center',
+			cellComponent: TextWithImageViewer,
+			cellDataGenerator: (item) => ({ title: item.name })
+		},
+		{
+			title: 'Location',
+			alignHeader: 'center',
+			cellComponent: CountryViewer,
+			cellDataGenerator: (item) => item.country
+		},
+		{
+			title: 'Address',
+			alignHeader: 'center',
+			cellComponent: MapViewerPopup,
+			cellDataGenerator: (item) => ({
+				latitude: item.location.lat,
+				longitude: item.location.lng,
+				title: item.name
+			})
+		},
+		{
+			title: 'Actions',
+			cellComponent: ActionsViewer,
+			width: '10em',
+			grow: '0',
+			cellDataGenerator: (item) => {
+				return {
+					onEdit: () => {
+						goto(`/venues/${item.id}/edit`)
+					},
+					onRemove: () => {
+						let index = venues.indexOf(item)
+						if (index >= 0) {
+							venues.splice(index, 1)
+							venues = venues
+						}
+					}
+				}
+			}
+		}
+	]
+
+	let isModalMainSpeaker = false
+	let isModalSecondarySpeaker = false
+	let isModalVenue = false
 
 	onMount(() => {
 		$pageStatus.title = 'Create an Event'
 	})
 	$: {
-		console.log(event)
+		// console.log(event)
+		// console.log(mainSpeakers)
 	}
 </script>
 
@@ -65,12 +218,11 @@
 			<DropdownFetcher
 				name="organizerId"
 				filterPlaceholder={'Search'}
-				itemViewer={DropdownOrganizer}
-				selectedViewer={DropdownOrganizerSelected}
-				bind:selected={mainSpeaker}
+				itemGenerator={(item) => ({ title: item.name, image: item.logo?.url })}
+				selectedGenerator={(item) => ({ title: item.name })}
 				bind:value={event.organizerId}
 				placeholder={'Select the organizer for this event'}
-				url={'/api/organizers'}
+				url={'/api/organizers?search={s}&limit={l}&offset={o}'}
 			/>
 		</div>
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
@@ -157,22 +309,237 @@
 					<LabelInput>Date ends</LabelInput>
 					<DatePicker placeholder="Choose the end date" bind:value={schedule.endTime} />
 				</div>
+				<div>
+					<LabelInput>Event registration date opens</LabelInput>
+					<DatePicker
+						placeholder="Choose the start date"
+						bind:value={schedule.visibleAt}
+					/>
+				</div>
 			</div>
 			<div class="input-set">
 				<SectionHeader>Speakers</SectionHeader>
 				<div>
 					<LabelInput>Primary Speaker</LabelInput>
-					<DropdownFetcher
-						filterPlaceholder={'Search'}
-						itemViewer={SpeakerViewer}
-						selectedViewer={SpeakerSelectedViewer}
-						bind:selected={mainSpeaker}
-						valueGenerator={(item) => item.id}
-						placeholder={'Select the main speaker'}
-						searchField={'search'}
-						url={'/api/speakers'}
-					/>
+					<div class="flex gap-2">
+						<div class="w-full">
+							<DropdownFetcher
+								filterPlaceholder={'Search'}
+								itemGenerator={(item) => ({
+									title: item.name,
+									image: item.picture?.url
+								})}
+								selectedGenerator={(item) => ({ title: item.name })}
+								valueGenerator={(item) => item.id}
+								placeholder={'Choose a primary speaker'}
+								url={'/api/speakers?search={s}&limit={l}&offset={o}'}
+								multiselect={false}
+								on:change={(e) => {
+									e.preventDefault()
+									const speaker = e.detail.selected
+									if (!mainSpeakers.some((item) => item.id == speaker.id)) {
+										mainSpeakers.push(speaker)
+										mainSpeakers = mainSpeakers
+									}
+								}}
+							/>
+						</div>
+						<MainButton fit on:click={() => (isModalMainSpeaker = true)}
+							>Create</MainButton
+						>
+						<SpeakersFormModal
+							isOpen={isModalMainSpeaker}
+							on:save={(event) => {
+								const speaker = event.detail
+								if (!mainSpeakers.some((item) => item.id == speaker.id)) {
+									mainSpeakers.push(speaker)
+									mainSpeakers = mainSpeakers
+								}
+							}}
+							handleClose={() => (isModalMainSpeaker = false)}
+						/>
+					</div>
 				</div>
+				<div>
+					<OrderableTable columns={speakerColumns} data={mainSpeakers} />
+				</div>
+				<div>
+					<LabelInput>Secondary Speaker</LabelInput>
+					<div class="flex gap-2">
+						<div class="w-full">
+							<DropdownFetcher
+								filterPlaceholder={'Search'}
+								itemGenerator={(item) => ({
+									title: item.name,
+									image: item.picture?.url
+								})}
+								selectedGenerator={(item) => ({ title: item.name })}
+								valueGenerator={(item) => item.id}
+								placeholder={'Choose a secondary speaker'}
+								url={'/api/speakers?search={s}&limit={l}&offset={o}'}
+								multiselect={false}
+								on:change={(e) => {
+									e.preventDefault()
+									const speaker = e.detail.selected
+									if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
+										secondarySpeakers.push(speaker)
+										secondarySpeakers = secondarySpeakers
+									}
+								}}
+							/>
+						</div>
+						<MainButton fit on:click={() => (isModalSecondarySpeaker = true)}
+							>Create</MainButton
+						>
+						<SpeakersFormModal
+							isOpen={isModalSecondarySpeaker}
+							on:save={(event) => {
+								const speaker = event.detail
+								if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
+									secondarySpeakers.push(speaker)
+									secondarySpeakers = secondarySpeakers
+								}
+							}}
+							handleClose={() => (isModalSecondarySpeaker = false)}
+						/>
+					</div>
+				</div>
+				<div>
+					<OrderableTable columns={speakerColumnsSecondary} data={secondarySpeakers} />
+				</div>
+				<div>
+					<LabelInput>Insert the invitation zoom link</LabelInput>
+
+					<Input bind:value={event.linkZoom} placeholder="Insert zoom link" />
+				</div>
+			</div>
+
+			<div class="input-set">
+				<SectionHeader>Venue</SectionHeader>
+				<div>
+					<LabelInput>Venue</LabelInput>
+					<div class="flex gap-2">
+						<div class="w-full">
+							<DropdownFetcher
+								filterPlaceholder={'Search'}
+								itemGenerator={(item) => ({ title: item.name })}
+								valueGenerator={(item) => item.id}
+								selectedGenerator={(item) => ({ title: item.name })}
+								placeholder={'Choose a venue'}
+								url={'/api/venues'}
+								multiselect={false}
+								selected={venues.length ? venues[0] : null}
+								on:change={(e) => {
+									const venue = e.detail.selected
+									venues = [venue]
+								}}
+							/>
+						</div>
+						<MainButton fit on:click={() => (isModalVenue = true)}>Create</MainButton>
+						<VenuesFormModal
+							isOpen={isModalVenue}
+							on:save={(event) => {
+								const venue = event.detail
+								venues = [venue]
+							}}
+							handleClose={() => (isModalVenue = false)}
+						/>
+					</div>
+				</div>
+				<div>
+					<OrderableTable columns={venueColumns} data={venues} />
+				</div>
+			</div>
+
+			<div class="input-set">
+				<SectionHeader>Language</SectionHeader>
+				<div>
+					<LabelInput>Primary Language</LabelInput>
+					<Dropdown
+						width="100%"
+						items={languages}
+						itemViewer={CountryViewer}
+						bind:selected={event.language}
+						selectedGenerator={(item) => ({ title: item.name })}
+						itemGenerator={(item) => ({
+							iso: item.flagIso,
+							nicename: item.name,
+							align: 'left'
+						})}
+					>
+						<div slot="title">Select the main language</div>
+					</Dropdown>
+				</div>
+				<div>
+					<LabelInput>Translated to</LabelInput>
+					<Dropdown
+						width="100%"
+						items={languages}
+						itemViewer={CountryViewer}
+						multiselect={true}
+						bind:selected={event.translation}
+						selectedGenerator={(item) => ({ title: item.name })}
+						itemGenerator={(item) => ({
+							iso: item.flagIso,
+							nicename: item.name,
+							align: 'left'
+						})}
+					>
+						<div slot="title">Select languages to translate</div>
+					</Dropdown>
+				</div>
+				<div class="flex-grow flex gap-4 flex-wrap">
+					{#each event.translation as translation, index}
+						<Badge
+							type="light"
+							hideOnClose={false}
+							onClose={() => {
+								event.translation.splice(index, 1)
+								event.translation = event.translation
+							}}
+						>
+							<CountryViewer
+								value={{
+									iso: translation.flagIso,
+									nicename: translation.name,
+									padding: '0'
+								}}
+							/>
+						</Badge>
+					{/each}
+				</div>
+			</div>
+
+			<div class="input-set">
+				<SectionHeader>Organizer Assigned</SectionHeader>
+				<div>
+					<LabelInput>Organizer Info</LabelInput>
+					<div class="w-[10em]">
+						<ToggleButtton
+							id="randomIdCuzIsMandatory"
+							left={'no'}
+							right={'yes'}
+							text
+							bind:checked={organizerInfoEnabled}
+						/>
+					</div>
+				</div>
+				{#if organizerInfoEnabled}
+					<div>
+						<LabelInput>Type organizer name</LabelInput>
+						<Input
+							placeholder="Organizer Assigned to this event"
+							bind:value={event.secondaryOrganizer}
+						/>
+					</div>
+					<div>
+						<LabelInput>Description</LabelInput>
+						<Input
+							placeholder="Organizer Assigned to this event"
+							bind:value={event.secondaryOrganizerDescription}
+						/>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>

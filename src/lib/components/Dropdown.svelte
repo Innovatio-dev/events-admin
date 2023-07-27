@@ -1,6 +1,7 @@
 <script lang="ts" context="module">
 	export type FilterFunction = (item: any, filter: string) => boolean
 	export type ValueGenerator = (item: any) => any
+	export type ItemGenerator = (item: any) => any
 	interface InternalItem {
 		item: any
 		selected: boolean
@@ -36,6 +37,8 @@
 	export let itemViewer: typeof SvelteComponent = TextWithImageViewer
 	export let selectedViewer: typeof SvelteComponent = SimpleTextViewer
 	export let valueGenerator: ValueGenerator = (item) => item.value
+	export let itemGenerator: ItemGenerator = (item) => ({ title: item.title, image: item.image })
+	export let selectedGenerator: ItemGenerator = (item) => ({ title: item.title })
 	export let filterFunction: FilterFunction | null = (item: any, filter: string) => {
 		return !item.title.toLowerCase().includes(filter)
 	}
@@ -155,7 +158,7 @@
 			</div>
 		{:else}
 			<div class="text">
-				<svelte:component this={selectedViewer} value={selected} />
+				<svelte:component this={selectedViewer} value={selectedGenerator(selected)} />
 			</div>
 		{/if}
 		<!-- {#if Array.isArray(selected)}
@@ -208,7 +211,10 @@
 				<!-- svelte-ignore a11y-click-events-have-key-events -->
 				<div class="item" on:click={() => handleClickItem(index)}>
 					<div class="viewer">
-						<svelte:component this={itemViewer} value={internalItem.item} />
+						<svelte:component
+							this={itemViewer}
+							value={itemGenerator(internalItem.item)}
+						/>
 					</div>
 					<div class="check">
 						{#if internalItem.selected}
