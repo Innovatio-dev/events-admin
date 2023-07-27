@@ -116,10 +116,7 @@
 			fileUpload.request = uploadRequest
 			files = files
 			uploadRequest.open('PUT', uploadUrl)
-<<<<<<< HEAD
-=======
 			uploadRequest.setRequestHeader('Content-Type', fileUpload.file.type)
->>>>>>> 2228f80727efeab88d7644c69b469e2e121e9d7b
 			uploadRequest.send(fileUpload.file)
 		} else {
 			fileUpload.status = 2
@@ -151,14 +148,7 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="mainContainer">
-	<input
-		bind:this={inputRef}
-		on:change={handleInputFile}
-		type="file"
-		accept="images/*"
-		hidden
-		{multiple}
-	/>
+	<input bind:this={inputRef} on:change={handleInputFile} type="file" hidden {multiple} />
 	{#if files.length == 0}
 		<div
 			class="content"
