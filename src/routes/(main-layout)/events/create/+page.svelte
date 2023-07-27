@@ -20,6 +20,8 @@
 	import { languages } from '$lib/utils/constants/Languages'
 	import Badge from '$lib/components/Badge.svelte'
 	import ToggleButtton from '$lib/components/ToggleButtton.svelte'
+	import SpeakersFormModal from '$lib/components/custom/SpeakersFormModal.svelte'
+	import VenuesFormModal from '$lib/components/custom/VenuesFormModal.svelte'
 
 	const typeEvents = [
 		{
@@ -195,6 +197,11 @@
 			}
 		}
 	]
+
+	let isModalMainSpeaker = false
+	let isModalSecondarySpeaker = false
+	let isModalVenue = false
+
 	onMount(() => {
 		$pageStatus.title = 'Create an Event'
 	})
@@ -337,7 +344,20 @@
 								}}
 							/>
 						</div>
-						<MainButton href="/speakers/create">Create</MainButton>
+						<MainButton fit on:click={() => (isModalMainSpeaker = true)}
+							>Create</MainButton
+						>
+						<SpeakersFormModal
+							isOpen={isModalMainSpeaker}
+							on:save={(event) => {
+								const speaker = event.detail
+								if (!mainSpeakers.some((item) => item.id == speaker.id)) {
+									mainSpeakers.push(speaker)
+									mainSpeakers = mainSpeakers
+								}
+							}}
+							handleClose={() => (isModalMainSpeaker = false)}
+						/>
 					</div>
 				</div>
 				<div>
@@ -368,7 +388,20 @@
 								}}
 							/>
 						</div>
-						<MainButton href="/speakers/create">Create</MainButton>
+						<MainButton fit on:click={() => (isModalSecondarySpeaker = true)}
+							>Create</MainButton
+						>
+						<SpeakersFormModal
+							isOpen={isModalSecondarySpeaker}
+							on:save={(event) => {
+								const speaker = event.detail
+								if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
+									secondarySpeakers.push(speaker)
+									secondarySpeakers = secondarySpeakers
+								}
+							}}
+							handleClose={() => (isModalSecondarySpeaker = false)}
+						/>
 					</div>
 				</div>
 				<div>
@@ -402,7 +435,15 @@
 								}}
 							/>
 						</div>
-						<MainButton href="/venues/create">Create</MainButton>
+						<MainButton fit on:click={() => (isModalVenue = true)}>Create</MainButton>
+						<VenuesFormModal
+							isOpen={isModalVenue}
+							on:save={(event) => {
+								const venue = event.detail
+								venues = [venue]
+							}}
+							handleClose={() => (isModalVenue = false)}
+						/>
 					</div>
 				</div>
 				<div>
@@ -475,7 +516,7 @@
 					<LabelInput>Organizer Info</LabelInput>
 					<div class="w-[10em]">
 						<ToggleButtton
-							id="asd"
+							id="randomIdCuzIsMandatory"
 							left={'no'}
 							right={'yes'}
 							text

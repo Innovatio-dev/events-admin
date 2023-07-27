@@ -32,17 +32,19 @@
 				})
 				handleClose()
 			} else {
-				console.log(await res.json())
 				$pageAlert = {
 					message: 'Oops! An error has occurred. try again later.',
 					status: false
 				}
+				dispatch('error', {
+					error: await res.json()
+				})
 				handleClose()
 			}
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
-			dispatch('save', {
+			dispatch('error', {
 				error: error
 			})
 			handleClose()

@@ -55,5 +55,6 @@ export async function POST(event: RequestEvent) {
 		})
 	)
 	const result = await Speaker.create(data)
-	return json(result)
+	const speaker = await Speaker.scope('full').findByPk(result.id)
+	return json(speaker)
 }

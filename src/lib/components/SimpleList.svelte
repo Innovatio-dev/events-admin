@@ -32,12 +32,6 @@
 		overflow-y: auto;
 		cursor: pointer;
 
-		.loader {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			height: 100px;
-		}
 		.item {
 			border-radius: 10px;
 			height: 3em;
