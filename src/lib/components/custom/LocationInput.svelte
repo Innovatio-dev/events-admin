@@ -1,8 +1,7 @@
 <script lang="ts">
-	// Leaflet
-	import { OpenCageProvider } from 'leaflet-geosearch'
 	// Svelte
 	import Input from '../Input.svelte'
+	import { onMount } from 'svelte'
 	// Icons
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
 	import Icon from 'svelte-icons-pack'
@@ -19,18 +18,23 @@
 	let containerElement: HTMLElement
 	let typedData = ''
 	let results: SearchResult<RawResult>[] = []
+	let provider
 
 	// Constants
 	import { countries, REGIONS } from '$lib/utils/constants/Regions'
 
+	onMount(async () => {
+		const geoSearch = await import('leaflet-geosearch')
+		provider = new geoSearch.OpenCageProvider({
+			params: {
+				key: '0b893a83f3394b3f80634c1debe238a4',
+				language: 'en'
+			}
+		})
+	})
+
 	const fetchLocation = async (e) => {
 		try {
-			const provider = new OpenCageProvider({
-				params: {
-					key: '0b893a83f3394b3f80634c1debe238a4',
-					language: 'en'
-				}
-			})
 			const response = await provider.search({ query: typedData })
 			results = response
 			// console.log(results)
