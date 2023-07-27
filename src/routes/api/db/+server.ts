@@ -132,6 +132,22 @@ async function populate(): Promise<any[]> {
 		role: 1
 	})
 
+	await User.create({
+		cognitoId: '8f84c538-7c95-4f1d-b921-860e300acbb6',
+		name: 'Chris',
+		surname: 'Molina',
+		email: 'xywafefu@mailinator.com',
+		role: 1
+	})
+
+	await User.create({
+		cognitoId: '22dd6ef1-7fdc-4f95-820c-6955350bdfae',
+		name: 'José Jaime',
+		surname: 'Rodríguez',
+		email: 'rodriguezjjaime@hotmail.com',
+		role: 1
+	})
+
 	const eventMimes = [
 		'webp',
 		'jpeg',
