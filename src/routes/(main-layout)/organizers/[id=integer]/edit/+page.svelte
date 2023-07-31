@@ -9,6 +9,7 @@
 	import ProfileHeader from '$lib/components/custom/ProfileHeader.svelte'
 	// Annimations
 	import { Circle3 } from 'svelte-loading-spinners'
+	import { goto } from '$app/navigation'
 
 	// State
 	let organizer: any = null
@@ -47,6 +48,7 @@
 					status: false
 				}
 			}
+			goto('/organizers')
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }

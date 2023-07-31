@@ -64,7 +64,6 @@
 		} else {
 			await submitAction({ ...venue, ...geoData })
 		}
-		// goto('/venues')
 	}
 
 	const updateVenue = (e) => {
@@ -72,7 +71,6 @@
 	}
 
 	const onCancel = () => {
-		// goto('/venues')
 	}
 </script>
 
