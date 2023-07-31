@@ -66,8 +66,9 @@
 			if (res.ok) {
 				data = await res.json()
 				if (data.results) {
-					data.results = data.results.map((item) => ({
+					data.results = data.results.map(({ role, ...item }) => ({
 						...item,
+						role: role === 1 ? 'Super admin' : 'Regular admin',
 						link: `/admin/${item.id}`
 					}))
 					pageCount = Math.ceil(data.count / itemsPerPage)
@@ -107,7 +108,7 @@
 		{
 			title: 'Type Admin',
 			sortable: true,
-			dataKey: 'name'
+			dataKey: 'role'
 		},
 		{
 			title: 'Details',

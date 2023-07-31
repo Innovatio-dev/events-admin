@@ -44,7 +44,11 @@
 			isError = false
 			const res = await fetch(`${$page.url.origin}/api/admins/${$page.params.id}`)
 			if (res.ok) {
-				admin = await res.json()
+				const { role, ...restAdmin } = await res.json()
+				admin = {
+					...restAdmin,
+					role: role === 1 ? 'Super admin' : 'Regular admin'
+				}
 			} else {
 				isError = true
 			}
@@ -140,7 +144,7 @@
 		{#if isChangeFormShow}
 			<ChangeEmailAdminForm onCancel={handleCloseChangeEmail} />
 		{/if}
-		{#if !isResetFormShow && !isChangeFormShow}
+		{#if admin && admin.role !== 'Super admin' && !isResetFormShow && !isChangeFormShow}
 			<div class="grid grid-cols-2 place-content-between gap-x-12 gap-y-6">
 				<MainButton on:click={handleChangeEmail}>Change email</MainButton>
 				<MainButton on:click={handleResetPassword}>Reset password</MainButton>
