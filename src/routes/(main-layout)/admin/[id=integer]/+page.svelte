@@ -20,6 +20,11 @@
 	let isRemoveError = false
 	let isOpenRemove = false
 
+	// Make super admin state
+	let isSuperLoading = false
+	let isSuperError = false
+	let isOpenSuper = false
+
 	// Reset password state
 	let isResetFormShow = false
 
@@ -82,9 +87,36 @@
 		}
 	}
 
+	async function makeSuperAdmin() {
+		try {
+			isSuperLoading = true
+			isSuperError = false
+			const res = await fetch(`${$page.url.origin}/api/admins/${$page.params.id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ role: 1 })
+			})
+			if (res.ok) {
+				isOpenSuper = false
+				location.reload()
+			} else {
+				isSuperError = true
+				throw new Error(await res.json())
+			}
+		} catch (error) {
+			console.log(error)
+			isSuperError = true
+		} finally {
+			isSuperLoading = false
+		}
+	}
+
 	// Handlers
 	function handleRemove() {
 		isOpenRemove = true
+	}
+
+	function handleSuper() {
+		isOpenSuper = true
 	}
 
 	function handleResetPassword() {
@@ -111,6 +143,16 @@
 
 	function handleAprovedRemove() {
 		deleteAdmin()
+	}
+
+	// Super handlers
+	function handleCloseSuper() {
+		isOpenSuper = false
+		isSuperError = false
+	}
+
+	function handleAprovedSuper() {
+		makeSuperAdmin()
 	}
 </script>
 
@@ -149,7 +191,7 @@
 				<MainButton on:click={handleChangeEmail}>Change email</MainButton>
 				<MainButton on:click={handleResetPassword}>Reset password</MainButton>
 				<MainButton on:click={handleRemove}>Remove</MainButton>
-				<MainButton>Make super admin</MainButton>
+				<MainButton on:click={handleSuper}>Make super admin</MainButton>
 			</div>
 		{/if}
 	</div>
@@ -162,6 +204,20 @@
 			onConfirm={handleAprovedRemove}
 		/>
 		{#if isRemoveError}
+			<p class="bg-alert-error text-sm font-medium text-white font-dm rounded-lg py-2 px-4">
+				An error has occurred, please try again.
+			</p>
+		{/if}
+	</Modal>
+	<Modal isOpen={isOpenSuper} handleClose={handleCloseSuper} title="">
+		<ApprovedModal
+			text="Are you sure you want to grant super admin capabilities?"
+			yesButtonText={isSuperLoading ? '...' : 'Yes'}
+			isLoading={isSuperLoading}
+			onCancel={handleCloseSuper}
+			onConfirm={handleAprovedSuper}
+		/>
+		{#if isSuperError}
 			<p class="bg-alert-error text-sm font-medium text-white font-dm rounded-lg py-2 px-4">
 				An error has occurred, please try again.
 			</p>
