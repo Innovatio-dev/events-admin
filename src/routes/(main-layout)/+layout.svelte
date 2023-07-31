@@ -58,6 +58,10 @@
 		{ path: '/admin', name: 'Admin panel', icon: Checklist }
 	]
 
+	if (data.user.role !== 1) {
+		items.pop()
+	}
+
 	let activeIndex = null
 
 	function updateIndex() {
