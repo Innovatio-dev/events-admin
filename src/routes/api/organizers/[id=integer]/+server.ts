@@ -28,7 +28,20 @@ export async function PUT(event: RequestEvent) {
 			email: uniqueKeyOf(Organizer, 'email')
 		})
 	)
-	let organizer = await Organizer.findByPk(id)
+	let organizer: Organizer | null = null
+
+	if (fields.status === organizerStatuses.INACTIVE) {
+		organizer = await Organizer.findByPk(id, {
+			include: [
+				{
+					model: Event,
+					as: 'events'
+				}
+			]
+		})
+	} else {
+		organizer = await Organizer.findByPk(id)
+	}
 	const connection = await getConnection()
 	if (organizer == null) {
 		throw error(404, {
@@ -53,10 +66,10 @@ export async function PUT(event: RequestEvent) {
 
 		// En caso de que el organizador esté inactivo, cancelar todos sus eventos
 		if (organizer.status === organizerStatuses.INACTIVE) {
-			await Event.update(
-				{ status: eventStatuses.CANCELLED },
-				{ where: { organizerId: organizer.id }, transaction }
-			)
+			organizer.events.forEach(async (element: Event) => {
+				element.status = eventStatuses.CANCELLED
+				await element.save()
+			})
 		}
 		await OrganizerLog.create(
 			{
