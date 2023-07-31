@@ -161,6 +161,7 @@
 
 <style lang="scss">
 	.content {
+		padding-bottom: 3rem;
 		position: absolute;
 		left: 70px;
 		top: 0;

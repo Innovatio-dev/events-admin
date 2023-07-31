@@ -31,7 +31,7 @@
 	let loading: boolean = true
 	let data: any = null
 	let error: any = null
-	let itemsPerPage = 5
+	let itemsPerPage = 15
 	let pageCount = 0
 	let params: any = {
 		typeEvent: [],

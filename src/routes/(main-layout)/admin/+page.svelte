@@ -25,7 +25,7 @@
 	let loading = false
 	let error = false
 	let pageCount = 0
-	let itemsPerPage = 5
+	let itemsPerPage = 15
 	let params: any = {
 		typeAdmin: [],
 		status: [],
