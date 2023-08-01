@@ -8,7 +8,16 @@ export const filterSchema = Joi.object({
 	regionId: Joi.number(),
 	countryId: Joi.number(),
 	city: Joi.string(),
-	order: orderSchema(['id', 'uid', 'name', 'surname', 'createdAt', 'status', 'email']).optional(),
+	order: orderSchema([
+		'id',
+		'uid',
+		'name',
+		'surname',
+		'createdAt',
+		'status',
+		'email',
+		'role'
+	]).optional(),
 	search: Joi.string().optional().allow(''),
 	export: Joi.bool().default(false)
 })
