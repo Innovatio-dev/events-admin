@@ -26,6 +26,7 @@
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
 	// Constants
 	import { OrganizerRequestColumns } from '$lib/utils/constants/ListTables'
+	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 
 	// State
 	let loading: boolean = true
@@ -205,10 +206,7 @@
 					<Ticket />
 				</div>
 			</Dropdown>
-			<MainButton>
-				<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
-				{'Export CSV'}
-			</MainButton>
+			<ExportCsvButton urlPrefix="organizersRequests" />
 		</div>
 	</div>
 	<div class="w-full flex py-10 gap-4">

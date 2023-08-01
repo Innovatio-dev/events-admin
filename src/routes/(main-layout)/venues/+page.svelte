@@ -21,6 +21,7 @@
 	import { createDebouncer } from '$lib/utils/debounce'
 	import LocationViewer from '$lib/components/table_cell/LocationViewer.svelte'
 	import { organizerListSchema } from '$lib/utils/validation/schemas'
+	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 
 	let inputElement
 	let loading: boolean = true
@@ -190,10 +191,7 @@
 			>
 				<Icon slot="trailing" src={AiOutlineSearch} color="currentColor" />
 			</Input>
-			<MainButton>
-				<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
-				{'Export CSV'}
-			</MainButton>
+			<ExportCsvButton urlPrefix="venues" />
 		</div>
 	</div>
 	<div class="w-full flex py-4 gap-4">

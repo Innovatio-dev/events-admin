@@ -26,6 +26,7 @@
 	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
 	import AiOutlinePlus from 'svelte-icons-pack/ai/AiOutlinePlus'
+	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 
 	let loading: boolean = true
 	let data: any = null
@@ -206,10 +207,7 @@
 			>
 				<Icon slot="trailing" src={AiOutlineSearch} color="currentColor" />
 			</Input>
-			<MainButton>
-				<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
-				{'Export CSV'}
-			</MainButton>
+			<ExportCsvButton urlPrefix="speakers" />
 		</div>
 	</div>
 	<div class="w-full flex py-4 gap-4">
