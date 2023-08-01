@@ -55,8 +55,8 @@ export const createSchema = Joi.object({
 	youtube: Joi.string(),
 	notes: Joi.string(),
 	linkZoom: Joi.string(),
-	language: Joi.string(),
-	translation: Joi.string(),
+	language: Joi.object(),
+	translation: Joi.array(),
 	pictures: Joi.array().items(Joi.number()),
 	organizerId: Joi.number().required(),
 	schedule: Joi.object({
