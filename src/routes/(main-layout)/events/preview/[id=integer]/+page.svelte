@@ -36,6 +36,7 @@
 					primarySpeakers.push(speaker)
 				} else {
 					secondarySpeakers.push(speaker)
+					console.log(secondarySpeakers)
 				}
 			}
 			$pageStatus.title = events.title
@@ -80,6 +81,7 @@
 						</p>
 					{/if}
 				</EventSection>
+				<!-- Speakers -->
 				<EventSection title={'Speakers'}>
 					{#if loading}
 						<div class="flex flex-col gap-y-4">
@@ -95,6 +97,7 @@
 						{/each}
 					{/if}
 				</EventSection>
+				<!-- Language -->
 				<EventSection title={'Language'}>
 					{#if loading}
 						<div class="flex flex-col gap-y-4">
@@ -112,10 +115,10 @@
 										class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
 									>
 										<svelte:component
-											this={Flag[capText(events.language.iso)]}
+											this={Flag[capText(events.language.flagIso)]}
 											size="20"
 										/>
-										{events.language}
+										{events.language.name}
 									</div>
 								{/if}
 							</div>
@@ -124,14 +127,18 @@
 									<p>Translations</p>
 								</div>
 								{#if events.translation}
-									<div
-										class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
-									>
-										<svelte:component
-											this={Flag[capText(events.ranslation.iso)]}
-											size="20"
-										/>
-										{events.translation}
+									<div class="flex gap-x-4">
+										{#each events.translation as translation}
+											<div
+												class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+											>
+												<svelte:component
+													this={Flag[capText(translation.flagIso)]}
+													size="20"
+												/>
+												{translation.name}
+											</div>
+										{/each}
 									</div>
 								{/if}
 							</div>
@@ -165,7 +172,7 @@
 											target="_blank"
 											class="underline text-brand-cyan text-xs"
 										>
-											https://zoomLink.com
+											{events.linkZoom}
 										</a>
 									</div>
 									<div
@@ -199,11 +206,11 @@
 				</EventSection>
 			</div>
 		</div>
-		<div class="flex items-center justify-center flex-col mx-auto w-3/4 mt-32">
-			<MainButton title={'Publish Event'} />
-			<MainButton title={'Save it in draft'} />
-			<MainButton title={'Edit'} />
-			<MainButton title={'Close Preview'} />
+		<div class="flex items-center justify-center flex-col w-full mx-auto pt-32">
+			<MainButton title="Publish Event" href="/" />
+			<MainButton title="Save it in draft" href="/" />
+			<MainButton title="Edit" href="/" />
+			<MainButton title="Close preview" href="/" />
 		</div>
 	</div>
 </section>
