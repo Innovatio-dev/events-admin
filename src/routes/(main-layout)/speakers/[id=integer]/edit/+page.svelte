@@ -2,6 +2,8 @@
 	// Svelte
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
+	import { goto } from '$app/navigation'
+
 	// Store
 	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	// Components
@@ -45,6 +47,7 @@
 					status: false
 				}
 			}
+			goto('/speakers')
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }

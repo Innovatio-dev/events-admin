@@ -4,7 +4,6 @@
 	// Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
-	import SecondaryButton from '$lib/components/SecondaryButton.svelte'
 	import ToggleButtton from '$lib/components/ToggleButtton.svelte'
 	// Icons
 	import Icon from 'svelte-icons-pack'
@@ -133,7 +132,7 @@
 		{/if}
 
 		<div class="w-full grid grid-cols-2 gap-8">
-			<SecondaryButton loading={isLoading}>Create</SecondaryButton>
+			<MainButton loading={isLoading}>Create</MainButton>
 			<MainButton href="/admin">Cancel</MainButton>
 		</div>
 	</form>

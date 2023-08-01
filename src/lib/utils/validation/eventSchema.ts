@@ -20,7 +20,8 @@ export const filterSchema = Joi.object({
 		'status'
 	]).optional(),
 	organizerId: Joi.number(),
-	search: Joi.string().optional().allow('')
+	search: Joi.string().optional().allow(''),
+	export: Joi.bool().default(false)
 })
 
 export const createSchema = Joi.object({
@@ -53,10 +54,9 @@ export const createSchema = Joi.object({
 	linkedin: Joi.string(),
 	youtube: Joi.string(),
 	notes: Joi.string(),
-	mailing: Joi.string(),
 	linkZoom: Joi.string(),
-	language: Joi.string(),
-	translation: Joi.string(),
+	language: Joi.object(),
+	translation: Joi.array(),
 	pictures: Joi.array().items(Joi.number()),
 	organizerId: Joi.number().required(),
 	schedule: Joi.object({

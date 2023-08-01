@@ -58,6 +58,10 @@
 		{ path: '/admin', name: 'Admin panel', icon: Checklist }
 	]
 
+	if (data.user.role !== 1) {
+		items.pop()
+	}
+
 	let activeIndex = null
 
 	function updateIndex() {
@@ -161,6 +165,7 @@
 
 <style lang="scss">
 	.content {
+		padding-bottom: 3rem;
 		position: absolute;
 		left: 70px;
 		top: 0;

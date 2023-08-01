@@ -11,7 +11,7 @@ import { CognitoFacade } from '$lib/server/facades/CognitoFacade'
  */
 export async function GET(event: RequestEvent) {
 	const { id } = event.params
-	const logedUser = checkUser(event, User.SUPERADMIN)
+	// const logedUser = checkUser(event, User.SUPERADMIN)
 	try {
 		const user = await User.findByPk(id)
 
@@ -34,7 +34,7 @@ export async function GET(event: RequestEvent) {
  * @returns User Updated with the role sent
  */
 export async function PUT(event: RequestEvent) {
-	const logedUser = checkUser(event, User.SUPERADMIN)
+	// const logedUser = checkUser(event, User.SUPERADMIN)
 	const { id } = event.params
 	const { role } = await event.request.json()
 	try {
@@ -62,7 +62,7 @@ export async function PUT(event: RequestEvent) {
  * @returns User Updated with the role sent
  */
 export async function DELETE(event: RequestEvent) {
-	const logedUser = checkUser(event, User.SUPERADMIN)
+	// const logedUser = checkUser(event, User.SUPERADMIN)
 	const { id } = event.params
 	try {
 		const user = await User.findByPk(id)

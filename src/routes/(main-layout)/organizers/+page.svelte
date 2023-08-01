@@ -17,7 +17,7 @@
 	import MailViewer from '$lib/components/table_cell/MailViewer.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import TypeEventViewer from '$lib/components/table_cell/TypeEventViewer.svelte'
-	import StatusViewer from '$lib/components/table_cell/StatusViewer.svelte'
+	import OrganizerStatusViewer from '$lib/components/table_cell/OrganizerStatusViewer.svelte'
 	import SeeMoreButton from '$lib/components/table_cell/SeeMoreButton.svelte'
 	import { organizerListSchema } from '$lib/utils/validation/schemas'
 	import {
@@ -31,7 +31,7 @@
 	let loading: boolean = true
 	let data: any = null
 	let error: any = null
-	let itemsPerPage = 5
+	let itemsPerPage = 15
 	let pageCount = 0
 	let params: any = {
 		typeEvent: [],
@@ -101,7 +101,7 @@
 			dataKey: 'status',
 			grow: '0',
 			minWidth: '5em',
-			cellComponent: StatusViewer
+			cellComponent: OrganizerStatusViewer
 		},
 		{
 			title: 'Details',
