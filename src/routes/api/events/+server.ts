@@ -87,7 +87,7 @@ export async function GET(event: RequestEvent) {
 			{
 				model: Venue,
 				as: 'venue',
-				where: whereVenue, // Apply venue filter conditions
+				// where: whereVenue, // Apply venue filter conditions
 				include: [
 					{
 						model: Region,
@@ -107,14 +107,14 @@ export async function GET(event: RequestEvent) {
 	// Fetch events based on filter conditions and associations
 	const results = await Event.scope('list').findAll({
 		where,
-		limit: filter.limit >= 0 ? filter.limit : undefined,
+		limit: filter.limit >= 0 ? filter.limit : 50,
 		offset: filter.offset,
 		order,
 		include: [
 			{
 				model: Venue,
 				as: 'venue',
-				where: whereVenue, // Apply venue filter conditions
+				// where: whereVenue, // Apply venue filter conditions
 				include: [
 					{
 						model: Region,
@@ -131,8 +131,8 @@ export async function GET(event: RequestEvent) {
 			{
 				model: Schedule,
 				as: 'schedule',
-				where: whereSchedule,
-				required: filter.dateMax != null || filter.dateMin != null
+				where: whereSchedule
+				// required: filter.dateMax != null || filter.dateMin != null
 			}
 		]
 	})
