@@ -8,13 +8,6 @@
 	export let urlPrefix: string
 
 	async function getCSVUrl() {
-		console.log(
-			'URL -> ',
-			`${$page.url.origin}/api/${urlPrefix}${$page.url.search}${
-				$page.url.search === '' ? '?' : '&'
-			}export=true`
-		)
-
 		const res = await fetch(
 			`${$page.url.origin}/api/${urlPrefix}${$page.url.search}${
 				$page.url.search === '' ? '?' : '&'
