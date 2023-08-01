@@ -13,6 +13,8 @@ import { Parser } from '@json2csv/plainjs'
 import { s3BucketName, s3Region } from '$lib/server/config/aws'
 import AWS from 'aws-sdk'
 import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
+import { SENDINBLUE_API_KEY } from '$env/static/private'
+import SibApiV3Sdk from 'sib-api-v3-sdk'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
@@ -204,6 +206,19 @@ export async function POST(event: RequestEvent) {
 	const connection = await getConnection()
 	const transaction = await connection.transaction()
 	try {
+		let defaultClient = SibApiV3Sdk.ApiClient.instance
+		let apiKey = defaultClient.authentications['api-key']
+		apiKey.apiKey = SENDINBLUE_API_KEY
+
+		let apiInstance = new SibApiV3Sdk.ContactsApi()
+		let createList = new SibApiV3Sdk.CreateList()
+
+		createList.name = values.title
+		createList.folderId = 5
+
+		const data = await apiInstance.createList(createList)
+		values.mailing = data.id
+
 		let event = await Event.create(
 			{
 				...values
