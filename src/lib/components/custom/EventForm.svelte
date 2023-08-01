@@ -63,6 +63,7 @@
 		pictures: any[]
 		linkZoom: any
 		language: any
+		venue: any
 		translation: { name: string; flagIso: string }[]
 		secondaryOrganizer: string | null
 		secondaryOrganizerDescription: string | null
@@ -84,6 +85,7 @@
 		pictures: [],
 		linkZoom: null,
 		language: null,
+		venue: null,
 		translation: [],
 		secondaryOrganizer: null,
 		secondaryOrganizerDescription: null,
@@ -238,6 +240,7 @@
 
 	async function viewForm() {
 		try {
+			eventData.venue = venues
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
 			const res = await fetch(`/api/events/`, {
@@ -606,9 +609,11 @@
 				{/if}
 			</div>
 			<MainButton disabled={eventSaved}>Save as draft</MainButton>
-			<MainButton href={`/events/preview/${eventData}`} disabled={true}
-				>View Preview</MainButton
-			>
+			{#if eventSaved}
+				<MainButton href={`/events/preview/${eventData}`} disabled={!eventSaved}
+					>View Preview</MainButton
+				>
+			{/if}
 			<MainButton>Discard</MainButton>
 		{/if}
 	</div>
