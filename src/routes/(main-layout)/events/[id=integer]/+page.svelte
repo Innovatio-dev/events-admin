@@ -48,8 +48,8 @@
 		return `${hours}:${minutes.toString().padStart(2, '0')} ${ampm}`
 	}
 
-	function capText(texto) {
-		return texto.charAt(0).toUpperCase() + texto.slice(1).toLowerCase()
+	function capText(text) {
+		return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 	}
 
 	async function fetchEvents(id) {

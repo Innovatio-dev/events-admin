@@ -121,18 +121,24 @@
 	</div>
 	<div class="flex !max-w-[280px] mb-8">
 		<div class="field">
-			<p>Feature photo:</p>
+			<p>Additional photo:</p>
 		</div>
 		{#if loading}
 			<div class="min-w-[280px] min-h-[160px] flex gap-x-12">
 				<SimpleSkeleton wFull height={180} items={1} />
 			</div>
-		{:else if venue}
-			<div class="min-w-[280px] min-h-[160px] flex gap-x-12">
-				{#each venue.pictures as picture, index}
-					<img src={picture.url} alt={picture.name} class="rounded-lg" />
-				{/each}
-			</div>
+		{:else if venue.pictures}
+			{#if venue.pictures.length > 1}
+				<div class="min-w-[280px] min-h-[160px] flex gap-x-12">
+					{#each venue.pictures as picture, index}
+						<img src={picture.url} alt={picture.name} class="rounded-lg" />
+					{/each}
+				</div>
+			{:else if venue.pictures}
+				<div class="flex justify-center items-center min-w-[400px] text-neutral-3">
+					<p>This venue doesn't have any additional photos</p>
+				</div>
+			{/if}
 		{/if}
 	</div>
 	<div class="flex flex-row gap-6">

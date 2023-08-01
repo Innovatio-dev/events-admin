@@ -7,7 +7,7 @@ import { Region } from '$lib/server/models/region'
 import { Schedule } from '$lib/server/models/schedule'
 import { Venue } from '$lib/server/models/venue'
 import { createSchema, filterSchema } from '$lib/utils/validation/eventSchema'
-import { json, type RequestEvent } from '@sveltejs/kit'
+import { error, json, type RequestEvent } from '@sveltejs/kit'
 import sequelize, { Op, type Order } from 'sequelize'
 import { Parser } from '@json2csv/plainjs'
 import { s3BucketName, s3Region } from '$lib/server/config/aws'
@@ -17,6 +17,7 @@ import { SENDINBLUE_API_KEY } from '$env/static/private'
 import SibApiV3Sdk from 'sib-api-v3-sdk'
 import { Speaker } from '$lib/server/models/speaker'
 import { EventSpeaker } from '$lib/server/models/eventSpeaker'
+import { HttpResponses } from '$lib/server/constants/httpResponses'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
@@ -267,10 +268,12 @@ export async function POST(event: RequestEvent) {
 		await transaction.commit()
 		event = (await Event.scope('full').findByPk(event.id)) as Event
 		return json(event)
-	} catch (error) {
-		console.log(error)
+	} catch (err) {
+		console.log(err)
 		await transaction.rollback()
-		throw error
+		throw error(HttpResponses.UNEXPECTED_ERROR, {
+			message: 'Something happend, try again later ' + err
+		})
 	}
 }
 
