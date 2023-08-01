@@ -113,8 +113,8 @@
                             name="password"/>
 
                         <div class="flex justify-between">
-                            <label class="text-neutral-4 select-none text-sm">
-                                <input type="checkbox" name="rememberme">
+                            <label class="flex items-center text-neutral-4 select-none text-sm">
+                                <input type="checkbox" name="rememberme" class="mr-2">
                                 Remember me
                             </label>
                             <span class="text-sm">
