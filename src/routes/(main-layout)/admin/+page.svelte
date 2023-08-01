@@ -20,6 +20,7 @@
 	} from '$lib/utils/validation/validation'
 	import { afterNavigate, goto } from '$app/navigation'
 	import { organizerListSchema } from '$lib/utils/validation/schemas'
+	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 
 	let data: any = null
 	let loading = false
@@ -184,10 +185,7 @@
 				<Icon slot="trailing" src={AiOutlineSearch} color="currentColor" />
 			</Input>
 
-			<MainButton>
-				<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
-				{'Export CSV'}
-			</MainButton>
+			<ExportCsvButton urlPrefix="admins" />
 		</div>
 	</div>
 

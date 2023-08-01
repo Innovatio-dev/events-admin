@@ -27,6 +27,7 @@
 		validateUrlSearchParams
 	} from '$lib/utils/validation/validation'
 	import { createDebouncer } from '$lib/utils/debounce'
+	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 
 	let loading: boolean = true
 	let data: any = null
@@ -268,10 +269,7 @@
 					<Ticket />
 				</div>
 			</Dropdown>
-			<MainButton>
-				<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
-				{'Export CSV'}
-			</MainButton>
+			<ExportCsvButton urlPrefix="organizers" />
 		</div>
 	</div>
 	<div class="w-full flex py-4 gap-4">
