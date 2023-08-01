@@ -14,6 +14,9 @@ dependencies:
   '@aws-sdk/s3-request-presigner':
     specifier: ^3.352.0
     version: 3.373.0
+  '@json2csv/plainjs':
+    specifier: ^7.0.1
+    version: 7.0.1
   '@smithy/hash-stream-node':
     specifier: ^2.0.1
     version: 2.0.1
@@ -35,6 +38,9 @@ dependencies:
   joi:
     specifier: ^17.8.4
     version: 17.9.2
+  json-2-csv:
+    specifier: ^4.0.0
+    version: 4.0.0
   leaflet:
     specifier: ^1.9.4
     version: 1.9.4
@@ -2577,6 +2583,18 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
+  /@json2csv/formatters@7.0.1:
+    resolution: {integrity: sha512-eCmYKIIoFDXUB0Fotet2RmcoFTtNLXLmSV7j6aEQH/D2GiO749Uan3ts03PtAhXpE11QghxBjS0toXom8VQNBw==}
+    dev: false
+
+  /@json2csv/plainjs@7.0.1:
+    resolution: {integrity: sha512-UAdaZwahrUeYhMYYilJwDsRfE7wDRsmGMsszYH67j8FLD5gZitqG38RXpUgHEH0s6YjsY8iKYWeEQ19WILncFA==}
+    dependencies:
+      '@json2csv/formatters': 7.0.1
+      '@streamparser/json': 0.0.15
+      lodash.get: 4.4.2
+    dev: false
+
   /@kwsites/file-exists@1.1.1(supports-color@8.1.1):
     resolution: {integrity: sha512-m9/5YGR18lIwxSFDwfE3oA7bWuq9kdau6ugN4H2rJeyhFQZcG9AgSHkQtSD15a8WvTgfz9aikZMrKPHvbpqFiw==}
     dependencies:
@@ -3243,6 +3261,10 @@ packages:
       '@smithy/abort-controller': 1.0.2
       '@smithy/types': 1.1.1
       tslib: 2.6.0
+
+  /@streamparser/json@0.0.15:
+    resolution: {integrity: sha512-6oikjkMTYAHGqKmcC9leE4+kY4Ch4eiTImXUN/N4d2bNGBYs0LJ/tfxmpvF5eExSU7iiPlV9jYlADqvj3NWA3Q==}
+    dev: false
 
   /@sveltejs/adapter-auto@2.1.0(@sveltejs/kit@1.22.3):
     resolution: {integrity: sha512-o2pZCfATFtA/Gw/BB0Xm7k4EYaekXxaPGER3xGSY3FvzFJGTlJlZjBseaXwYSM94lZ0HniOjTokN3cWaLX6fow==}
@@ -4845,6 +4867,11 @@ packages:
       strip-dirs: 2.1.0
     dev: true
 
+  /deeks@3.0.0:
+    resolution: {integrity: sha512-go4YE5vDMzDNzC9OqK7iIQd6agUUqZdBiw3TD2niRxsKGdGdB1FW8eZdrWsyCRZCNkBjV5Vutcx5uT1AikEPCg==}
+    engines: {node: '>= 16'}
+    dev: false
+
   /deep-eql@4.1.3:
     resolution: {integrity: sha512-WaEtAOpRA1MQ0eohqZjpGD8zdI0Ovsm8mmFhaDN8dvDZzyoUMcYDnf5Y6iu7HTXxf8JDS23qWa4a+hKCDyOPzw==}
     engines: {node: '>=6'}
@@ -4955,6 +4982,11 @@ packages:
   /dlv@1.1.3:
     resolution: {integrity: sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==}
     dev: true
+
+  /doc-path@4.0.0:
+    resolution: {integrity: sha512-By/OF7rbws/bgExPZW10gHASoy3sACwXKKpKBIzYk/E19nX8q8IbILbreCeCYAVFIcO9FOxDjFYbm45wvn4I6w==}
+    engines: {node: '>=16'}
+    dev: false
 
   /doctrine@3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
@@ -6517,6 +6549,14 @@ packages:
     hasBin: true
     dev: true
 
+  /json-2-csv@4.0.0:
+    resolution: {integrity: sha512-r8WXuuLgVbeufMuCyzUXSp8VP9YK4BTuzM7rTG0X85MPKuHKa8JD6LHrp0rEKVCtBSgHA3LMu/VjrZHx+851DQ==}
+    engines: {node: '>= 16'}
+    dependencies:
+      deeks: 3.0.0
+      doc-path: 4.0.0
+    dev: false
+
   /json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
     dev: true
@@ -6757,7 +6797,6 @@ packages:
 
   /lodash.get@4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
-    dev: true
 
   /lodash.isplainobject@4.0.6:
     resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}

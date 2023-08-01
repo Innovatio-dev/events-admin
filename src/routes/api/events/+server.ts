@@ -9,6 +9,10 @@ import { Venue } from '$lib/server/models/venue'
 import { createSchema, filterSchema } from '$lib/utils/validation/eventSchema'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import sequelize, { Op, type Order } from 'sequelize'
+import { Parser } from '@json2csv/plainjs'
+import { s3BucketName, s3Region } from '$lib/server/config/aws'
+import AWS from 'aws-sdk'
+import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
@@ -128,7 +132,62 @@ export async function GET(event: RequestEvent) {
 		]
 	})
 
+	if (filter.export) {
+		try {
+			const opts = {}
+			const parser = new Parser(opts)
+
+			const S3 = new AWS.S3({
+				accessKeyId: AS_ACCESS_KEY_ID,
+				secretAccessKey: AS_SECRET_ACCESS_KEY,
+				region: AS_REGION
+			})
+
+			let events: Array<string | any> = []
+			for (const iterator of results) {
+				events.push({
+					name: iterator.title,
+					slug: iterator.slug,
+					date: iterator.schedule.startTime,
+					location: iterator.venue.city,
+					region: iterator.venue.region.name,
+					country: iterator.venue.country.nicename,
+					featured: iterator.isFeatured
+				})
+			}
+
+			const csv = parser.parse(events)
+
+			var data = {
+				Bucket: s3BucketName,
+				Key: 'public/dumpdata.csv',
+				Body: csv,
+				ContentEncoding: 'base64'
+			}
+
+			// const putObjectRequest: PutObjectRequest
+			S3.upload(data, function (err, data) {
+				if (err) {
+					console.log(err)
+					console.log('Error uploading data')
+				} else {
+					console.log('succesfully uploaded!!!')
+				}
+			})
+		} catch (err) {
+			console.error(err)
+		}
+	}
+
 	// Return the count and results as JSON response
+	const formedUrl = `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/public/dumpdata.csv`
+	if (filter.export) {
+		return json({
+			count,
+			formedUrl,
+			results
+		})
+	}
 	return json({
 		count,
 		results
