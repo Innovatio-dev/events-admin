@@ -202,8 +202,16 @@ export async function GET(event: RequestEvent) {
 export async function POST(event: RequestEvent) {
 	const user = checkUser(event)
 	//TODO: Create eventSpeakers based on array of speakers
-	const { pictures, bannerId, speakers, speakersSecondary, bannerMobileId, schedule, ...values } =
-		await validateBody(event, createSchema)
+	const {
+		pictures,
+		bannerId,
+		speakers,
+		speakersSecondary,
+		bannerMobileId,
+		schedule,
+		venue,
+		...values
+	} = await validateBody(event, createSchema)
 
 	const connection = await getConnection()
 	const transaction = await connection.transaction()
@@ -221,6 +229,8 @@ export async function POST(event: RequestEvent) {
 		const data = await apiInstance.createList(createList)
 		values.mailing = data.id
 		values.userId = user.id
+		values.venueId = venue[0].id
+		values.regionId = venue[0].region.id
 
 		let event = await Event.create(
 			{
