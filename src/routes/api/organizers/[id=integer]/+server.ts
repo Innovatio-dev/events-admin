@@ -8,6 +8,7 @@ import { OrganizerLog } from '$lib/server/models/organizerLog'
 import { deleteSchema, updateSchema } from '$lib/utils/validation/organizerSchema'
 import { uniqueKeyOf } from '$lib/server/validation/schemas'
 import { error, json, type RequestEvent } from '@sveltejs/kit'
+
 export async function GET(event: RequestEvent) {
 	const { id } = event.params
 	const result = await Organizer.scope('full').findByPk(id)
@@ -30,7 +31,7 @@ export async function PUT(event: RequestEvent) {
 	)
 	let organizer: Organizer | null = null
 
-	if (fields.status === organizerStatuses.INACTIVE) {
+	if (fields.status === organizerStatuses.SUSPENDED) {
 		organizer = await Organizer.findByPk(id, {
 			include: [
 				{
@@ -65,7 +66,7 @@ export async function PUT(event: RequestEvent) {
 		}
 
 		// En caso de que el organizador esté inactivo, cancelar todos sus eventos
-		if (organizer.status === organizerStatuses.INACTIVE) {
+		if (organizer.status === organizerStatuses.SUSPENDED) {
 			organizer.events.forEach(async (element: Event) => {
 				element.status = eventStatuses.CANCELLED
 				await element.save()
