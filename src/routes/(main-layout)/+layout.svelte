@@ -118,10 +118,10 @@
 					<SimpleList
 						itemViewer={TextWithIcon}
 						items={[
-							{
-								text: 'Profile',
-								icon: AiOutlineUser
-							},
+							// {
+							// 	text: 'Profile',
+							// 	icon: AiOutlineUser
+							// },
 							{
 								text: 'Log out',
 								icon: AiOutlineLogout
