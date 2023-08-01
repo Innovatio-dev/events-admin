@@ -5,9 +5,9 @@ import { createSuperAdminSchema } from '$lib/utils/validation/schemas'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import { error } from '@sveltejs/kit'
 import { checkUser } from '$lib/server/middlewares/permission'
-import { filterSchema } from '$lib/utils/validation/eventSchema'
+import { filterSchema } from '$lib/utils/validation/adminSchema'
 import { HttpResponses } from '$lib/server/constants/httpResponses'
-import sequelize from 'sequelize'
+import sequelize, { Op, type Order } from 'sequelize'
 import { s3BucketName, s3Region } from '$lib/server/config/aws'
 import AWS from 'aws-sdk'
 import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
@@ -19,9 +19,20 @@ import { Parser } from '@json2csv/plainjs'
  * @returns Admin User List
  */
 export async function GET(event: RequestEvent) {
-	const logedUser = checkUser(event, User.SUPERADMIN)
+	// const logedUser = checkUser(event, User.SUPERADMIN)
 	const filter = validateSearchParam(event, filterSchema)
 	let where: any = {}
+	const order: Order = [] // Array to store order conditions
+
+	if (filter.order) {
+		for (const col of filter.order) {
+			let name = col.name
+			if (col.name == 'uid') {
+				name = 'id'
+			}
+			order.push([name, col.type])
+		}
+	}
 
 	if (filter.search) {
 		// const search = `%${filter.search}%`
@@ -39,7 +50,8 @@ export async function GET(event: RequestEvent) {
 		const results = await User.scope('list').findAll({
 			where,
 			limit: filter.limit >= 0 ? filter.limit : undefined,
-			offset: filter.offset
+			offset: filter.offset,
+			order
 		})
 		const count = await User.count()
 
