@@ -199,10 +199,11 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function POST(event: RequestEvent) {
-	// const user = checkUser(event)
+	const user = checkUser(event)
 	//TODO: Create eventSpeakers based on array of speakers
 	const { pictures, bannerId, speakers, bannerMobileId, schedule, ...values } =
 		await validateBody(event, createSchema)
+
 	const connection = await getConnection()
 	const transaction = await connection.transaction()
 	try {
@@ -218,7 +219,7 @@ export async function POST(event: RequestEvent) {
 
 		const data = await apiInstance.createList(createList)
 		values.mailing = data.id
-		values.userId = 1
+		values.userId = user.id
 
 		let event = await Event.create(
 			{
@@ -253,11 +254,14 @@ export async function POST(event: RequestEvent) {
 		await event.setEventSpeakers(snapshotSpeakers)
 
 		await event.setSchedule(
-			await Schedule.create({
-				startTime: schedule.startDate,
-				endTime: schedule.endDate,
-				visibleAt: schedule.startDate
-			})
+			await Schedule.create(
+				{
+					startTime: schedule.startTime,
+					endTime: schedule.endTime
+				},
+				{ transaction }
+			),
+			{ transaction }
 		)
 
 		await transaction.commit()
