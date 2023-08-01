@@ -1,15 +1,23 @@
 <script lang="ts">
+	// Svelte
+	import { onMount, createEventDispatcher } from 'svelte'
+	// Components
 	import Modal from '$lib/components/Modal.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
-	import { onMount } from 'svelte'
+
 	// Props
 	export let handleClose: () => void
 	export let items: { id: string; label: string }[]
 	export let events = []
+
+	// State
 	let selectedOption: string = ''
 	let selectedId: string
 	let updateOption: string = ''
 	let isOpenModal: boolean = false
+
+	const dispatch = createEventDispatcher()
+
 	// Set initial value on text area
 	onMount(() => {
 		selectedOption = items[0].label
@@ -32,6 +40,7 @@
 			selectedOption = ''
 		}
 	}
+
 	const handleCloseModal = () => {
 		isOpenModal = false
 	}
@@ -51,6 +60,9 @@
 				}
 			}
 		} else {
+			dispatch('submit', {
+				reason: selectedOption
+			})
 		}
 	}
 </script>
@@ -108,8 +120,7 @@
 			<MainButton on:click={handleSubmit}>
 				{'Yes'}
 			</MainButton>
-			<svelte:component
-				this={Modal}
+			<Modal
 				isOpen={isOpenModal}
 				handleClose={handleCloseModal}
 				title=""
@@ -130,7 +141,7 @@
 						</MainButton>
 					</div>
 				</div>
-			</svelte:component>
+			</Modal>
 		</div>
 		<div class="w-20">
 			<MainButton on:click={handleClose}>

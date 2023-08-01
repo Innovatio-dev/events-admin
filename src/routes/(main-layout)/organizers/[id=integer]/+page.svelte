@@ -1,13 +1,22 @@
 <script lang="ts">
+	// Svelte
+	import { goto } from '$app/navigation'
+	import { onMount } from 'svelte'
+	import { page } from '$app/stores'
+	// Store
+	import { pageAlert, pageStatus } from '$lib/stores/pageStatus'
+	// Components
 	import MainButton from '$lib/components/MainButton.svelte'
 	import SecondaryButton from '$lib/components/SecondaryButton.svelte'
 	import Modal from '$lib/components/Modal.svelte'
 	import SuspendOrganizer from '$lib/components/SuspendOrganizer.svelte'
-	import { onMount } from 'svelte'
-	import { page } from '$app/stores'
-	import { Circle3 } from 'svelte-loading-spinners'
 	import OrganizerView from '$lib/components/custom/OrganizerView.svelte'
-	import { pageStatus } from '$lib/stores/pageStatus'
+
+	// State
+	let organizer: any = null
+	let events = []
+	let loading: boolean = true
+
 	// Modal
 	let isOpen = false
 	const handleOpenModal = () => {
@@ -16,22 +25,13 @@
 	const handleCloseModal = () => {
 		isOpen = false
 	}
+
 	const options = [
 		{ id: 'option1', label: 'User is not eligible for our events..' },
 		{ id: 'option2', label: 'There are missing some more information about you.' }
 	]
 
-	let organizer: any = null
-	let events = []
-	let loading: boolean = true
-
-	onMount(async () => {
-		let id = $page.params.id
-		await fetchOrganizer(id)
-		await fetchOrganizerEvents(id)
-	})
-
-	async function fetchOrganizer(id) {
+	const fetchOrganizer = async (id) => {
 		loading = true
 		let response = await fetch(`/api/organizers/${id}`)
 		if (response.ok) {
@@ -42,7 +42,7 @@
 		loading = false
 	}
 
-	async function fetchOrganizerEvents(id) {
+	const fetchOrganizerEvents = async (id) => {
 		loading = true
 		let response = await fetch(`/api/events?organizerId=${id}`)
 		if (response.ok) {
@@ -54,6 +54,40 @@
 		}
 		loading = false
 	}
+
+	const suspendOrganizer = async (id, suspendReason) => {
+		try {
+			const res = await fetch(`/api/organizers/${id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ status: 1, reason: suspendReason })
+			})
+			if (res.ok) {
+				const data = await res.json()
+				console.log(data)
+				$pageAlert = { message: 'Organizer suspended.', status: true }
+			} else {
+				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
+			}
+			goto('/organizers')
+		} catch (error) {
+			console.error('Error:', error)
+			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
+		}
+	}
+
+	const handleSuspend = async (e) => {
+		await suspendOrganizer(organizer.id, e.detail.reason)
+	}
+
+	onMount(async () => {
+		let id = $page.params.id
+		await fetchOrganizer(id)
+		await fetchOrganizerEvents(id)
+	})
 </script>
 
 <div class="w-full p-6">
@@ -68,9 +102,14 @@
 			<SecondaryButton on:click={handleOpenModal}>
 				{'Suspend'}
 			</SecondaryButton>
-			<svelte:component this={Modal} {isOpen} handleClose={handleCloseModal} title="">
-				<SuspendOrganizer {events} items={options} handleClose={handleCloseModal} />
-			</svelte:component>
+			<Modal {isOpen} handleClose={handleCloseModal} title="">
+				<SuspendOrganizer
+					on:submit={handleSuspend}
+					{events}
+					items={options}
+					handleClose={handleCloseModal}
+				/>
+			</Modal>
 		</div>
 	</div>
 </div>
