@@ -202,7 +202,7 @@ export async function GET(event: RequestEvent) {
 export async function POST(event: RequestEvent) {
 	const user = checkUser(event)
 	//TODO: Create eventSpeakers based on array of speakers
-	const { pictures, bannerId, speakers, bannerMobileId, schedule, ...values } =
+	const { pictures, bannerId, speakers, speakersSecondary, bannerMobileId, schedule, ...values } =
 		await validateBody(event, createSchema)
 
 	const connection = await getConnection()
@@ -249,8 +249,24 @@ export async function POST(event: RequestEvent) {
 				}
 			}
 			const snapshotSpeakers = await Promise.all(
-				speakersMap.map((speaker: Speaker) =>
-					createSpeakerSnapshot(speaker, event, transaction)
+				speakersMap.map((speaker: Speaker, index: number) =>
+					createSpeakerSnapshot(speaker, event, true, index, transaction)
+				)
+			)
+			await event.setEventSpeakers(snapshotSpeakers)
+		}
+
+		speakersMap = []
+		if (speakersSecondary && speakersSecondary.length > 0) {
+			for (const iterator of speakersSecondary) {
+				const element = await Speaker.findByPk(iterator)
+				if (element) {
+					speakersMap.push(element)
+				}
+			}
+			const snapshotSpeakers = await Promise.all(
+				speakersMap.map((speaker: Speaker, index: number) =>
+					createSpeakerSnapshot(speaker, event, false, index, transaction)
 				)
 			)
 			await event.setEventSpeakers(snapshotSpeakers)
@@ -279,7 +295,13 @@ export async function POST(event: RequestEvent) {
 	}
 }
 
-async function createSpeakerSnapshot(speaker: Speaker, event: Event, transaction) {
+async function createSpeakerSnapshot(
+	speaker: Speaker,
+	event: Event,
+	primary: boolean,
+	order: number,
+	transaction: sequelize.Transaction
+) {
 	//increase refCount of image
 	const image = await speaker.getPicture()
 	const country = await speaker.getCountry()
@@ -295,8 +317,8 @@ async function createSpeakerSnapshot(speaker: Speaker, event: Event, transaction
 			youtube: speaker.youtube,
 			description: speaker.description,
 			speakerId: speaker.id,
-			primary: Math.floor(Math.random() * 5) > 3,
-			order: Math.floor(Math.random() * 5),
+			primary,
+			order,
 			eventId: event.id
 		},
 		{ transaction }
