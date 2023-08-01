@@ -3,6 +3,8 @@
 	import LocalTimeEvent from '../LocalTimeEvent.svelte'
 	import BiSolidVideo from 'svelte-icons-pack/bi/BiSolidVideo'
 	import MarkButton from './MarkButton.svelte'
+	import DateSquare from './DateSquare.svelte'
+	import Skeleton from '../skeletons/Skeleton.svelte'
 	export let events: any
 	export let loading: boolean
 </script>
@@ -11,11 +13,19 @@
 	class="w-full flex flex-col lg:flex-row justify-between items-center gap-8 bg-[#161718] px-4 py-4 my-6 rounded-lg"
 >
 	<div class="w-full lg:w-auto flex md:items-center gap-7">
-		<div class="lg:w-[87px] lg:h-[87px]" />
+		{#if loading}
+			<Skeleton width={87} height={87} />
+		{:else if events.schedule}
+			<DateSquare
+				date={events.schedule.startTime}
+				className="lg:w-[90px] lg:h-[90px]"
+				size={24}
+			/>
+		{/if}
 		<div class="w-[calc(100%-5.15rem)] lg:w-[calc(100%-6.75rem)] flex justify-between">
-			<div class="w-full flex flex-col justify-between gap-4 lg:gap-3">
+			<div class="w-full flex flex-col justify-between gap-4 lg:gap-3 lg:min-w-[600px]">
 				{#if loading}
-					loading
+					<Skeleton wFull height={30} />
 				{:else if events}
 					<span
 						class="text-lg md:text-3xl lg:text-4xl font-dm font-semibold leading-none tracking-[0.005em] line-clamp-1"
@@ -30,20 +40,27 @@
 					>
 						<div>
 							{#if loading}
-								loading
+								<div class="flex gap-x-4">
+									<Skeleton width={200} height={15} />
+									<Skeleton width={100} height={15} />
+								</div>
 							{:else if events}
 								<LocalTimeEvent dateString={events.schedule.startTime} />
 							{/if}
 						</div>
 						<div class="flex items-center text-white! gap-x-3">
-							<Icon src={BiSolidVideo} color="#fff" size="1.5em" />
-							<span class="w-max underline text-brand-cyan">Zoom Link</span>
+							{#if loading}
+								<Skeleton width={100} height={15} />
+							{:else if events}
+								<Icon src={BiSolidVideo} color="#fff" size="1.5em" />
+								<span class="w-max underline text-brand-cyan">Zoom Link</span>
+							{/if}
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="flex items-center w-[200px] h-16">
+		<div class="flex items-center min-w-[200px] h-16">
 			<MarkButton text="Mark the date" />
 		</div>
 	</div>

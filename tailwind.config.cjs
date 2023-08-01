@@ -54,7 +54,8 @@ export default {
 			'gd-preview':
 				'linear-gradient(360deg, rgba(10, 10, 10, 0.33) 0%, rgba(10, 10, 10, 0.33) 100%)',
 			'black-gradient-r': 'var(--black-gradient-r)',
-			'black-gradient-l': 'var(--black-gradient-l)'
+			'black-gradient-l': 'var(--black-gradient-l)',
+			'vertical-gradient': 'var(--vertical-gradient)'
 		},
 		boxShadow: {
 			section: 'var(--shadow-section)',

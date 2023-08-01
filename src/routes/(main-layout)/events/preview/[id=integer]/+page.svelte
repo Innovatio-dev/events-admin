@@ -8,11 +8,13 @@
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
 	import MarkButton from '$lib/components/preview/MarkButton.svelte'
-	import Carousel  from '$lib/components/preview/Carousel.svelte'
+	import Carousel from '$lib/components/preview/Carousel.svelte'
+	import * as Flag from 'svelte-flag-icons'
 	// Icons
 	import Icon from 'svelte-icons-pack'
 	import FiCopy from 'svelte-icons-pack/fi/FiCopy'
 	import CgAdd from 'svelte-icons-pack/cg/CgAdd'
+	import MainButton from '$lib/components/preview/MainButton.svelte'
 
 	let events: any = null
 	let loading: boolean = true
@@ -39,6 +41,10 @@
 			$pageStatus.title = events.title
 		}
 		loading = false
+	}
+
+	function capText(text) {
+		return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 	}
 </script>
 
@@ -95,8 +101,43 @@
 							<Skeleton wFull height={200} />
 							<Skeleton wFull height={120} />
 						</div>
-					{:else if events}
-						<p />
+					{:else if events.language}
+						<div class="flex items-center gap-x-12">
+							<div>
+								<div>
+									<p>Primary Language</p>
+								</div>
+								{#if events.language}
+									<div
+										class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+									>
+										<svelte:component
+											this={Flag[capText(events.language.iso)]}
+											size="20"
+										/>
+										{events.language}
+									</div>
+								{/if}
+							</div>
+							<div>
+								<div>
+									<p>Translations</p>
+								</div>
+								{#if events.translation}
+									<div
+										class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+									>
+										<svelte:component
+											this={Flag[capText(events.ranslation.iso)]}
+											size="20"
+										/>
+										{events.translation}
+									</div>
+								{/if}
+							</div>
+						</div>
+					{:else}
+						<p>No Language specified</p>
 					{/if}
 				</EventSection>
 				<div>
@@ -109,7 +150,9 @@
 							<div
 								class="flex flex-col justify-between bg-black w-[115%] h-fit relative -ml-[9%]"
 							>
-								<div class="flex items-center justify-start gap-x-4 px-6 py-4 h-fit">
+								<div
+									class="flex items-center justify-start gap-x-4 px-6 py-4 h-fit"
+								>
 									<div class="flex items-center justify-center gap-x-2">
 										<Icon src={CgAdd} size={'2rem'} />
 										<div>invite</div>
@@ -132,7 +175,7 @@
 									</div>
 								</div>
 								<div class="w-full h-[500px] overflow-hidden">
-									<Carousel images={events.pictures}/>
+									<Carousel images={events.pictures} />
 								</div>
 								<div class="flex items-center justify-center w-full mx-auto py-6">
 									<MarkButton text="Mark the date" />
@@ -147,10 +190,20 @@
 							<Skeleton wFull height={200} />
 						</div>
 					{:else if events}
-						<PrimaryCard item={events.organizer} />
+						<PrimaryCard
+							country={events.organizer.country.name}
+							flag={events.organizer.country.iso}
+							item={events.organizer}
+						/>
 					{/if}
 				</EventSection>
 			</div>
+		</div>
+		<div class="flex items-center justify-center flex-col mx-auto w-3/4 mt-32">
+			<MainButton title={'Publish Event'} />
+			<MainButton title={'Save it in draft'} />
+			<MainButton title={'Edit'} />
+			<MainButton title={'Close Preview'} />
 		</div>
 	</div>
 </section>
