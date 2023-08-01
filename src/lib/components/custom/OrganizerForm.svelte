@@ -55,7 +55,7 @@
 		youtube: '',
 		description: '',
 		countryId: '',
-		logos:[]
+		logos: []
 	}
 	let updatedOrganizer = {
 		status: addOrganizer?.status,
@@ -81,7 +81,6 @@
 			}
 			submitAction({ ...organizer, ...formattedData })
 		}
-		goto('/organizers')
 	}
 
 	const updateOrganizer = (e) => {
@@ -104,9 +103,7 @@
 		return organizer.regions.findIndex((region, index) => region.id == regionId) != -1
 	}
 
-	const onCancel = () => {
-		goto('/organizers')
-	}
+	const onCancel = () => {}
 </script>
 
 <form

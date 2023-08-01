@@ -72,7 +72,7 @@
 <svelte:window on:click={handleClickOutside} />
 <div bind:this={containerElement} class="relative">
 	<Input
-		placeholder="Type the venue location (google maps - checkin)"
+		placeholder="Type the venue location"
 		label="Location finder"
 		bind:value={typedData}
 		type="text"
