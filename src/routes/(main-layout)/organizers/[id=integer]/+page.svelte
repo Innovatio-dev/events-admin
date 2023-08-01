@@ -23,11 +23,13 @@
 	import VCountryViewer from '$lib/components/table_cell/VCountryViewer.svelte'
 	import VCityViewer from '$lib/components/table_cell/VCityViewer.svelte'
 	import FeaturedViewer from '$lib/components/table_cell/FeaturedViewer.svelte'
+	import SuspensionData from '$lib/components/custom/SuspensionData.svelte'
 	// Utils
 	import { createUrl } from '$lib/utils/validation/validation'
 
 	// State
 	let organizer: any = null
+	let logData: any = null
 	let events = []
 	let loading: boolean = true
 
@@ -174,6 +176,16 @@
 		}
 		loading = false
 	}
+	
+	const fetchSuspensionData = async (id) => {
+		loading = true
+		let response = await fetch(`/api/organizers/${id}/logs`)
+		if (response.ok) {
+			logData = await response.json()
+			// console.log(logData)
+		}
+		loading = false
+	}
 
 	const fetchOrganizerEvents = async (id) => {
 		loading = true
@@ -233,6 +245,7 @@
 		let id = $page.params.id
 		await fetchOrganizer(id)
 		await fetchOrganizerEvents(id)
+		await fetchSuspensionData(id)
 	})
 </script>
 
@@ -260,6 +273,7 @@
 			</div>
 		</div>
 	{:else if organizer?.status === 1}
+	<SuspensionData {loading} logData={logData}/>
 		<div class="w-fit">
 			<SecondaryButton on:click={handleOpenConfirmationModal}>
 				<div class="flex gap-5">
