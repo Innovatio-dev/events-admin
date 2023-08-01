@@ -241,18 +241,20 @@ export async function POST(event: RequestEvent) {
 
 		let speakersMap: Array<Speaker> = []
 
-		for (const iterator of speakers) {
-			const element = await Speaker.findByPk(iterator)
-			if (element) {
-				speakersMap.push(element)
+		if (speakers && speakers.length > 0) {
+			for (const iterator of speakers) {
+				const element = await Speaker.findByPk(iterator)
+				if (element) {
+					speakersMap.push(element)
+				}
 			}
-		}
-		const snapshotSpeakers = await Promise.all(
-			speakersMap.map((speaker: Speaker) =>
-				createSpeakerSnapshot(speaker, event, transaction)
+			const snapshotSpeakers = await Promise.all(
+				speakersMap.map((speaker: Speaker) =>
+					createSpeakerSnapshot(speaker, event, transaction)
+				)
 			)
-		)
-		await event.setEventSpeakers(snapshotSpeakers)
+			await event.setEventSpeakers(snapshotSpeakers)
+		}
 
 		await event.setSchedule(
 			await Schedule.create(
