@@ -121,6 +121,7 @@
 	let mainSpeakers: any[] = []
 	let secondarySpeakers: any = []
 	let venues: any[] = []
+	let eventId: number
 
 	let venueColumns: Column[] = [
 		{
@@ -251,6 +252,8 @@
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Venue updated correctly.', status: true }
 				eventSaved = true
+				eventId = data.id
+				return eventId
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -610,9 +613,9 @@
 			</div>
 			<MainButton disabled={eventSaved}>Save as draft</MainButton>
 			{#if eventSaved}
-				<MainButton href={`/events/preview/${eventData}`} disabled={!eventSaved}
-					>View Preview</MainButton
-				>
+				<MainButton href={`/events/preview/${eventId}`}>View Preview</MainButton>
+			{:else}
+				<MainButton disabled={!eventSaved}>View Preview</MainButton>
 			{/if}
 			<MainButton>Discard</MainButton>
 		{/if}
