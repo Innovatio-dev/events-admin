@@ -8,6 +8,10 @@ import { encodedIntegerArray, orderSchema } from '$lib/utils/validation/schemas'
 import sequelize, { Op, type Includeable, type Order } from 'sequelize'
 import { Country } from '$lib/server/models/country'
 import { Region } from '$lib/server/models/region'
+import { Parser } from '@json2csv/plainjs'
+import { s3BucketName, s3Region } from '$lib/server/config/aws'
+import AWS from 'aws-sdk'
+import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
 
 const schema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
@@ -25,7 +29,8 @@ const schema = Joi.object({
 		'typeEvent',
 		'status'
 	]).optional(),
-	search: Joi.string().optional()
+	search: Joi.string().optional(),
+	export: Joi.boolean().default(false)
 })
 
 const postSchema = Joi.object({
@@ -125,6 +130,52 @@ export async function GET(event: RequestEvent) {
 		])
 
 		await transaction.commit()
+
+		if (filter.export) {
+			const opts = {}
+			const parser = new Parser(opts)
+
+			const S3 = new AWS.S3({
+				accessKeyId: AS_ACCESS_KEY_ID,
+				secretAccessKey: AS_SECRET_ACCESS_KEY,
+				region: AS_REGION
+			})
+
+			let organizerRequests: Array<string | any> = []
+			for (const iterator of results) {
+				organizerRequests.push({
+					name: iterator.name,
+					company: iterator.company,
+					email: iterator.email,
+					country: iterator.country.nicename,
+					mavieId: iterator.mavieId ?? 'N/A'
+				})
+			}
+
+			const csv = parser.parse(organizerRequests)
+
+			var data = {
+				Bucket: s3BucketName,
+				Key: 'data/dumpdata_organizer_requests.csv',
+				Body: csv,
+				ContentEncoding: 'base64'
+			}
+
+			S3.upload(data, function (err, data) {
+				if (err) {
+					console.log(err)
+					console.log('Error uploading data')
+				} else {
+					console.log('succesfully uploaded!!!')
+				}
+			})
+
+			return json({
+				count,
+				formedUrl: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/data/dumpdata_organizer_requests.csv`,
+				results
+			})
+		}
 
 		return json({
 			count,
