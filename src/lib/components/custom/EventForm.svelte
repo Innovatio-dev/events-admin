@@ -66,8 +66,8 @@
 		translation: { name: string; flagIso: string }[]
 		secondaryOrganizer: string | null
 		secondaryOrganizerDescription: string | null
-		mainSpeakers: any[]
-		secondarySpeakers: any[]
+		speakers: any[]
+		speakersSecondary: any[]
 		schedule: {
 			startTime: Date | null
 			endTime: Date | null
@@ -87,8 +87,8 @@
 		translation: [],
 		secondaryOrganizer: null,
 		secondaryOrganizerDescription: null,
-		mainSpeakers: [],
-		secondarySpeakers: [],
+		speakers: [],
+		speakersSecondary: [],
 		schedule: {
 			startTime: null,
 			endTime: null,
@@ -238,8 +238,8 @@
 
 	async function viewForm() {
 		try {
-			eventData.secondarySpeakers = extractSpeakerIds(secondarySpeakers)
-			eventData.mainSpeakers = extractSpeakerIds(mainSpeakers)
+			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
+			eventData.speakers = extractSpeakerIds(mainSpeakers)
 			const res = await fetch(`/api/events/`, {
 				method: 'POST',
 				body: JSON.stringify({ ...eventData })
