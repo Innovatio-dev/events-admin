@@ -47,18 +47,18 @@
 
 	const handleSubmit = () => {
 		if (events.length) {
-			if (updateOption === 'create') {
-				items.push({ id: 'option' + (items.length + 1), label: selectedOption })
-				selectedOption = ''
+			// if (updateOption === 'create') {
+			// 	items.push({ id: 'option' + (items.length + 1), label: selectedOption })
+			// 	selectedOption = ''
+			// } else {
+			const index = items.findIndex((item) => item.id === selectedId)
+			if (index !== -1) {
+				items[index] = { id: selectedId, label: selectedOption }
+				isOpenModal = true
 			} else {
-				const index = items.findIndex((item) => item.id === selectedId)
-				if (index !== -1) {
-					items[index] = { id: selectedId, label: selectedOption }
-					isOpenModal = true
-				} else {
-					console.error('No se encontró el elemento con el ID:', selectedId)
-				}
+				console.error('No se encontró el elemento con el ID:', selectedId)
 			}
+			// }
 		} else {
 			dispatch('submit', {
 				reason: selectedOption

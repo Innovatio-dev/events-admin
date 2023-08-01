@@ -11,6 +11,7 @@
 	import Modal from '$lib/components/Modal.svelte'
 	import SuspendOrganizer from '$lib/components/SuspendOrganizer.svelte'
 	import OrganizerView from '$lib/components/custom/OrganizerView.svelte'
+	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
 
 	// State
 	let organizer: any = null
@@ -24,6 +25,15 @@
 	}
 	const handleCloseModal = () => {
 		isOpen = false
+	}
+
+	// Confirmation Modal
+	let isOpenConfirmation = false
+	const handleOpenConfirmationModal = () => {
+		isOpenConfirmation = true
+	}
+	const handleCloseConfirmationModal = () => {
+		isOpenConfirmation = false
 	}
 
 	const options = [
@@ -55,16 +65,19 @@
 		loading = false
 	}
 
-	const suspendOrganizer = async (id, suspendReason) => {
+	const suspendOrganizer = async (id, suspendReason, action = 1) => {
 		try {
 			const res = await fetch(`/api/organizers/${id}`, {
 				method: 'PUT',
-				body: JSON.stringify({ status: 1, reason: suspendReason })
+				body: JSON.stringify({ status: action, reason: suspendReason })
 			})
 			if (res.ok) {
 				const data = await res.json()
-				console.log(data)
-				$pageAlert = { message: 'Organizer suspended.', status: true }
+				// console.log(data)
+				$pageAlert = {
+					message: action ? 'Organizer suspended.' : "Organizer's suspension removed.",
+					status: true
+				}
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -82,6 +95,9 @@
 	const handleSuspend = async (e) => {
 		await suspendOrganizer(organizer.id, e.detail.reason)
 	}
+	const handleUnsuspend = async () => {
+		await suspendOrganizer(organizer.id, 'empty', 0)
+	}
 
 	onMount(async () => {
 		let id = $page.params.id
@@ -92,24 +108,41 @@
 
 <div class="w-full p-6">
 	<OrganizerView {organizer} {loading} />
-	<div class="flex flex-row gap-6">
-		<div class="w-fit">
-			<MainButton href={`/organizers/${$page.params.id}/edit`}>
-				{'Edit'}
-			</MainButton>
+	{#if organizer?.status === 0}
+		<div class="flex flex-row gap-6">
+			<div class="w-fit">
+				<MainButton href={`/organizers/${$page.params.id}/edit`}>
+					{'Edit'}
+				</MainButton>
+			</div>
+			<div class="w-fit">
+				<SecondaryButton on:click={handleOpenModal}>
+					{'Suspend'}
+				</SecondaryButton>
+				<Modal {isOpen} handleClose={handleCloseModal} title="">
+					<SuspendOrganizer
+						on:submit={handleSuspend}
+						{events}
+						items={options}
+						handleClose={handleCloseModal}
+					/>
+				</Modal>
+			</div>
 		</div>
+	{:else if organizer?.status === 1}
 		<div class="w-fit">
-			<SecondaryButton on:click={handleOpenModal}>
-				{'Suspend'}
+			<SecondaryButton on:click={handleOpenConfirmationModal}>
+				<div class="flex gap-5">
+					{'Revoque Suspension'}
+				</div>
 			</SecondaryButton>
-			<Modal {isOpen} handleClose={handleCloseModal} title="">
-				<SuspendOrganizer
-					on:submit={handleSuspend}
-					{events}
-					items={options}
-					handleClose={handleCloseModal}
-				/>
-			</Modal>
 		</div>
-	</div>
+		<Modal isOpen={isOpenConfirmation} handleClose={handleCloseConfirmationModal}>
+			<ApprovedModal
+				text="Are you sure you would like to revoke suspension for this User?"
+				onConfirm={handleUnsuspend}
+				onCancel={handleCloseConfirmationModal}
+			/>
+		</Modal>
+	{/if}
 </div>
