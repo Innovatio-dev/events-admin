@@ -310,10 +310,6 @@
 				</div>
 			</Dropdown>
 			<ExportCsvButton urlPrefix="events" />
-			<MainButton>
-				<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
-				{'Export CSV'}
-			</MainButton>
 		</div>
 	</div>
 	<div class="w-full flex py-4 gap-4">
