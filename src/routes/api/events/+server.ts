@@ -15,6 +15,8 @@ import AWS from 'aws-sdk'
 import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
 import { SENDINBLUE_API_KEY } from '$env/static/private'
 import SibApiV3Sdk from 'sib-api-v3-sdk'
+import { Speaker } from '$lib/server/models/speaker'
+import { EventSpeaker } from '$lib/server/models/eventSpeaker'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
@@ -199,10 +201,9 @@ export async function GET(event: RequestEvent) {
 export async function POST(event: RequestEvent) {
 	const user = checkUser(event)
 	//TODO: Create eventSpeakers based on array of speakers
-	const { pictures, bannerId, bannerMobileId, ...values } = await validateBody(
-		event,
-		createSchema
-	)
+	const { pictures, bannerId, speakers, bannerMobileId, schedule, ...values } =
+		await validateBody(event, createSchema)
+
 	const connection = await getConnection()
 	const transaction = await connection.transaction()
 	try {
@@ -218,6 +219,7 @@ export async function POST(event: RequestEvent) {
 
 		const data = await apiInstance.createList(createList)
 		values.mailing = data.id
+		values.userId = user.id
 
 		let event = await Event.create(
 			{
@@ -235,6 +237,33 @@ export async function POST(event: RequestEvent) {
 		if (bannerMobileId) {
 			await event.setBannerMobile(bannerMobileId, { transaction })
 		}
+
+		let speakersMap: Array<Speaker> = []
+
+		for (const iterator of speakers) {
+			const element = await Speaker.findByPk(iterator)
+			if (element) {
+				speakersMap.push(element)
+			}
+		}
+		const snapshotSpeakers = await Promise.all(
+			speakersMap.map((speaker: Speaker) =>
+				createSpeakerSnapshot(speaker, event, transaction)
+			)
+		)
+		await event.setEventSpeakers(snapshotSpeakers)
+
+		await event.setSchedule(
+			await Schedule.create(
+				{
+					startTime: schedule.startTime,
+					endTime: schedule.endTime
+				},
+				{ transaction }
+			),
+			{ transaction }
+		)
+
 		await transaction.commit()
 		event = (await Event.scope('full').findByPk(event.id)) as Event
 		return json(event)
@@ -243,4 +272,32 @@ export async function POST(event: RequestEvent) {
 		await transaction.rollback()
 		throw error
 	}
+}
+
+async function createSpeakerSnapshot(speaker: Speaker, event: Event, transaction) {
+	//increase refCount of image
+	const image = await speaker.getPicture()
+	const country = await speaker.getCountry()
+	const speakerSnapshot = await EventSpeaker.create(
+		{
+			status: speaker.status,
+			name: speaker.name,
+			jobRole: speaker.jobRole,
+			company: speaker.company,
+			instagram: speaker.instagram,
+			linkedin: speaker.linkedin,
+			facebook: speaker.facebook,
+			youtube: speaker.youtube,
+			description: speaker.description,
+			speakerId: speaker.id,
+			primary: Math.floor(Math.random() * 5) > 3,
+			order: Math.floor(Math.random() * 5),
+			eventId: event.id
+		},
+		{ transaction }
+	)
+	speakerSnapshot.setPicture(image)
+	speakerSnapshot.setCountry(country)
+	await speakerSnapshot.save()
+	return speakerSnapshot
 }

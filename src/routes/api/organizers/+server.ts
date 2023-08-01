@@ -12,6 +12,10 @@ import { createSchema, filterSchema } from '$lib/utils/validation/organizerSchem
 import sequelize, { Op, type Includeable, type Order } from 'sequelize'
 import { foreignKeyOf, uniqueKeyOf } from '$lib/server/validation/schemas'
 import Joi from 'joi'
+import { Parser } from '@json2csv/plainjs'
+import { s3BucketName, s3Region } from '$lib/server/config/aws'
+import AWS from 'aws-sdk'
+import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
@@ -92,6 +96,52 @@ export async function GET(event: RequestEvent) {
 		])
 
 		await transaction.commit()
+
+		if (filter.export) {
+			const opts = {}
+			const parser = new Parser(opts)
+
+			const S3 = new AWS.S3({
+				accessKeyId: AS_ACCESS_KEY_ID,
+				secretAccessKey: AS_SECRET_ACCESS_KEY,
+				region: AS_REGION
+			})
+
+			let organizers: Array<string | any> = []
+			for (const iterator of results) {
+				organizers.push({
+					name: iterator.name,
+					company: iterator.company,
+					email: iterator.email,
+					country: iterator.country.nicename,
+					mavieId: iterator.mavieId ?? 'N/A'
+				})
+			}
+
+			const csv = parser.parse(organizers)
+
+			var data = {
+				Bucket: s3BucketName,
+				Key: 'data/dumpdata_organizers.csv',
+				Body: csv,
+				ContentEncoding: 'base64'
+			}
+
+			S3.upload(data, function (err, data) {
+				if (err) {
+					console.log(err)
+					console.log('Error uploading data')
+				} else {
+					console.log('succesfully uploaded!!!')
+				}
+			})
+
+			return json({
+				count,
+				formedUrl: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/data/dumpdata_organizers.csv`,
+				results
+			})
+		}
 
 		return json({
 			count,
