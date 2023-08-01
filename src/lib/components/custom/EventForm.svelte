@@ -46,6 +46,10 @@
 		}
 	]
 
+	interface Speaker {
+		id: number
+	}
+
 	const data: { banner: number[] } = { banner: [] }
 
 	const eventData: {
@@ -62,6 +66,8 @@
 		translation: { name: string; flagIso: string }[]
 		secondaryOrganizer: string | null
 		secondaryOrganizerDescription: string | null
+		mainSpeakers: any[]
+		secondarySpeakers: any[]
 		schedule: {
 			startTime: Date | null
 			endTime: Date | null
@@ -81,6 +87,8 @@
 		translation: [],
 		secondaryOrganizer: null,
 		secondaryOrganizerDescription: null,
+		mainSpeakers: [],
+		secondarySpeakers: [],
 		schedule: {
 			startTime: null,
 			endTime: null,
@@ -98,11 +106,16 @@
 		return bannerId
 	}
 
+	function extractSpeakerIds(speakers: Speaker[]): number[] {
+		return speakers.map((speaker) => speaker.id)
+	}
+
 	// Props
 	let organizerInfoEnabled: boolean = false
 	let isModalMainSpeaker = false
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
+	let eventSaved = false
 	let mainSpeakers: any[] = []
 	let secondarySpeakers: any = []
 	let venues: any[] = []
@@ -225,6 +238,8 @@
 
 	async function viewForm() {
 		try {
+			eventData.secondarySpeakers = extractSpeakerIds(secondarySpeakers)
+			eventData.mainSpeakers = extractSpeakerIds(mainSpeakers)
 			const res = await fetch(`/api/events/`, {
 				method: 'POST',
 				body: JSON.stringify({ ...eventData })
@@ -232,6 +247,7 @@
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Venue updated correctly.', status: true }
+				eventSaved = true
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -244,6 +260,8 @@
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
 	}
+
+	console.log(eventData)
 </script>
 
 <form class="content" on:submit|preventDefault={viewForm}>
@@ -400,7 +418,7 @@
 								const speaker = event.detail
 								if (!mainSpeakers.some((item) => item.id == speaker.id)) {
 									mainSpeakers.push(speaker)
-									mainSpeakers = mainSpeakers
+									mainSpeakers = extractSpeakerIds(mainSpeakers)
 								}
 							}}
 							handleClose={() => (isModalMainSpeaker = false)}
@@ -587,8 +605,10 @@
 					</div>
 				{/if}
 			</div>
-			<MainButton>Save as draft</MainButton>
-			<MainButton href={`/events/preview/${eventData}`}>View Preview</MainButton>
+			<MainButton disabled={eventSaved}>Save as draft</MainButton>
+			<MainButton href={`/events/preview/${eventData}`} disabled={true}
+				>View Preview</MainButton
+			>
 			<MainButton>Discard</MainButton>
 		{/if}
 	</div>

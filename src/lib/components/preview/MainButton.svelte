@@ -2,18 +2,19 @@
 	export let title: string
 	export let href: string | null = null
 	export let handleClick: (() => void) | undefined
+	export let isDisabled: boolean = false
 </script>
 
 {#if href}
 	<a {href}>
-		<button class="bgBlack">
+		<button class="bgBlack" disabled={isDisabled}>
 			<div class="bgBlack">
 				{title}
 			</div>
 		</button>
 	</a>
 {:else}
-	<button class="bgMavie" on:click={handleClick}>
+	<button class="bgMavie" on:click={handleClick} disabled={isDisabled}>
 		<div class="bgBlack">
 			{title}
 		</div>
