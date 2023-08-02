@@ -8,10 +8,14 @@
 	export let items: any[] = []
 	export let itemViewer: typeof SvelteComponent
 	export let itemGenerator: ItemGenerator = (item) => item
-	function handleClickItem(index) {}
+	function handleClickItem(index) {
+		if (index === items.length - 1) {
+			document.forms['logout'].submit()
+		}
+	}
 </script>
 
-<div class="list">
+<form name='logout' class="list" action="/logout" method="post">
 	{#if items.length}
 		{#each items as row, index}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -22,7 +26,7 @@
 			</div>
 		{/each}
 	{/if}
-</div>
+</form>
 
 <style lang="scss">
 	.list {
