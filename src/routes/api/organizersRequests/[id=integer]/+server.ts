@@ -21,7 +21,7 @@ export async function GET(event: RequestEvent) {
 		}
 		return json(result)
 	} catch {
-		throw error(HttpResponses.UNEXPECTED_ERROR, {
+		throw error(HttpResponses.NOT_FOUND, {
 			message: 'Organizer Request with id ' + id + ' does not exists'
 		})
 	}

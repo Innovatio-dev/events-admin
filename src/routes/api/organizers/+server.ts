@@ -151,7 +151,7 @@ export async function GET(event: RequestEvent) {
 		console.log(error)
 		transaction.rollback()
 		throw httpError(HttpResponses.UNEXPECTED_ERROR, {
-			message: 'An error has been ocurred when accessing to database'
+			message: 'An error has been ocurred when accessing to database ' + error
 		})
 	}
 }

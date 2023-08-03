@@ -120,7 +120,7 @@ export async function DELETE(event: RequestEvent) {
 		console.log(err)
 
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
-			message: 'Something happend, try again later'
+			message: 'Something happend, try again later ' + err
 		})
 	}
 }

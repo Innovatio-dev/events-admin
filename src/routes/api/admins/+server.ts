@@ -104,7 +104,7 @@ export async function GET(event: RequestEvent) {
 	} catch (err) {
 		console.log(err)
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
-			message: 'Something happend try again later'
+			message: 'Something happend try again later ' + err
 		})
 	}
 }

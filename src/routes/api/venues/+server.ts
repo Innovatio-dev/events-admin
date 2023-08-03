@@ -159,7 +159,7 @@ export async function POST(event: RequestEvent) {
 		console.log(err)
 		await transaction.rollback()
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
-			message: 'Something happend, try again later'
+			message: 'Something happend, try again later ' + err
 		})
 	}
 }
