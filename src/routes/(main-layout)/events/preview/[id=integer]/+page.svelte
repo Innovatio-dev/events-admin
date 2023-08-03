@@ -216,6 +216,18 @@
 </section>
 
 <style>
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: var(--font-eesti);
+	}
+
+	p,
+	span,
+	div {
+		font-family: var(--font-dm-Sans);
+	}
 	.background {
 		color: #fff;
 		background: #111;

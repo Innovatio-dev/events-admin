@@ -239,8 +239,9 @@
 		}
 	]
 
-	async function viewForm() {
+	async function createEvent() {
 		try {
+			eventData.slug = createSlug(eventData.title)
 			eventData.venue = venues
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
@@ -266,15 +267,10 @@
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
 	}
-
-	console.log(eventData)
 </script>
 
-<form class="content" on:submit|preventDefault={viewForm}>
+<div class="content">
 	<div class="form-container">
-		<div class="hidden">
-			{(eventData.slug = createSlug(eventData.title))}
-		</div>
 		<LabelInput>Select Organizer</LabelInput>
 		<div class="z-50">
 			<DropdownFetcher
@@ -611,18 +607,30 @@
 					</div>
 				{/if}
 			</div>
-			<MainButton disabled={eventSaved}>Save as draft</MainButton>
+			<MainButton disabled={eventSaved} on:click={createEvent}>Save as draft</MainButton>
 			{#if eventSaved}
 				<MainButton href={`/events/preview/${eventId}`}>View Preview</MainButton>
 			{:else}
 				<MainButton disabled={!eventSaved}>View Preview</MainButton>
 			{/if}
-			<MainButton>Discard</MainButton>
+			<MainButton href={`/`}>Discard</MainButton>
 		{/if}
 	</div>
-</form>
+</div>
 
 <style lang="scss">
+	h1,
+	h2,
+	h3,
+	h4 {
+		font-family: var(--font-eesti);
+	}
+
+	p,
+	span,
+	div {
+		font-family: var(--font-dm-Sans);
+	}
 	.content {
 		display: flex;
 		align-items: center;
