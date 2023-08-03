@@ -245,7 +245,7 @@
 			eventData.venue = venues
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
-			const res = await fetch(`/api/events/`, {
+			const res = await fetch(`/api/events`, {
 				method: 'POST',
 				body: JSON.stringify({ ...eventData })
 			})
