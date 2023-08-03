@@ -89,8 +89,8 @@
 				<div class="content">
 					<p>{events.status === 0 ? 'Inactive ' : 'Active'}</p>
 					<p>{events.uid ?? '---'}</p>
-					<p>{events.venue.country.name ?? '---'}</p>
-					<p>{events.venue.addres ?? '---'}</p>
+					<p>{events.createdAt ?? '---'}</p>
+					<p>{events.updatedAt ?? '---'}</p>
 				</div>
 			{/if}
 		</div>
@@ -217,7 +217,7 @@
 				<div class="w-full h-[100px]">
 					<SpeakerBadge
 						size={'80'}
-						image={speaker.picture.url}
+						image={speaker.picture?.url ?? ''}
 						jobRole={speaker.jobRole}
 						company={speaker.company}
 					/>
@@ -244,7 +244,7 @@
 				<div class="w-full h-[60px]">
 					<SpeakerBadge
 						size={'60'}
-						image={speaker.picture.url}
+						image={speaker.picture?.url ?? ''}
 						jobRole={speaker.jobRole}
 						company={speaker.company}
 					/>
@@ -317,7 +317,7 @@
 				<div class="flex gap-x-12 w-full">
 					{#each events.pictures as picture, index}
 						<div class="min-w-[280px] min-h-[160px]">
-							<img src={picture.url} alt={picture.name} class="rounded-lg" />
+							<img src={picture?.url ?? ''} alt={picture.name} class="rounded-lg" />
 						</div>
 					{/each}
 				</div>
@@ -357,7 +357,7 @@
 				</div>
 			{:else if events.organizer}
 				<div class="text-ellipsis underline">
-					<a target="_blank" href={`${events.organizer.logo.url}`}> Organizer Photo </a>
+					<a target="_blank" href={`${events.organizer.logo?.url ?? ''}`}> Organizer Photo </a>
 				</div>
 			{/if}
 		</div>
