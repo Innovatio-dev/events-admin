@@ -31,7 +31,13 @@ export async function GET(event: RequestEvent) {
 	}
 	if (filter.order) {
 		for (const col of filter.order) {
-			order.push([col.name, col.type])
+			if (col.name == 'region') {
+				order.push([{ model: Region, as: 'region' }, 'id', col.type])
+			} else if (col.name == 'country') {
+				order.push([{ model: Country, as: 'country' }, 'name', col.type])
+			} else {
+				order.push([col.name, col.type])
+			}
 		}
 	}
 	if (filter.search) {

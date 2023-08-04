@@ -471,7 +471,7 @@
 					{'Edit'}
 				</div>
 			</MainButton>
-			{#if events?.status === 0 || 1}
+			{#if events?.status === (0 || 1)}
 				<MainButton on:click={handleOpenModal}>
 					<div class="flex gap-3 items-center">
 						<Icon size="20" src={IoClose} />

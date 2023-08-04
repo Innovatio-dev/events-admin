@@ -280,7 +280,7 @@
 				items={statuses}
 				bind:selected={params.status}
 				multiselect
-				on:change={(event) => {
+			on:change={(event) => {
 					const selected = event.detail.selected
 					const values = selected.map((status) => status.value)
 					gotoFilter({
