@@ -89,7 +89,7 @@
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
 			if (params.typeEvent.length) {
-				params.typeEvent = mapArrayIntoCollection(params.typeEvent, 'value')
+				params.typeEvent = mapArrayIntoCollection(params.typeEvent, [], 'value')
 			}
 			if (params.order.length) {
 				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)

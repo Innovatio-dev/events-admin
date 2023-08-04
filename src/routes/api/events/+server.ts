@@ -61,8 +61,11 @@ export async function GET(event: RequestEvent) {
 			let name = col.name
 			if (col.name == 'uid') {
 				name = 'id'
+			} else if (col.name == 'country') {
+				order.push(['venue','country', 'name', col.type])
+			} else {
+				order.push([name, col.type])
 			}
-			order.push([name, col.type])
 		}
 	}
 	if (filter.search) {
@@ -148,7 +151,7 @@ export async function GET(event: RequestEvent) {
 				region: AS_REGION
 			})
 
-			let events: Array<string | any> = []
+			const events: Array<string | any> = []
 			for (const iterator of results) {
 				events.push({
 					name: iterator.title,
@@ -163,7 +166,7 @@ export async function GET(event: RequestEvent) {
 
 			const csv = parser.parse(events)
 
-			var data = {
+			const data = {
 				Bucket: s3BucketName,
 				Key: 'public/dumpdata.csv',
 				Body: csv,
@@ -216,12 +219,12 @@ export async function POST(event: RequestEvent) {
 	const connection = await getConnection()
 	const transaction = await connection.transaction()
 	try {
-		let defaultClient = SibApiV3Sdk.ApiClient.instance
-		let apiKey = defaultClient.authentications['api-key']
+		const defaultClient = SibApiV3Sdk.ApiClient.instance
+		const apiKey = defaultClient.authentications['api-key']
 		apiKey.apiKey = SENDINBLUE_API_KEY
 
-		let apiInstance = new SibApiV3Sdk.ContactsApi()
-		let createList = new SibApiV3Sdk.CreateList()
+		const apiInstance = new SibApiV3Sdk.ContactsApi()
+		const createList = new SibApiV3Sdk.CreateList()
 
 		createList.name = values.title
 		createList.folderId = 5

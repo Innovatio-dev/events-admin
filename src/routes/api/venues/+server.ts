@@ -18,7 +18,7 @@ const schema = Joi.object({
 	regionId: Joi.number().min(0).optional(),
 	limit: Joi.number().min(-1).optional().default(10),
 	search: Joi.string().min(0).optional(),
-	order: orderSchema(['id', 'status', 'city']).optional()
+	order: orderSchema(['name', 'region', 'country']).optional()
 })
 
 export async function GET(event: RequestEvent) {
@@ -89,7 +89,7 @@ export async function GET(event: RequestEvent) {
 			region: AS_REGION
 		})
 
-		let venues: Array<string | any> = []
+		const venues: Array<string | any> = []
 		for (const iterator of results) {
 			venues.push({
 				name: iterator.name,
@@ -102,7 +102,7 @@ export async function GET(event: RequestEvent) {
 
 		const csv = parser.parse(venues)
 
-		var data = {
+		const data = {
 			Bucket: s3BucketName,
 			Key: 'data/dumpdata_venues.csv',
 			Body: csv,
@@ -124,7 +124,6 @@ export async function GET(event: RequestEvent) {
 			results
 		})
 	}
-
 	return json({
 		count,
 		results
