@@ -20,6 +20,7 @@
 	let loading: boolean = true
 	let primarySpeakers: any[] = []
 	let secondarySpeakers: any[] = []
+	let id: string = $page.params.id
 
 	onMount(async () => {
 		let id = $page.params.id
@@ -209,22 +210,13 @@
 		<div class="flex items-center justify-center flex-col w-full mx-auto pt-32">
 			<MainButton title="Publish Event" href="/" />
 			<MainButton title="Save it in draft" href="/" />
-			<MainButton title="Edit" href="/" />
+			<MainButton title="Edit" href={`/events/edit/${id}`} />
 			<MainButton title="Close preview" href="/" />
 		</div>
 	</div>
 </section>
 
 <style>
-	h1,
-	h2,
-	h3,
-	h4 {
-		font-family: var(--font-eesti);
-	}
-
-	p,
-	span,
 	div {
 		font-family: var(--font-dm-Sans);
 	}

@@ -1,3 +1,29 @@
+<script context="module" lang="ts">
+	export interface EventData {
+		slug: string
+		organizerId: string
+		typeEvent: string | null
+		isFeatured: boolean
+		title: string
+		description: string
+		bannerId: number | undefined
+		pictures: any[]
+		linkZoom: any
+		language: any
+		venue: any
+		translation: { name: string; flagIso: string }[]
+		secondaryOrganizer: string | null
+		secondaryOrganizerDescription: string | null
+		speakers: any[]
+		speakersSecondary: any[]
+		schedule: {
+			startTime: Date | null
+			endTime: Date | null
+			visibleAt: Date | null
+		}
+	}
+</script>
+
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	// Components
@@ -52,32 +78,10 @@
 
 	const data: { banner: number[] } = { banner: [] }
 
-	const eventData: {
-		slug: string
-		organizerId: string
-		typeEvent: string | null
-		isFeatured: boolean
-		title: string
-		description: string
-		bannerId: number | undefined
-		pictures: any[]
-		linkZoom: any
-		language: any
-		venue: any
-		translation: { name: string; flagIso: string }[]
-		secondaryOrganizer: string | null
-		secondaryOrganizerDescription: string | null
-		speakers: any[]
-		speakersSecondary: any[]
-		schedule: {
-			startTime: Date | null
-			endTime: Date | null
-			visibleAt: Date | null
-		}
-	} = {
+	export let eventData: EventData = {
 		slug: '',
 		organizerId: '',
-		typeEvent: null,
+		typeEvent: '',
 		isFeatured: false,
 		title: '',
 		description: '',
@@ -276,6 +280,7 @@
 			<DropdownFetcher
 				name="organizerId"
 				filterPlaceholder={'Search'}
+				selected={eventData.organizerId}
 				itemGenerator={(item) => ({ title: item.name, image: item.logo?.url })}
 				selectedGenerator={(item) => ({ title: item.name })}
 				bind:value={eventData.organizerId}
@@ -619,15 +624,6 @@
 </div>
 
 <style lang="scss">
-	h1,
-	h2,
-	h3,
-	h4 {
-		font-family: var(--font-eesti);
-	}
-
-	p,
-	span,
 	div {
 		font-family: var(--font-dm-Sans);
 	}

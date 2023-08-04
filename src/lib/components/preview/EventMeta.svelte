@@ -12,18 +12,20 @@
 <div
 	class="w-full flex flex-col lg:flex-row justify-between items-center gap-8 bg-[#161718] px-4 py-4 my-6 rounded-lg"
 >
-	<div class="w-full lg:w-auto flex md:items-center gap-7">
+	<div class="w-full lg:w-[80%] flex md:items-center gap-7">
 		{#if loading}
 			<Skeleton width={87} height={87} />
 		{:else if events.schedule}
-			<DateSquare
-				date={events.schedule.startTime}
-				className="lg:w-[90px] lg:h-[90px]"
-				size={24}
-			/>
+			<div class="flex justify-center items-center min-w-[90px]">
+				<DateSquare
+					date={events.schedule.startTime}
+					className="lg:w-[90px] lg:h-[90px]"
+					size={24}
+				/>
+			</div>
 		{/if}
-		<div class="w-[calc(100%-5.15rem)] lg:w-[calc(100%-6.75rem)] flex justify-between">
-			<div class="w-full flex flex-col justify-between gap-4 lg:gap-3 lg:min-w-[600px]">
+		<div class="w-[calc(100%-5.15rem)] lg:min-w-[calc(100%-6.75rem)] flex justify-between">
+			<div class="w-full flex flex-col justify-between gap-4 lg:gap-3">
 				{#if loading}
 					<Skeleton wFull height={30} />
 				{:else if events}
@@ -51,7 +53,7 @@
 						<div class="flex items-center text-white! gap-x-3">
 							{#if loading}
 								<Skeleton width={100} height={15} />
-							{:else if events}
+							{:else if events.type === 0}
 								<Icon src={BiSolidVideo} color="#fff" size="1.5em" />
 								<span class="w-max underline text-brand-cyan">Zoom Link</span>
 							{/if}
