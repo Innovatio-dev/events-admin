@@ -68,7 +68,43 @@ export const createSchema = Joi.object({
 	}).required()
 })
 
-export const updateSchema = createSchema.keys({
-	reason: Joi.string().required(),
-	email: emailSchema
+// export const updateSchema = createSchema.keys({
+// 	reason: Joi.string().required(),
+// 	email: emailSchema
+// })
+
+export const updateSchema = Joi.object({
+	speakers: Joi.array().items(Joi.number()),
+	slug: Joi.string()
+		.regex(/^[a-zA-Z0-9-]+$/)
+		.min(1)
+		.max(100)
+		.lowercase()
+		.trim()
+		.messages({
+			'string.base': 'The slug must be a string',
+			'string.empty': 'The slug cannot be empty',
+			'string.min': 'The slug must have at least {#limit} characters',
+			'string.max': 'The slug cannot have more than {#limit} characters',
+			'string.pattern.base': 'The slug can only contain letters, numbers, and hyphens',
+			'string.lowercase': 'The slug must be in lowercase',
+			'any.required': 'The slug is a required field'
+		}),
+	isFeatured: Joi.bool().default(false),
+	status: Joi.number(),
+	title: Joi.string().required(),
+	bannerId: Joi.number(),
+	bannerMobileId: Joi.number(),
+	description: Joi.string(),
+	notes: Joi.string(),
+	linkZoom: Joi.string(),
+	language: Joi.object(),
+	translation: Joi.array(),
+	pictures: Joi.array().items(Joi.number()),
+	organizerId: Joi.number(),
+	schedule: Joi.object({
+		startTime: Joi.date(),
+		endTime: Joi.date(),
+		visibleAt: Joi.date()
+	})
 })
