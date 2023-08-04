@@ -6,6 +6,7 @@
 	import MainButton from '$lib/components/MainButton.svelte'
 
 	// Props
+	export let title = ''
 	export let handleClose: () => void
 	export let items: { id: string; label: string }[]
 	export let events = []
@@ -68,7 +69,7 @@
 </script>
 
 <div class="w-fit px-16 flex flex-col items-center text-center">
-	<h3>Do you really want to suspend the organizer?</h3>
+	<h3>{title}</h3>
 	<div class="flex flex-col text-left mx-6 mt-6 gap-y-4 max-w-[600px]" id="optionsContainer">
 		{#each items as option}
 			<li class="flex gap-x-6">

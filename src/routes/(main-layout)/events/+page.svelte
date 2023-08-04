@@ -4,7 +4,7 @@
 	import MainButton from '$lib/components/MainButton.svelte'
 	import TextViewer from '$lib/components/table_cell/TextViewer.svelte'
 	import VRegionViewer from '$lib/components/table_cell/VRegionViewer.svelte'
-	import VCountryViewer from '$lib/components/table_cell/VCountryViewer.svelte'
+	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import VCityViewer from '$lib/components/table_cell/VCityViewer.svelte'
 	import FeaturedViewer from '$lib/components/table_cell/FeaturedViewer.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
@@ -86,8 +86,8 @@
 		{
 			title: 'Country',
 			sortable: true,
-			dataKey: 'venue',
-			cellComponent: VCountryViewer
+			dataKey: 'country',
+			cellComponent: CountryViewer
 		},
 		{
 			title: 'City',
@@ -98,7 +98,7 @@
 		{
 			title: 'Type',
 			sortable: true,
-			dataKey: '',
+			dataKey: 'typeEvent',
 			minWidth: '12em',
 			grow: '0',
 			cellComponent: TypeEventViewer
@@ -148,6 +148,9 @@
 	afterNavigate(async () => {
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
+			if (params.order.length) {
+				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
+			}
 			if (params.locations.length) {
 				params.status = mapArrayIntoCollection(params.location, locations, 'value')
 			}
@@ -156,9 +159,6 @@
 			}
 			if (params.typeEvent.length) {
 				params.typeEvent = mapArrayIntoCollection(params.typeEvent, types, 'value')
-			}
-			if (params.order.length) {
-				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
 			}
 		} catch (error) {}
 		await fetchEvents()
@@ -184,7 +184,8 @@
 			if (data.results) {
 				data.results = data.results.map((item) => ({
 					...item,
-					link: `/events/${item.id}`
+					link: `/events/${item.id}`,
+					country:item.venue.country
 				}))
 				pageCount = Math.ceil(data.count / itemsPerPage)
 			}

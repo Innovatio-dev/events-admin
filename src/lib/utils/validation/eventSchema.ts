@@ -17,7 +17,9 @@ export const filterSchema = Joi.object({
 		'createdAt',
 		'country',
 		'typeEvent',
-		'status'
+		'status',
+		'venue',
+		'isFeatured'
 	]).optional(),
 	organizerId: Joi.number(),
 	search: Joi.string().optional().allow(''),

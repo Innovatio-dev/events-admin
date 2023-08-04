@@ -21,7 +21,6 @@
 
 	// State
 	let events: any = null
-	let organizer: any = null
 	let loading: boolean = true
 	let primarySpeakers: any[] = []
 	let secondarySpeakers: any[] = []
@@ -60,17 +59,14 @@
 	}
 
 	const handleSuspend = async (e) => {
-		await suspendOrganizer(organizer.id, e.detail.reason)
+		await suspendEvent(events.id, e.detail.reason)
 	}
 
 	const handleUnsuspend = async () => {
-		await suspendOrganizer(organizer.id, 'empty', 0)
+		await suspendEvent(events.id, 'empty', 1)
 	}
 
-	const options = [
-		{ id: 'option1', label: 'User is not eligible for our events..' },
-		{ id: 'option2', label: 'There are missing some more information about you.' }
-	]
+	const options = [{ id: 'option1', label: 'Unable to make this event at the moment.' }]
 
 	function formatTime(dateString) {
 		const date = new Date(dateString)
@@ -94,7 +90,6 @@
 		let response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
-			organizer = events?.organizer
 			for (const speaker of events.eventSpeakers) {
 				if (speaker.primary) {
 					primarySpeakers.push(speaker)
@@ -108,9 +103,9 @@
 		loading = false
 	}
 
-	const suspendOrganizer = async (id, suspendReason, action = 1) => {
+	const suspendEvent = async (id, suspendReason, action = 3) => {
 		try {
-			const res = await fetch(`/api/organizers/${id}`, {
+			const res = await fetch(`/api/events/${id}`, {
 				method: 'PUT',
 				body: JSON.stringify({ status: action, reason: suspendReason })
 			})
@@ -119,7 +114,7 @@
 				handleCloseModal()
 				handleCloseConfirmationModal()
 				await fetchEvents($page.params.id)
-				// console.log(data)
+				console.log(data)
 				$pageAlert = {
 					message: action ? 'Organizer suspended.' : "Organizer's suspension removed.",
 					status: true
@@ -469,42 +464,43 @@
 				<p>{events.mailing ?? '---'}</p>
 			{/if}
 		</div>
-		{#if organizer?.status === 0}
-			<div class="flex flex-row gap-6 max-w-fit">
-				<MainButton href={`/organizers/${organizer.id}/edit`}>
-					<div class="flex gap-3 items-center">
-						<Icon size="20" src={BiEditAlt} />
-						{'Edit'}
-					</div>
-				</MainButton>
+		<div class="flex flex-row gap-6 max-w-fit">
+			<MainButton href={`/events/${$page.params.id}/edit`}>
+				<div class="flex gap-3 items-center">
+					<Icon size="20" src={BiEditAlt} />
+					{'Edit'}
+				</div>
+			</MainButton>
+			{#if events?.status === 0 || 1}
 				<MainButton on:click={handleOpenModal}>
 					<div class="flex gap-3 items-center">
 						<Icon size="20" src={IoClose} />
 						{'Suspend'}
 					</div>
 				</MainButton>
-			</div>
-		{:else if organizer?.status === 1}
-			<div class="w-fit">
-				<MainButton on:click={handleOpenConfirmationModal}>
-					<div class="flex gap-5">
-						{'Revoque Suspension'}
-					</div>
-				</MainButton>
-			</div>
-			<Modal isOpen={isOpenConfirmation} handleClose={handleCloseConfirmationModal}>
-				<ApprovedModal
-					text="Are you sure you would like to revoke suspension for this User?"
-					onConfirm={handleUnsuspend}
-					onCancel={handleCloseConfirmationModal}
-				/>
-			</Modal>
-		{/if}
+			{:else if events?.status === 3}
+				<div class="w-fit">
+					<MainButton on:click={handleOpenConfirmationModal}>
+						<div class="flex gap-5">
+							{'Revoque Suspension'}
+						</div>
+					</MainButton>
+				</div>
+				<Modal isOpen={isOpenConfirmation} handleClose={handleCloseConfirmationModal}>
+					<ApprovedModal
+						text="Are you sure you would like to revoke suspension for this User?"
+						onConfirm={handleUnsuspend}
+						onCancel={handleCloseConfirmationModal}
+					/>
+				</Modal>
+			{/if}
+		</div>
 		<Modal {isOpen} handleClose={handleCloseModal} title="">
 			<SuspendOrganizer
 				on:submit={handleSuspend}
 				{events}
 				items={options}
+				title={'Do you really want to suspend the event?'}
 				handleClose={handleCloseModal}
 			/>
 		</Modal>
