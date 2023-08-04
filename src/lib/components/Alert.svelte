@@ -16,7 +16,7 @@
 <div
 	in:fly={{ delay: 250, duration: 300, y: -200, opacity: 0.5, easing: quintOut }}
 	out:fly={{ delay: 250, duration: 600, y: -200, opacity: 0.5, easing: quintOut }}
-	class="fixed top-12 flex w-full justify-center"
+	class="fixed top-12 flex w-full justify-center z-50"
 >
 	<div
 		class="flex gap-2 items-center p-3 mb-4 text-sm text-white rounded-full bg-black"
