@@ -92,7 +92,7 @@ export const updateSchema = Joi.object({
 		}),
 	isFeatured: Joi.bool().default(false),
 	status: Joi.number(),
-	title: Joi.string().required(),
+	title: Joi.string(),
 	bannerId: Joi.number(),
 	bannerMobileId: Joi.number(),
 	description: Joi.string(),
