@@ -7,7 +7,6 @@
 	import { pageAlert, pageStatus } from '$lib/stores/pageStatus'
 	// Components
 	import MainButton from '$lib/components/MainButton.svelte'
-	import SecondaryButton from '$lib/components/SecondaryButton.svelte'
 	import Modal from '$lib/components/Modal.svelte'
 	import SuspendOrganizer from '$lib/components/SuspendOrganizer.svelte'
 	import OrganizerView from '$lib/components/custom/OrganizerView.svelte'
@@ -26,6 +25,9 @@
 	import SuspensionData from '$lib/components/custom/SuspensionData.svelte'
 	// Utils
 	import { createUrl } from '$lib/utils/validation/validation'
+	// Icons
+	import Icon from 'svelte-icons-pack'
+	import IoClose from 'svelte-icons-pack/io/IoClose'
 
 	// State
 	let organizer: any = null
@@ -176,7 +178,7 @@
 		}
 		loading = false
 	}
-	
+
 	const fetchSuspensionData = async (id) => {
 		loading = true
 		let response = await fetch(`/api/organizers/${id}/logs`)
@@ -259,9 +261,12 @@
 				</MainButton>
 			</div>
 			<div class="w-fit">
-				<SecondaryButton on:click={handleOpenModal}>
-					{'Suspend'}
-				</SecondaryButton>
+				<MainButton on:click={handleOpenModal}>
+					<div class="flex gap-3 items-center">
+						<Icon size="20" src={IoClose} />
+						{'Suspend'}
+					</div>
+				</MainButton>
 				<Modal {isOpen} handleClose={handleCloseModal} title="">
 					<SuspendOrganizer
 						on:submit={handleSuspend}
@@ -273,13 +278,13 @@
 			</div>
 		</div>
 	{:else if organizer?.status === 1}
-	<SuspensionData {loading} logData={logData}/>
+		<SuspensionData {loading} {logData} />
 		<div class="w-fit">
-			<SecondaryButton on:click={handleOpenConfirmationModal}>
+			<MainButton on:click={handleOpenConfirmationModal}>
 				<div class="flex gap-5">
 					{'Revoque Suspension'}
 				</div>
-			</SecondaryButton>
+			</MainButton>
 		</div>
 		<Modal isOpen={isOpenConfirmation} handleClose={handleCloseConfirmationModal}>
 			<ApprovedModal

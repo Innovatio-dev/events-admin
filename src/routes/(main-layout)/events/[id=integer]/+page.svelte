@@ -1,7 +1,8 @@
 <script lang="ts">
+	// Svelte
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import { pageStatus } from '$lib/stores/pageStatus'
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	import { format } from 'date-fns'
 	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
@@ -9,13 +10,18 @@
 	import ProfilePic from '$lib/components/ProfilePic.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
 	import * as Flag from 'svelte-flag-icons'
+	import SpeakerBadge from '$lib/components/SpeakerBadge.svelte'
+	import Modal from '$lib/components/Modal.svelte'
+	import SuspendOrganizer from '$lib/components/SuspendOrganizer.svelte'
 	// Icons
 	import Icon from 'svelte-icons-pack'
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
 	import IoClose from 'svelte-icons-pack/io/IoClose'
-	import SpeakerBadge from '$lib/components/SpeakerBadge.svelte'
+	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
 
+	// State
 	let events: any = null
+	let organizer: any = null
 	let loading: boolean = true
 	let primarySpeakers: any[] = []
 	let secondarySpeakers: any[] = []
@@ -34,6 +40,37 @@
 	function formatDate(date) {
 		return format(new Date(date), 'MMM dd, yyyy')
 	}
+
+	// Modal
+	let isOpen = false
+	const handleOpenModal = () => {
+		isOpen = true
+	}
+	const handleCloseModal = () => {
+		isOpen = false
+	}
+
+	// Confirmation Modal
+	let isOpenConfirmation = false
+	const handleOpenConfirmationModal = () => {
+		isOpenConfirmation = true
+	}
+	const handleCloseConfirmationModal = () => {
+		isOpenConfirmation = false
+	}
+
+	const handleSuspend = async (e) => {
+		await suspendOrganizer(organizer.id, e.detail.reason)
+	}
+
+	const handleUnsuspend = async () => {
+		await suspendOrganizer(organizer.id, 'empty', 0)
+	}
+
+	const options = [
+		{ id: 'option1', label: 'User is not eligible for our events..' },
+		{ id: 'option2', label: 'There are missing some more information about you.' }
+	]
 
 	function formatTime(dateString) {
 		const date = new Date(dateString)
@@ -57,6 +94,7 @@
 		let response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
+			organizer = events?.organizer
 			for (const speaker of events.eventSpeakers) {
 				if (speaker.primary) {
 					primarySpeakers.push(speaker)
@@ -68,6 +106,35 @@
 			eventPhoto = events.venue.pictures[0].url
 		}
 		loading = false
+	}
+
+	const suspendOrganizer = async (id, suspendReason, action = 1) => {
+		try {
+			const res = await fetch(`/api/organizers/${id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ status: action, reason: suspendReason })
+			})
+			if (res.ok) {
+				const data = await res.json()
+				handleCloseModal()
+				handleCloseConfirmationModal()
+				await fetchEvents($page.params.id)
+				// console.log(data)
+				$pageAlert = {
+					message: action ? 'Organizer suspended.' : "Organizer's suspension removed.",
+					status: true
+				}
+			} else {
+				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
+			}
+		} catch (error) {
+			console.error('Error:', error)
+			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
+		}
 	}
 </script>
 
@@ -357,7 +424,9 @@
 				</div>
 			{:else if events.organizer}
 				<div class="text-ellipsis underline">
-					<a target="_blank" href={`${events.organizer.logo?.url ?? ''}`}> Organizer Photo </a>
+					<a target="_blank" href={`${events.organizer.logo?.url ?? ''}`}>
+						Organizer Photo
+					</a>
 				</div>
 			{/if}
 		</div>
@@ -400,20 +469,45 @@
 				<p>{events.mailing ?? '---'}</p>
 			{/if}
 		</div>
-		<div class="flex flex-row gap-6 max-w-fit">
-			<MainButton>
-				<div class="flex gap-3 items-center">
-					<Icon size="20" src={BiEditAlt} color="gray" />
-					{'Edit'}
-				</div>
-			</MainButton>
-			<MainButton>
-				<div class="flex gap-3 items-center">
-					<Icon size="20" src={IoClose} color="gray" />
-					{'Suspend'}
-				</div>
-			</MainButton>
-		</div>
+		{#if organizer?.status === 0}
+			<div class="flex flex-row gap-6 max-w-fit">
+				<MainButton href={`/organizers/${organizer.id}/edit`}>
+					<div class="flex gap-3 items-center">
+						<Icon size="20" src={BiEditAlt} />
+						{'Edit'}
+					</div>
+				</MainButton>
+				<MainButton on:click={handleOpenModal}>
+					<div class="flex gap-3 items-center">
+						<Icon size="20" src={IoClose} />
+						{'Suspend'}
+					</div>
+				</MainButton>
+			</div>
+		{:else if organizer?.status === 1}
+			<div class="w-fit">
+				<MainButton on:click={handleOpenConfirmationModal}>
+					<div class="flex gap-5">
+						{'Revoque Suspension'}
+					</div>
+				</MainButton>
+			</div>
+			<Modal isOpen={isOpenConfirmation} handleClose={handleCloseConfirmationModal}>
+				<ApprovedModal
+					text="Are you sure you would like to revoke suspension for this User?"
+					onConfirm={handleUnsuspend}
+					onCancel={handleCloseConfirmationModal}
+				/>
+			</Modal>
+		{/if}
+		<Modal {isOpen} handleClose={handleCloseModal} title="">
+			<SuspendOrganizer
+				on:submit={handleSuspend}
+				{events}
+				items={options}
+				handleClose={handleCloseModal}
+			/>
+		</Modal>
 	</div>
 </div>
 

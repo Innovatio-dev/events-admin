@@ -21,7 +21,7 @@
 		<button
 			class="{disabled
 				? disabledStyle
-				: ''} hover:no-underline hover:bg-gd-icon hover:!text-white hover:!fill-white hover:border-neutral-1 border-2 border-neutral-2 text-neutral-4 fill-neutral-4 p-2 flex w-full justify-evenly gap-2 rounded-lg font-medium transition-all ease-in-out px-4 py-2 items-center"
+				: ''} hover:no-underline test hover:bg-gd-icon hover:!text-white hover:!fill-white hover:border-neutral-1 border-2 border-neutral-2 text-neutral-4 fill-neutral-4 p-2 flex w-full justify-evenly gap-2 rounded-lg font-medium transition-all ease-in-out px-4 py-2 items-center"
 			disabled={disabled || loading}
 		>
 			{#if loading}
@@ -47,3 +47,13 @@
 		{/if}
 	</button>
 {/if}
+
+<style lang="scss">
+	.test {
+		&:hover {
+			svg {
+				fill: var(--white) !important;
+			}
+		}
+	}
+</style>
