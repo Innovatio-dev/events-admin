@@ -29,15 +29,15 @@
 <style lang="scss">
 	.inactive {
 		background-color: var(--alert-warning);
-		box-shadow: 0px 4px 4px rgba(255, 229, 135, 0.4);
+		box-shadow: 0px 4px 4px #FFE587;
 	}
 	.active {
 		background-color: var(--alert-success);
-		box-shadow: 0px 4px 4px rgba(24, 171, 53, 0.6);
+		box-shadow: 0px 4px 4px #8bc510;
 	}
 	.suspended {
 		background-color: var(--alert-error);
-		box-shadow: 0px 4px 4px rgb(171 92 24 / 60%);
+		box-shadow: 0px 4px 4px #d33030;
 	}
 	.arrow {
 		width: 0;

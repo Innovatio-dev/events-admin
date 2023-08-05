@@ -13,8 +13,9 @@
 	import SortableTable from '$lib/components/SortableTable.svelte'
 	import DateViewer from '$lib/components/table_cell/DateViewer.svelte'
 	import TypeEventViewer from '$lib/components/table_cell/TypeEventViewer.svelte'
-	import StatusViewer from '$lib/components/table_cell/StatusViewer.svelte'
+	import EventStatusViewer from '$lib/components/table_cell/EventStatusViewer.svelte'
 	import SeeMoreButton from '$lib/components/table_cell/SeeMoreButton.svelte'
+	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 	//Icons
 	import Icon from 'svelte-icons-pack'
 	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
@@ -32,7 +33,6 @@
 		mapArrayIntoCollectionOrder,
 		validateUrlSearchParams
 	} from '$lib/utils/validation/validation'
-	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 
 	let loading: boolean = true
 	let data: any = null
@@ -115,7 +115,7 @@
 			dataKey: 'status',
 			grow: '0',
 			minWidth: '5em',
-			cellComponent: StatusViewer
+			cellComponent: EventStatusViewer
 		},
 		{
 			title: 'Details',
