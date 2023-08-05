@@ -46,6 +46,7 @@
 		description: ''
 	}
 	let updatedSpeaker = {}
+	let loading = false
 
 	if (addSpeaker) {
 		speaker = JSON.parse(JSON.stringify(addSpeaker))
@@ -54,8 +55,11 @@
 
 	const handleSubmit = async () => {
 		if (updateAction) {
+			loading = true
 			await updateAction(speaker?.id ?? 0, updatedSpeaker)
+			loading = false
 		} else {
+			loading = true
 			const formattedData = {
 				twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
 				facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
@@ -65,6 +69,7 @@
 				pictureId: speaker.picture[0]
 			}
 			await submitAction({ ...speaker, ...formattedData })
+			loading = false
 		}
 	}
 
@@ -72,8 +77,7 @@
 		updatedSpeaker[e.target.name] = e.target.value
 	}
 
-	const onCancel = () => {
-	}
+	const onCancel = () => {}
 </script>
 
 <form
@@ -140,8 +144,8 @@
 		{/if}
 	</div>
 	<div class="flex gap-10">
-		<MainButton>Save</MainButton>
-		<MainButton on:click={onCancel}>cancel</MainButton>
+		<MainButton >Save</MainButton>
+		<MainButton {loading}on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>
 

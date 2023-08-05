@@ -61,6 +61,7 @@
 		status: addOrganizer?.status,
 		reason: 'Organizer updated'
 	}
+	let loading = false
 
 	if (addOrganizer) {
 		organizer = JSON.parse(JSON.stringify(addOrganizer))
@@ -69,9 +70,11 @@
 
 	const handleSubmit = async () => {
 		if (updateAction) {
+			loading = true
 			await updateAction(organizer?.id ?? 0, updatedOrganizer)
-			// console.log(updatedOrganizer)
+			loading = false
 		} else {
+			loading = true
 			const formattedData = {
 				twitter: 'https://twitter.com/' + organizer.twitter.replace(/\s/g, '_'),
 				facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
@@ -79,6 +82,7 @@
 				youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_'),
 				logoId: organizer.logos[0]
 			}
+			loading = false
 			submitAction({ ...organizer, ...formattedData })
 		}
 	}
@@ -218,7 +222,7 @@
 		<textarea class="min-h-[150px]" bind:value={organizer.description} />
 	</label>
 	<div class="flex gap-10">
-		<MainButton>Submit</MainButton>
+		<MainButton {loading}>Submit</MainButton>
 		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>

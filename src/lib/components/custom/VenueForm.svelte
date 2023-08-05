@@ -45,6 +45,7 @@
 		location: { lat: '', lng: '' }
 	}
 	let updatedVenue = {}
+	let loading = false
 
 	if (addVenue) {
 		venue.id = addVenue.id
@@ -60,9 +61,13 @@
 
 	const handleSubmit = async () => {
 		if (updateAction) {
+			loading = true
 			await updateAction(venue?.id ?? 0, updatedVenue)
+			loading = false
 		} else {
+			loading = true
 			await submitAction({ ...venue, ...geoData })
+			loading = false
 		}
 	}
 
@@ -70,8 +75,7 @@
 		updatedVenue[e.target.name] = e.target.value
 	}
 
-	const onCancel = () => {
-	}
+	const onCancel = () => {}
 </script>
 
 <form
@@ -154,7 +158,7 @@
 		</span>
 	</div>
 	<div class="flex gap-10">
-		<MainButton>Save</MainButton>
+		<MainButton {loading}>Save</MainButton>
 		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>

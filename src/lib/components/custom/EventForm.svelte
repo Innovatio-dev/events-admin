@@ -72,6 +72,8 @@
 		}
 	]
 
+	let loading = false
+
 	interface Speaker {
 		id: number
 	}
@@ -245,6 +247,7 @@
 
 	async function createEvent() {
 		try {
+			loading = true
 			eventData.slug = createSlug(eventData.title)
 			eventData.venue = venues
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
@@ -255,7 +258,7 @@
 			})
 			if (res.ok) {
 				const data = await res.json()
-				$pageAlert = { message: 'Success! Venue updated correctly.', status: true }
+				$pageAlert = { message: 'Success! Event created as draft.', status: true }
 				eventSaved = true
 				eventId = data.id
 				return eventId
@@ -266,6 +269,7 @@
 					status: false
 				}
 			}
+			loading = false
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
@@ -612,7 +616,9 @@
 					</div>
 				{/if}
 			</div>
-			<MainButton disabled={eventSaved} on:click={createEvent}>Save as draft</MainButton>
+			<MainButton disabled={eventSaved} {loading} on:click={createEvent}
+				>Save as draft</MainButton
+			>
 			{#if eventSaved}
 				<MainButton href={`/events/preview/${eventId}`}>View Preview</MainButton>
 			{:else}
