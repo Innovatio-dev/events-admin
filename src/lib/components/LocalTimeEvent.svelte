@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Icon from 'svelte-icons-pack'
-	import BsCalendar3 from 'svelte-icons-pack/bs/BsCalendar3'
 	import AiOutlineClockCircle from 'svelte-icons-pack/ai/AiOutlineClockCircle'
+	import BsCalendar3 from 'svelte-icons-pack/bs/BsCalendar3'
 	export let dateString: any
 
 	function getFormattedTime(dateString: string) {
@@ -25,7 +25,7 @@
 	let dateFormatted = getFormattedDate(dateString)
 </script>
 
-<div class="flex gap-x-5">
+<div class="flex flex-col @lg:flex-row gap-3 @lg:gap-5">
 	<div class="flex gap-x-2 items-center">
 		<Icon src={BsCalendar3} color="#fff" size="1.3em" />
 		<p>{dateFormatted}</p>

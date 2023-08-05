@@ -27,13 +27,10 @@
 	<div
 		class="w-[calc(100%-0.2rem)] h-full flex flex-col justify-center items-center bg-black rounded-r"
 	>
-		<span
-			style={`font-size: max(${size}px)`}
-			class="text-[clamp(16px,_2vw,_24px)] font-dm uppercase tracking-[2.6px] !leading-none"
+		<span class="text-base @lg:text-2xl font-dm uppercase tracking-[2.6px] !leading-none"
 			>{MONTHS[month]}</span
 		>
 		<span
-			style={`font-size: max(${size && size + 12}px)`}
 			class="text-[clamp(24px,_3vw,_36px)] font-medium italic tracking-[0.7px] !leading-none"
 			>{day}</span
 		>

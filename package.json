@@ -61,6 +61,7 @@
     "@json2csv/plainjs": "^7.0.1",
     "@smithy/hash-stream-node": "^2.0.1",
     "@sveltejs/adapter-node": "^1.2.3",
+    "@tailwindcss/container-queries": "0.1.1",
     "@types/pg": "^8.6.6",
     "aws-jwt-verify": "^3.4.0",
     "aws-sdk": "^2.1334.0",

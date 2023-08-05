@@ -74,5 +74,7 @@ export default {
 			'4xl': '2560px'
 		}
 	},
-	plugins: []
+	plugins: [
+		require('@tailwindcss/container-queries')
+	]
 }
