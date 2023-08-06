@@ -78,56 +78,18 @@
 		id: number
 	}
 
-	const data: { banner: number[] } = { banner: [] }
-
-	export let eventData: EventData = {
-		slug: '',
-		organizerId: '',
-		typeEvent: '',
-		isFeatured: false,
-		title: '',
-		description: '',
-		bannerId: undefined,
-		pictures: [],
-		linkZoom: null,
-		language: null,
-		venue: null,
-		translation: [],
-		secondaryOrganizer: null,
-		secondaryOrganizerDescription: null,
-		speakers: [],
-		speakersSecondary: [],
-		schedule: {
-			startTime: null,
-			endTime: null,
-			visibleAt: null
-		}
-	}
-
-	function createSlug(title: string): string {
-		const slug = title.toLowerCase().replace(/\s+/g, '-')
-		return slug
-	}
-
-	function createBanner(banner: number[]): number {
-		const bannerId = Number(banner[0])
-		return bannerId
-	}
-
-	function extractSpeakerIds(speakers: Speaker[]): number[] {
-		return speakers.map((speaker) => speaker.id)
-	}
-
 	// Props
+	export let eventData: EventData
+	const data: { banner: number[] } = { banner: [] }
 	let organizerInfoEnabled: boolean = false
 	let isModalMainSpeaker = false
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
-	let eventSaved = false
-	let mainSpeakers: any[] = []
-	let secondarySpeakers: any = []
 	let venues: any[] = []
-	let eventId: number
+	export let eventSaved: boolean = false
+	export let mainSpeakers: any[] = []
+	export let secondarySpeakers: any[] = []
+	export let eventId: string
 
 	let venueColumns: Column[] = [
 		{
@@ -252,6 +214,11 @@
 			eventData.venue = venues
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
+			if (data.banner.length > 0) {
+				eventData.bannerId = createBanner(data.banner)
+			}
+			eventData.bannerId = eventData.bannerId
+			console.log(eventData)
 			const res = await fetch(`/api/events`, {
 				method: 'POST',
 				body: JSON.stringify({ ...eventData })
@@ -274,6 +241,20 @@
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
+	}
+
+	function createSlug(title: string): string {
+		const slug = title.toLowerCase().replace(/\s+/g, '-')
+		return slug
+	}
+
+	function createBanner(banner: number[]): number {
+		const bannerId = Number(banner[0])
+		return bannerId
+	}
+
+	function extractSpeakerIds(speakers: Speaker[]): number[] {
+		return speakers.map((speaker) => speaker.id)
 	}
 </script>
 
@@ -367,7 +348,6 @@
 					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 					body="600x500"
 				/>
-				<div class="hidden">{(eventData.bannerId = createBanner(data.banner))}</div>
 			</div>
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
@@ -504,7 +484,7 @@
 								placeholder={'Choose a venue'}
 								url={'/api/venues'}
 								multiselect={false}
-								selected={venues.length ? venues[0] : null}
+								selected={eventData.venue ? eventData.venue : null}
 								on:change={(e) => {
 									const venue = e.detail.selected
 									venues = [venue]
