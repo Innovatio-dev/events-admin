@@ -22,7 +22,7 @@
 
 <style lang="postcss">
 	.bgMavie {
-		@apply flex items-center justify-center w-full h-full bg-gd-main rounded-xl p-[2px] my-4 lg:min-w-[600px];
+		@apply flex items-center justify-center w-full h-full bg-gd-main rounded-xl p-[2px] my-4;
 	}
 	.bgBlack {
 		@apply flex items-center justify-center w-full h-full py-2 px-6 bg-black rounded-lg text-white;
