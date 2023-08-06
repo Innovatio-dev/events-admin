@@ -10,6 +10,7 @@
 	export let handleClose: () => void
 	export let items: { id: string; label: string }[]
 	export let events = []
+	export let loading = false
 
 	// State
 	let selectedOption: string = ''
@@ -118,7 +119,7 @@
 	</div>
 	<div class="flex w-[90%] gap-x-12 mx-auto my-6 items-center justify-center">
 		<div class="w-20">
-			<MainButton on:click={handleSubmit}>
+			<MainButton {loading} on:click={handleSubmit}>
 				{'Yes'}
 			</MainButton>
 			<Modal

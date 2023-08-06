@@ -4,13 +4,12 @@
 	import { page } from '$app/stores'
 	import { goto } from '$app/navigation'
 	// Store
-	import { pageStatus } from '$lib/stores/pageStatus'
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import ProfilePic from '$lib/components/ProfilePic.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
 	import Modal from '$lib/components/Modal.svelte'
-	import SpeakerForm from '$lib/components/custom/SpeakerForm.svelte'
 	// Icon
 	import Icon from 'svelte-icons-pack/Icon.svelte'
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
@@ -18,7 +17,8 @@
 
 	// State
 	let speaker: any = null
-	let loading: boolean = true
+	let loading = true
+	let fetchLoading = false
 
 	//  Modal
 	let isOpen = false
@@ -35,21 +35,29 @@
 	}
 
 	async function deleteSpeaker(id) {
-		loading = true
+		fetchLoading = true
 		try {
 			const res = await fetch(`/api/speakers/${id}`, {
 				method: 'DELETE'
 			})
 			if (res.ok) {
 				const data = await res.json()
-				// console.log(data)
+				$pageAlert = { message: 'Speaker deleted', status: true }
 			} else {
 				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
 			}
+			fetchLoading = false
 		} catch (error) {
 			console.error('Error:', error)
+			$pageAlert = {
+				message: 'Oops! An error has occurred. try again later.',
+				status: false
+			}
 		}
-		loading = false
 	}
 
 	async function fetchSpeaker(id) {
@@ -114,13 +122,13 @@
 	<div class="flex gap-10 mb-10">
 		<MainButton on:click={() => goto(`${$page.url}/edit`)}>
 			<div class="flex gap-3 items-center">
-				<Icon size="20" src={BiEditAlt} color="gray" />
+				<Icon size="20" src={BiEditAlt}/>
 				{'Edit'}
 			</div>
 		</MainButton>
 		<MainButton on:click={handleOpenModal}>
 			<div class="flex gap-3 items-center">
-				<Icon size="20" src={BsTrash3} color="gray" />
+				<Icon size="20" src={BsTrash3}/>
 				{'Remove'}
 			</div>
 		</MainButton>
@@ -131,7 +139,7 @@
 				</span>
 				<div class="flex w-[90%] gap-5 mx-auto items-center justify-center">
 					<div class="w-20">
-						<MainButton on:click={removeSpeaker}>
+						<MainButton loading={fetchLoading} on:click={removeSpeaker}>
 							<span class="font-light font-eesti text-sm">
 								{'Yes'}
 							</span>

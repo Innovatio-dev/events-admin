@@ -144,8 +144,8 @@
 		{/if}
 	</div>
 	<div class="flex gap-10">
-		<MainButton >Save</MainButton>
-		<MainButton {loading}on:click={onCancel}>cancel</MainButton>
+		<MainButton {loading}>Save</MainButton>
+		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>
 

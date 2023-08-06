@@ -82,8 +82,8 @@
 				youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_'),
 				logoId: organizer.logos[0]
 			}
+			await submitAction({ ...organizer, ...formattedData })
 			loading = false
-			submitAction({ ...organizer, ...formattedData })
 		}
 	}
 

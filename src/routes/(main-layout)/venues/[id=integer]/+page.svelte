@@ -2,17 +2,21 @@
 	// Svelte
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import { pageStatus } from '$lib/stores/pageStatus'
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	import { goto } from '$app/navigation'
-
 	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
 	import Modal from '$lib/components/Modal.svelte'
-	import VenueForm from '$lib/components/custom/VenueForm.svelte'
+	// Icons
+	import Icon from 'svelte-icons-pack'
+	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
+	import BsTrash3 from 'svelte-icons-pack/bs/BsTrash3'
 
+	// State
 	let venue: any = null
-	let loading: boolean = true
+	let loading = true
+	let fetchLoading = false
 
 	// Modal
 	let isOpen = false
@@ -28,21 +32,29 @@
 		goto('/venues')
 	}
 	async function deleteVenue(id) {
-		loading = true
+		fetchLoading = true
 		try {
 			const res = await fetch(`/api/venues/${id}`, {
 				method: 'DELETE'
 			})
 			if (res.ok) {
 				const data = await res.json()
-				console.log(data)
+				$pageAlert = { message: 'Venue deleted', status: true }
 			} else {
 				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
 			}
 		} catch (error) {
 			console.error('Error:', error)
+			$pageAlert = {
+				message: 'Oops! An error has occurred. try again later.',
+				status: false
+			}
 		}
-		loading = false
+		fetchLoading = false
 	}
 
 	async function fetchVenue(id) {
@@ -144,11 +156,13 @@
 	<div class="flex flex-row gap-6">
 		<div class="w-fit">
 			<MainButton href={`/venues/${$page.params.id}/edit`}>
+				<Icon size="20" src={BiEditAlt} />
 				{'Edit'}
 			</MainButton>
 		</div>
 		<div class="w-fit">
 			<MainButton on:click={handleOpenModal}>
+				<Icon size="20" src={BsTrash3} />
 				{'Remove'}
 			</MainButton>
 		</div>
@@ -160,7 +174,7 @@
 			</span>
 			<div class="flex w-[90%] gap-5 mx-auto items-center justify-center">
 				<div class="w-20">
-					<MainButton on:click={removeVenue}>
+					<MainButton loading={fetchLoading} on:click={removeVenue}>
 						<span class="font-light font-eesti text-sm">
 							{'Yes'}
 						</span>

@@ -43,6 +43,7 @@
 	const options = [{ id: 'option1', label: 'Deny application option.' }]
 	let organizer: any = null
 	let loading: boolean = true
+	let fetchLoading = false
 
 	const setDenied = async () => {
 		let reason = ''
@@ -114,7 +115,7 @@
 				<div class="w-fit">
 					<MainButton on:click={handleOpenModalApproved}>
 						<div class="flex gap-3 items-center">
-							<Icon size="20" src={BsCheck2} color="gray" />
+							<Icon size="20" src={BsCheck2} />
 							{'Approve'}
 						</div>
 					</MainButton>
@@ -128,7 +129,7 @@
 				<div class="w-fit">
 					<MainButton on:click={handleOpenModalDenied}>
 						<div class="flex gap-3 items-center">
-							<Icon size="20" src={VscClose} color="gray" />
+							<Icon size="20" src={VscClose} />
 							{'Deny'}
 						</div>
 					</MainButton>

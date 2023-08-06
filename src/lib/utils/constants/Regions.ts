@@ -300,7 +300,7 @@ export const countries = [
 		id: 34,
 		iso: 'BF',
 		name: 'BURKINA FASO',
-		nanicename: 'Burki Faso',
+		nicename: 'Burki Faso',
 		iso3: 'BFA',
 		numcode: 854,
 		phonecode: 226

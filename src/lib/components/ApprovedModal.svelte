@@ -1,6 +1,7 @@
 <script>
+	// Components
 	import MainButton from './MainButton.svelte'
-
+	// Props
 	export let text = 'Are you sure you want to approve the application?'
 	export let yesButtonText = 'Yes'
 	export let noButtonText = 'No'
@@ -15,7 +16,7 @@
 	</p>
 	<div class="flex w-full justify-center gap-5">
 		<div class="w-[5rem]">
-			<MainButton disabled={isLoading} on:click={onConfirm}>
+			<MainButton loading={isLoading} on:click={onConfirm}>
 				{yesButtonText}
 			</MainButton>
 		</div>

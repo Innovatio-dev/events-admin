@@ -28,12 +28,15 @@
 	// Icons
 	import Icon from 'svelte-icons-pack'
 	import IoClose from 'svelte-icons-pack/io/IoClose'
+	import AiOutlineReload from 'svelte-icons-pack/ai/AiOutlineReload'
+	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
 
 	// State
 	let organizer: any = null
 	let logData: any = null
 	let events = []
 	let loading: boolean = true
+	let fetchLoading = false
 
 	let data: any = null
 	let error: any = null
@@ -210,6 +213,7 @@
 	}
 
 	const suspendOrganizer = async (id, suspendReason, action = 1) => {
+		fetchLoading = true
 		try {
 			const res = await fetch(`/api/organizers/${id}`, {
 				method: 'PUT',
@@ -229,6 +233,7 @@
 					status: false
 				}
 			}
+			fetchLoading = false
 			goto('/organizers')
 		} catch (error) {
 			console.error('Error:', error)
@@ -257,7 +262,10 @@
 		<div class="flex flex-row gap-6">
 			<div class="w-fit">
 				<MainButton href={`/organizers/${$page.params.id}/edit`}>
-					{'Edit'}
+					<div class="flex gap-3 items-center">
+						<Icon size="20" src={BiEditAlt} />
+						{'Edit'}
+					</div>
 				</MainButton>
 			</div>
 			<div class="w-fit">
@@ -269,6 +277,7 @@
 				</MainButton>
 				<Modal {isOpen} handleClose={handleCloseModal} title="">
 					<SuspendOrganizer
+						loading={fetchLoading}
 						on:submit={handleSuspend}
 						{events}
 						items={options}
@@ -280,8 +289,9 @@
 	{:else if organizer?.status === 1}
 		<SuspensionData {loading} {logData} />
 		<div class="w-fit">
-			<MainButton on:click={handleOpenConfirmationModal}>
-				<div class="flex gap-5">
+			<MainButton loading={fetchLoading} on:click={handleOpenConfirmationModal}>
+				<div class="flex gap-3 items-center">
+					<Icon size="20" src={AiOutlineReload} />
 					{'Revoque Suspension'}
 				</div>
 			</MainButton>
@@ -291,6 +301,7 @@
 				text="Are you sure you would like to revoke suspension for this User?"
 				onConfirm={handleUnsuspend}
 				onCancel={handleCloseConfirmationModal}
+				isLoading={fetchLoading}
 			/>
 		</Modal>
 	{/if}
