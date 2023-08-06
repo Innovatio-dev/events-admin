@@ -61,6 +61,7 @@ export async function GET(event: RequestEvent) {
 			let name = col.name
 			if (col.name == 'uid') {
 				name = 'id'
+				order.push([name, col.type])
 			} else if (col.name == 'country') {
 				order.push(['venue','country', 'name', col.type])
 			} else {
