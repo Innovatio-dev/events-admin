@@ -3,6 +3,8 @@
 	import { goto } from '$app/navigation'
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
+	// Store
+	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	// Components
 	import MainButton from '$lib/components/MainButton.svelte'
 	import Modal from '$lib/components/Modal.svelte'
@@ -13,8 +15,6 @@
 	import VscClose from 'svelte-icons-pack/vsc/VscClose'
 	import BsCheck2 from 'svelte-icons-pack/bs/BsCheck2'
 	import Icon from 'svelte-icons-pack/Icon.svelte'
-	// Context
-	import { pageStatus } from '$lib/stores/pageStatus'
 
 	// Modal Approved
 	let isOpenApproved = false
@@ -40,12 +40,13 @@
 
 	// State
 	let selectedLabel = ''
-	const options = [{ id: 'option1', label: 'Deny application option.' }]
+	const options = [{ id: 'option1', label: 'There is some missing information about you.' }]
 	let organizer: any = null
 	let loading: boolean = true
 	let fetchLoading = false
 
 	const setDenied = async () => {
+		fetchLoading = true
 		let reason = ''
 
 		if (selectedLabel.length) {
@@ -54,26 +55,65 @@
 			let day = new Date(Date.now())
 			reason = options[0].label
 		}
-
-		const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
-			method: 'PUT',
-			body: JSON.stringify({
-				status: 2,
-				reason: reason
+		try {
+			const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
+				method: 'PUT',
+				body: JSON.stringify({
+					status: 2,
+					reason: reason
+				})
 			})
-		})
+			if (res.ok) {
+				const data = await res.json()
+				// console.log(data)
+				$pageAlert = { message: 'Organizer request dennied', status: true }
+			} else {
+				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
+			}
+			fetchLoading = false
+		} catch (error) {
+			console.error('Error:', error)
+			$pageAlert = {
+				message: 'Oops! An error has occurred. try again later.',
+				status: false
+			}
+		}
 	}
 
 	const setApproved = async () => {
+		fetchLoading = true
 		let day = new Date(Date.now())
-
-		const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
-			method: 'PUT',
-			body: JSON.stringify({
-				status: 1,
-				reason: `Approved in ${day}`
+		try {
+			const res = await fetch(`${$page.url.origin}/api/organizersRequests/${organizer.id}`, {
+				method: 'PUT',
+				body: JSON.stringify({
+					status: 1,
+					reason: `Approved in ${day}`
+				})
 			})
-		})
+			if (res.ok) {
+				const data = await res.json()
+				// console.log(data)
+				$pageAlert = { message: 'Organizer request approved', status: true }
+			} else {
+				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
+			}
+			fetchLoading = false
+		} catch (error) {
+			console.error('Error:', error)
+			$pageAlert = {
+				message: 'Oops! An error has occurred. try again later.',
+				status: false
+			}
+		}
 	}
 
 	const handleDeniedModal = async () => {
@@ -123,6 +163,7 @@
 						<ApprovedModal
 							onCancel={handleCloseModalApproved}
 							onConfirm={handleAprovedModal}
+							isLoading={fetchLoading}
 						/>
 					</Modal>
 				</div>
@@ -133,19 +174,15 @@
 							{'Deny'}
 						</div>
 					</MainButton>
-					<svelte:component
-						this={Modal}
-						isOpen={isOpenDenied}
-						handleClose={handleCloseModalDennied}
-						title=""
-					>
+					<Modal isOpen={isOpenDenied} handleClose={handleCloseModalDennied} title="">
 						<OrganizerAplication
 							handleClose={handleCloseModalDennied}
 							handleOnSubmit={handleDeniedModal}
 							items={options}
 							bind:selectedLabel
+							loading={fetchLoading}
 						/>
-					</svelte:component>
+					</Modal>
 				</div>
 			</div>
 		{/if}
