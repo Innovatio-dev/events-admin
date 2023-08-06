@@ -29,6 +29,7 @@
 	// Components
 	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
+	import UploadedImage from './UploadedImage.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
@@ -86,10 +87,12 @@
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
 	let venues: any[] = []
+	export let banner: string | null = null
 	export let eventSaved: boolean = false
 	export let mainSpeakers: any[] = []
 	export let secondarySpeakers: any[] = []
-	export let eventId: string
+	export let eventId: string | null = null
+	export let updateAction: boolean = false
 
 	let venueColumns: Column[] = [
 		{
@@ -207,6 +210,18 @@
 		}
 	]
 
+	const handleSubmit = async () => {
+		if (updateAction) {
+			loading = true
+			await updateEvent()
+			loading = false
+		} else {
+			loading = true
+			await createEvent()
+			loading = false
+		}
+	}
+
 	async function createEvent() {
 		try {
 			loading = true
@@ -240,6 +255,41 @@
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
+		}
+	}
+
+	async function updateEvent() {
+		try {
+			eventData.slug = createSlug(eventData.title)
+			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
+			eventData.speakers = extractSpeakerIds(mainSpeakers)
+			eventData.organizerId = eventData.organizerId
+			console.log(eventData)
+			loading = true
+			// Es posible que debas incluir el ID del evento en la URL del endpoint, por ejemplo: `/api/events/${eventId}`
+			const res = await fetch(`/api/events/${eventId}`, {
+				method: 'PUT',
+				body: JSON.stringify({ ...eventData })
+			})
+
+			if (res.ok) {
+				const data = await res.json()
+				$pageAlert = { message: '¡Éxito! Evento actualizado.', status: true }
+			} else {
+				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
+					status: false
+				}
+			}
+
+			loading = false
+		} catch (error) {
+			console.error('Error:', error)
+			$pageAlert = {
+				message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
+				status: false
+			}
 		}
 	}
 
@@ -340,14 +390,18 @@
 			</div>
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
-				<DragAndDrop
-					bind:uploaded={data.banner}
-					url="/api/resources"
-					name="file"
-					title="Upload your image"
-					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-					body="600x500"
-				/>
+				{#if eventData.pictures}
+					<UploadedImage image={banner ?? ''} />
+				{:else}
+					<DragAndDrop
+						bind:uploaded={data.banner}
+						url="/api/resources"
+						name="file"
+						title="Upload your image"
+						subtitle="PNG, JPG, WEBP, 2MB files are allowed"
+						body="600x500"
+					/>
+				{/if}
 			</div>
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
@@ -596,9 +650,7 @@
 					</div>
 				{/if}
 			</div>
-			<MainButton disabled={eventSaved} {loading} on:click={createEvent}
-				>Save as draft</MainButton
-			>
+			<MainButton {loading} on:click={handleSubmit}>Save as draft</MainButton>
 			{#if eventSaved}
 				<MainButton href={`/events/preview/${eventId}`}>View Preview</MainButton>
 			{:else}

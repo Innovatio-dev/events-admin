@@ -38,7 +38,6 @@
 					primarySpeakers.push(speaker)
 				} else {
 					secondarySpeakers.push(speaker)
-					console.log(secondarySpeakers)
 				}
 			}
 			$pageStatus.title = events.title

@@ -14,12 +14,14 @@
 	let mainSpeakers: any[] = []
 	let secondarySpeakers: any[] = []
 	let eventId = $page.params.id
+	let bannerImage: string
 
 	async function fetchEvents(id: string) {
 		loading = true
 		const response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
+			bannerImage = events.banner.url
 			updateEventData(events)
 		}
 		loading = false
@@ -60,7 +62,6 @@
 		eventData.secondaryOrganizerDescription = secondaryOrganizerDescription
 		mainSpeakers = eventData.speakers.filter((speaker) => speaker.primary)
 		secondarySpeakers = eventData.speakers.filter((speaker) => !speaker.primary)
-		pictures
 	}
 
 	let eventData: EventData = {
@@ -89,5 +90,13 @@
 </script>
 
 <section>
-	<EventForm {eventData} {mainSpeakers} {secondarySpeakers} eventSaved {eventId} />
+	<EventForm
+		{eventData}
+		{mainSpeakers}
+		{secondarySpeakers}
+		eventSaved={true}
+		{eventId}
+		banner={bannerImage}
+		updateAction={true}
+	/>
 </section>
