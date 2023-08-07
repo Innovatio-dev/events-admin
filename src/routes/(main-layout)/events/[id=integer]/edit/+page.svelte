@@ -3,8 +3,11 @@
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
 	import EventForm, { type EventData } from '$lib/components/custom/EventForm.svelte'
+	// Store
+	import { pageStatus } from '$lib/stores/pageStatus'
 
 	onMount(async () => {
+		$pageStatus.title = 'Edit Event'
 		const id = $page.params.id
 		await fetchEvents(id)
 	})
