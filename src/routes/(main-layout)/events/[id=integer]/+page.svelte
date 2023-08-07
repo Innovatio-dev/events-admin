@@ -465,7 +465,7 @@
 			{/if}
 		</div>
 		<div class="flex flex-row gap-6 max-w-fit">
-			<MainButton href={`/events/${$page.params.id}/edit`}>
+			<MainButton href={`/events/edit/${$page.params.id}`}>
 				<div class="flex gap-3 items-center">
 					<Icon size="20" src={BiEditAlt} />
 					{'Edit'}

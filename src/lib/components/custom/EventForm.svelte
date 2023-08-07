@@ -29,6 +29,7 @@
 	// Components
 	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
+	import UploadedImage from './UploadedImage.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
@@ -78,56 +79,20 @@
 		id: number
 	}
 
-	const data: { banner: number[] } = { banner: [] }
-
-	export let eventData: EventData = {
-		slug: '',
-		organizerId: '',
-		typeEvent: '',
-		isFeatured: false,
-		title: '',
-		description: '',
-		bannerId: undefined,
-		pictures: [],
-		linkZoom: null,
-		language: null,
-		venue: null,
-		translation: [],
-		secondaryOrganizer: null,
-		secondaryOrganizerDescription: null,
-		speakers: [],
-		speakersSecondary: [],
-		schedule: {
-			startTime: null,
-			endTime: null,
-			visibleAt: null
-		}
-	}
-
-	function createSlug(title: string): string {
-		const slug = title.toLowerCase().replace(/\s+/g, '-')
-		return slug
-	}
-
-	function createBanner(banner: number[]): number {
-		const bannerId = Number(banner[0])
-		return bannerId
-	}
-
-	function extractSpeakerIds(speakers: Speaker[]): number[] {
-		return speakers.map((speaker) => speaker.id)
-	}
-
 	// Props
+	export let eventData: EventData
+	const data: { banner: number[] } = { banner: [] }
 	let organizerInfoEnabled: boolean = false
 	let isModalMainSpeaker = false
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
-	let eventSaved = false
-	let mainSpeakers: any[] = []
-	let secondarySpeakers: any = []
 	let venues: any[] = []
-	let eventId: number
+	export let banner: string | null = null
+	export let eventSaved: boolean = false
+	export let mainSpeakers: any[] = []
+	export let secondarySpeakers: any[] = []
+	export let eventId: string | null = null
+	export let updateAction: boolean = false
 
 	let venueColumns: Column[] = [
 		{
@@ -245,6 +210,18 @@
 		}
 	]
 
+	const handleSubmit = async () => {
+		if (updateAction) {
+			loading = true
+			await updateEvent()
+			loading = false
+		} else {
+			loading = true
+			await createEvent()
+			loading = false
+		}
+	}
+
 	async function createEvent() {
 		try {
 			loading = true
@@ -252,6 +229,11 @@
 			eventData.venue = venues
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
+			if (data.banner.length > 0) {
+				eventData.bannerId = createBanner(data.banner)
+			}
+			eventData.bannerId = eventData.bannerId
+			console.log(eventData)
 			const res = await fetch(`/api/events`, {
 				method: 'POST',
 				body: JSON.stringify({ ...eventData })
@@ -274,6 +256,55 @@
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
+	}
+
+	async function updateEvent() {
+		try {
+			eventData.slug = createSlug(eventData.title)
+			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
+			eventData.speakers = extractSpeakerIds(mainSpeakers)
+			eventData.organizerId = eventData.organizerId
+			console.log(eventData)
+			loading = true
+			// Es posible que debas incluir el ID del evento en la URL del endpoint, por ejemplo: `/api/events/${eventId}`
+			const res = await fetch(`/api/events/${eventId}`, {
+				method: 'PUT',
+				body: JSON.stringify({ ...eventData })
+			})
+
+			if (res.ok) {
+				const data = await res.json()
+				$pageAlert = { message: '¡Éxito! Evento actualizado.', status: true }
+			} else {
+				console.log(await res.json())
+				$pageAlert = {
+					message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
+					status: false
+				}
+			}
+
+			loading = false
+		} catch (error) {
+			console.error('Error:', error)
+			$pageAlert = {
+				message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
+				status: false
+			}
+		}
+	}
+
+	function createSlug(title: string): string {
+		const slug = title.toLowerCase().replace(/\s+/g, '-')
+		return slug
+	}
+
+	function createBanner(banner: number[]): number {
+		const bannerId = Number(banner[0])
+		return bannerId
+	}
+
+	function extractSpeakerIds(speakers: Speaker[]): number[] {
+		return speakers.map((speaker) => speaker.id)
 	}
 </script>
 
@@ -359,15 +390,18 @@
 			</div>
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
-				<DragAndDrop
-					bind:uploaded={data.banner}
-					url="/api/resources"
-					name="file"
-					title="Upload your image"
-					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-					body="600x500"
-				/>
-				<div class="hidden">{(eventData.bannerId = createBanner(data.banner))}</div>
+				{#if eventData.pictures}
+					<UploadedImage image={banner ?? ''} />
+				{:else}
+					<DragAndDrop
+						bind:uploaded={data.banner}
+						url="/api/resources"
+						name="file"
+						title="Upload your image"
+						subtitle="PNG, JPG, WEBP, 2MB files are allowed"
+						body="600x500"
+					/>
+				{/if}
 			</div>
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
@@ -504,7 +538,7 @@
 								placeholder={'Choose a venue'}
 								url={'/api/venues'}
 								multiselect={false}
-								selected={venues.length ? venues[0] : null}
+								selected={eventData.venue ? eventData.venue : null}
 								on:change={(e) => {
 									const venue = e.detail.selected
 									venues = [venue]
@@ -616,9 +650,7 @@
 					</div>
 				{/if}
 			</div>
-			<MainButton disabled={eventSaved} {loading} on:click={createEvent}
-				>Save as draft</MainButton
-			>
+			<MainButton {loading} on:click={handleSubmit}>Save as draft</MainButton>
 			{#if eventSaved}
 				<MainButton href={`/events/preview/${eventId}`}>View Preview</MainButton>
 			{:else}

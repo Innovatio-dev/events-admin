@@ -15,6 +15,7 @@
 	import Icon from 'svelte-icons-pack'
 	import CgAdd from 'svelte-icons-pack/cg/CgAdd'
 	import FiCopy from 'svelte-icons-pack/fi/FiCopy'
+	import VenueCard from '$lib/components/preview/VenueCard.svelte'
 
 	let events: any = null
 	let loading: boolean = true
@@ -22,6 +23,8 @@
 	let secondarySpeakers: any[] = []
 	let id: string = $page.params.id
 	let isMobile = false
+	let typeTitle: string = ''
+	let typeEvent
 
 	onMount(async () => {
 		let id = $page.params.id
@@ -33,12 +36,17 @@
 		let response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
+			typeEvent = events.typeEvent
+			if (typeEvent === 1) {
+				typeTitle = 'Venue'
+			} else {
+				typeTitle = 'Join our Zoom'
+			}
 			for (const speaker of events.eventSpeakers) {
 				if (speaker.primary) {
 					primarySpeakers.push(speaker)
 				} else {
 					secondarySpeakers.push(speaker)
-					console.log(secondarySpeakers)
 				}
 			}
 			$pageStatus.title = events.title
@@ -155,57 +163,70 @@
 					{/if}
 				</EventSection>
 				<!-- Language -->
-				<EventSection title={'Language'}>
-					{#if loading}
-						<div class="flex flex-col gap-y-4">
-							<Skeleton wFull height={200} />
-							<Skeleton wFull height={120} />
-						</div>
-					{:else if events.language}
-						<div class="flex items-center gap-x-12">
-							<div>
-								<div>
-									<p>Primary Language</p>
-								</div>
-								{#if events.language}
-									<div
-										class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
-									>
-										<svelte:component
-											this={Flag[capText(events.language.flagIso)]}
-											size="20"
-										/>
-										{events.language.name}
-									</div>
-								{/if}
+				{#if typeEvent === 0}
+					<EventSection title={'Language'}>
+						{#if loading}
+							<div class="flex flex-col gap-y-4">
+								<Skeleton wFull height={200} />
+								<Skeleton wFull height={120} />
 							</div>
-							<div>
+						{:else if events.language}
+							<div class="flex items-center gap-x-12">
 								<div>
-									<p>Translations</p>
-								</div>
-								{#if events.translation}
-									<div class="flex gap-x-4">
-										{#each events.translation as translation}
-											<div
-												class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
-											>
-												<svelte:component
-													this={Flag[capText(translation.flagIso)]}
-													size="20"
-												/>
-												{translation.name}
-											</div>
-										{/each}
+									<div>
+										<p>Primary Language</p>
 									</div>
-								{/if}
+									{#if events.language}
+										<div
+											class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+										>
+											<svelte:component
+												this={Flag[capText(events.language.flagIso)]}
+												size="20"
+											/>
+											{events.language.name}
+										</div>
+									{/if}
+								</div>
+								<div>
+									<div>
+										<p>Translations</p>
+									</div>
+									{#if events.translation}
+										<div class="flex gap-x-4">
+											{#each events.translation as translation}
+												<div
+													class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+												>
+													<svelte:component
+														this={Flag[capText(translation.flagIso)]}
+														size="20"
+													/>
+													{translation.name}
+												</div>
+											{/each}
+										</div>
+									{/if}
+								</div>
 							</div>
-						</div>
-					{:else}
-						<p>No Language specified</p>
-					{/if}
-				</EventSection>
+						{:else}
+							<p>No Language specified</p>
+						{/if}
+					</EventSection>
+				{/if}
 				<div>
-					<EventSection title={'Join our zoom'}>
+					<EventSection title={typeTitle}>
+						{#if typeEvent === 1}
+							<VenueCard
+								image={events.venue.pictures[0].url}
+								title={events.venue.name}
+								content={events.venue.description}
+								continent={events.venue.region.name}
+								country={events.venue.country.nicename}
+								city={events.venue.city}
+								location={events.venue.city}
+							/>
+						{/if}
 						{#if loading}
 							<div class="flex flex-col gap-y-4 w-[115%] -ml-[9%]">
 								<Skeleton wFull height={700} />
@@ -214,33 +235,37 @@
 							<div
 								class="flex flex-col justify-between bg-black w-[115%] h-fit relative -ml-[9%]"
 							>
-								<div
-									class="flex items-center justify-start gap-x-4 px-6 py-4 h-fit"
-								>
-									<div class="flex items-center justify-center gap-x-2">
-										<Icon src={CgAdd} size={'2rem'} />
-										<div>invite</div>
-									</div>
+								{#if events.typeEvent}
 									<div
-										class="flex items-center bg-brand-gray border-[1px] border-neutral-4 py-2 px-4 rounded-lg h-[40px]"
+										class="flex items-center justify-start gap-x-4 px-6 py-4 h-fit"
 									>
-										<a
-											href="www.zoomlink"
-											target="_blank"
-											class="underline text-brand-cyan text-xs"
+										<div class="flex items-center justify-center gap-x-2">
+											<Icon src={CgAdd} size={'2rem'} />
+											<div>invite</div>
+										</div>
+										<div
+											class="flex items-center bg-brand-gray border-[1px] border-neutral-4 py-2 px-4 rounded-lg h-[40px]"
 										>
-											{events.linkZoom}
-										</a>
+											<a
+												href="www.zoomlink"
+												target="_blank"
+												class="underline text-brand-cyan text-xs"
+											>
+												{events.linkZoom}
+											</a>
+										</div>
+										<div
+											class="flex items-center justify-center bg-brand-gray border-[1px] border-neutral-4 w-[40px] h-[40px] rounded-lg"
+										>
+											<Icon src={FiCopy} />
+										</div>
 									</div>
-									<div
-										class="flex items-center justify-center bg-brand-gray border-[1px] border-neutral-4 w-[40px] h-[40px] rounded-lg"
-									>
-										<Icon src={FiCopy} />
+								{/if}
+								{#if events.pictures}
+									<div class="w-full h-[500px] overflow-hidden">
+										<Carousel images={events.pictures} />
 									</div>
-								</div>
-								<div class="w-full h-[500px] overflow-hidden">
-									<Carousel images={events.pictures} />
-								</div>
+								{/if}
 								<div class="flex items-center justify-center w-full mx-auto py-6">
 									<MarkButton text="Mark the date" />
 								</div>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Icon from 'svelte-icons-pack'
+	import TiLocation from 'svelte-icons-pack/ti/TiLocation'
 	import BiSolidVideo from 'svelte-icons-pack/bi/BiSolidVideo'
 	import LocalTimeEvent from '../LocalTimeEvent.svelte'
 	import Skeleton from '../skeletons/Skeleton.svelte'
@@ -60,9 +61,12 @@
 						<div class="flex items-center text-white! gap-x-3">
 							{#if loading}
 								<Skeleton width={100} height={15} />
-							{:else if events.type === 0}
+							{:else if events.typeEvent === 0}
 								<Icon src={BiSolidVideo} color="#fff" size="1.5em" />
 								<span class="w-max underline text-brand-cyan">Zoom Link</span>
+							{:else if events.typeEvent === 1}
+								<Icon src={TiLocation} color="#fff" size="1.5em" />
+								<span class="w-max">{events.venue.name}-{events.venue.city}</span>
 							{/if}
 						</div>
 					</div>
