@@ -151,8 +151,8 @@
 				<div class="content">
 					<p>{events.status === 0 ? 'Inactive ' : 'Active'}</p>
 					<p>{events.uid ?? '---'}</p>
-					<p>{events.createdAt ?? '---'}</p>
-					<p>{events.updatedAt ?? '---'}</p>
+					<p>{formatDate(events.createdAt) ?? '---'}</p>
+					<p>{formatDate(events.updatedAt) ?? '---'}</p>
 				</div>
 			{/if}
 		</div>

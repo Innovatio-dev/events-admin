@@ -153,8 +153,8 @@ export const init = (sequelize: Sequelize) => {
 				'regionId',
 				'countryId',
 				'organizerId',
-				'createdAt',
-				'updatedAt',
+				// 'createdAt',
+				// 'updatedAt',
 				'deletedAt',
 				'notes'
 			]
