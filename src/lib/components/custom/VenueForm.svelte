@@ -1,6 +1,17 @@
+<script context="module" lang="ts">
+	interface Venue {
+		id?: number
+		name: string
+		country: string
+		city: string
+		address: string
+		location: { lat: string; lng: string }
+		description: string
+		pictures: number[]
+	}
+</script>
+
 <script lang="ts">
-	// Svelte
-	import { goto } from '$app/navigation'
 	// Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '../MainButton.svelte'
@@ -12,17 +23,6 @@
 	import ToggleButtton from '../ToggleButtton.svelte'
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
-
-	interface Venue {
-		id?: number
-		name: string
-		country: string
-		city: string
-		address: string
-		location: { lat: string; lng: string }
-		description: string
-		pictures?: number[]
-	}
 
 	// Props
 	export let addVenue: any = null
@@ -36,7 +36,8 @@
 		city: '',
 		address: '',
 		location: { lat: '', lng: '' },
-		description: ''
+		description: '',
+		pictures: []
 	}
 	let geoData = {
 		country: '',
@@ -44,6 +45,7 @@
 		address: '',
 		location: { lat: '', lng: '' }
 	}
+	let extraPictures = []
 	let updatedVenue = {}
 	let loading = false
 
@@ -66,7 +68,12 @@
 			loading = false
 		} else {
 			loading = true
-			await submitAction({ ...venue, ...geoData })
+			const formattedData = {
+				...venue,
+				...geoData,
+				pictures: [venue.pictures[0], ...extraPictures]
+			}
+			await submitAction(formattedData)
 			loading = false
 		}
 	}
@@ -119,6 +126,8 @@
 			<UploadedImage image={addVenue.pictures[0]?.url ?? ''} />
 		{:else}
 			<DragAndDrop
+				multiple={false}
+				bind:uploaded={extraPictures}
 				url="/api/resources"
 				name="file"
 				title="Upload your image"
