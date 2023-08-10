@@ -260,7 +260,9 @@
 		/>
 	{/if}
 	{#if !loading && !data?.results.length}
-		<EmptyResults />
+		<EmptyResults
+			title="No results found / try adjusting your search or filter to find what you’re looking for"
+		/>
 	{/if}
 </section>
 

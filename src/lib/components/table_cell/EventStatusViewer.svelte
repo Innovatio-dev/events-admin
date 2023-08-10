@@ -17,7 +17,7 @@
 		{:else if value == 1}
 			{'Published'}
 		{:else if value == 2}
-			{'Canceled'}
+			{'Cancelled'}
 		{:else}
 			{'Suspended'}
 		{/if}

@@ -33,6 +33,7 @@
 		mapArrayIntoCollectionOrder,
 		validateUrlSearchParams
 	} from '$lib/utils/validation/validation'
+	import EmptyResults from '$lib/components/EmptyResults.svelte'
 
 	let loading: boolean = true
 	let data: any = null
@@ -129,9 +130,10 @@
 
 	const locations = [
 		{ value: 0, title: 'South America', variant: 'secondary' },
-		{ value: 1, title: 'Asia', variant: 'secondary' },
-		{ value: 2, title: 'Europe', variant: 'secondary' },
-		{ value: 3, title: 'Virtual', variant: 'secondary' }
+		{ value: 1, title: 'North America', variant: 'secondary' },
+		{ value: 2, title: 'Asia', variant: 'secondary' },
+		{ value: 3, title: 'Europe', variant: 'secondary' },
+		{ value: 4, title: 'Virtual', variant: 'secondary' }
 	]
 
 	const statuses = [
@@ -185,7 +187,7 @@
 				data.results = data.results.map((item) => ({
 					...item,
 					link: `/events/${item.id}`,
-					country:item.venue.country
+					country: item.venue.country
 				}))
 				pageCount = Math.ceil(data.count / itemsPerPage)
 			}
@@ -280,7 +282,7 @@
 				items={statuses}
 				bind:selected={params.status}
 				multiselect
-			on:change={(event) => {
+				on:change={(event) => {
 					const selected = event.detail.selected
 					const values = selected.map((status) => status.value)
 					gotoFilter({
@@ -354,6 +356,11 @@
 			sortedColumns={params.order}
 			{loading}
 			{pageCount}
+		/>
+	{/if}
+	{#if !loading && !data?.results.length}
+		<EmptyResults
+			title="No results found / try adjusting your search or filter to find what you’re looking for"
 		/>
 	{/if}
 </section>

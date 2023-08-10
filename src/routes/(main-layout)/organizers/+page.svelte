@@ -28,6 +28,7 @@
 	} from '$lib/utils/validation/validation'
 	import { createDebouncer } from '$lib/utils/debounce'
 	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
+	import EmptyResults from '$lib/components/EmptyResults.svelte'
 
 	let loading: boolean = true
 	let data: any = null
@@ -318,6 +319,11 @@
 			sortedColumns={params.order}
 			{loading}
 			{pageCount}
+		/>
+	{/if}
+	{#if !loading && !data?.results.length}
+		<EmptyResults
+			title="No results found / try adjusting your search or filter to find what you’re looking for"
 		/>
 	{/if}
 </section>
