@@ -1,5 +1,10 @@
 <script lang="ts">
+	//Utils
+	import { pageAlert, pageStatus } from '$lib/stores/pageStatus'
+	import { onMount } from 'svelte'
+	import * as Flag from 'svelte-flag-icons'
 	import { page } from '$app/stores'
+	//Components
 	import Carousel from '$lib/components/preview/Carousel.svelte'
 	import EventMeta from '$lib/components/preview/EventMeta.svelte'
 	import EventSection from '$lib/components/preview/EventSection.svelte'
@@ -7,16 +12,15 @@
 	import PrimaryCard from '$lib/components/preview/PrimaryCard.svelte'
 	import SecondaryCard from '$lib/components/preview/SecondaryCard.svelte'
 	import Skeleton from '$lib/components/skeletons/Skeleton.svelte'
-	import { pageStatus } from '$lib/stores/pageStatus'
-	import { onMount } from 'svelte'
-	import * as Flag from 'svelte-flag-icons'
+	import VenueCard from '$lib/components/preview/VenueCard.svelte'
+	import Modal from '$lib/components/Modal.svelte'
+	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
 	// Icons
 	import MainButton from '$lib/components/preview/MainButton.svelte'
 	import Icon from 'svelte-icons-pack'
 	import CgAdd from 'svelte-icons-pack/cg/CgAdd'
 	import FiCopy from 'svelte-icons-pack/fi/FiCopy'
-	import VenueCard from '$lib/components/preview/VenueCard.svelte'
-
+	//Props
 	let events: any = null
 	let loading: boolean = true
 	let primarySpeakers: any[] = []
@@ -25,6 +29,29 @@
 	let isMobile = false
 	let typeTitle: string = ''
 	let typeEvent
+	// Modal
+	let isOpen = false
+	let isOpenDraft = false
+	const handleOpenModal = () => {
+		isOpen = true
+	}
+	const handleOpenDraftModal = () => {
+		isOpenDraft = true
+	}
+	const handleCloseModal = () => {
+		isOpen = false
+	}
+	const handleCloseDraftModal = () => {
+		isOpenDraft = false
+	}
+	async function handleConfirm() {
+		await changeStatus(1)
+		handleCloseModal()
+	}
+	async function handleConfirmDraft() {
+		await changeStatus(2)
+		handleCloseModal()
+	}
 
 	onMount(async () => {
 		let id = $page.params.id
@@ -36,26 +63,54 @@
 		let response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
+			//Change TypeEvent section
 			typeEvent = events.typeEvent
-			if (typeEvent === 1) {
-				typeTitle = 'Venue'
-			} else {
-				typeTitle = 'Join our Zoom'
-			}
-			for (const speaker of events.eventSpeakers) {
-				if (speaker.primary) {
-					primarySpeakers.push(speaker)
-				} else {
-					secondarySpeakers.push(speaker)
-				}
-			}
+			typeTitle = typeEvent === 1 ? 'Venue' : 'Join our Zoom'
+			//Filter speakers
+			primarySpeakers = events.eventSpeakers.filter((speaker) => speaker.primary)
+			secondarySpeakers = events.eventSpeakers.filter((speaker) => !speaker.primary)
 			$pageStatus.title = events.title
 		}
 		loading = false
 	}
 
+	const changeStatus = async (publishStatus) => {
+		try {
+			const response = await fetch(`/api/events/${id}`, {
+				method: 'PUT',
+				body: JSON.stringify({ status: publishStatus, reason: '' })
+			})
+			if (response.ok) {
+				events.status = publishStatus
+				if (publishStatus == 1) {
+					$pageAlert = {
+						message: publishStatus && 'Event Published',
+						status: true
+					}
+				} else if (publishStatus == 2) {
+					$pageAlert = {
+						message: publishStatus && 'Event saved as draft',
+						status: true
+					}
+				}
+			} else {
+				console.log(await response.json())
+				$pageAlert = {
+					message: 'Oops! An error has occurred. try again later.',
+					status: false
+				}
+			}
+		} catch (error) {
+			console.error('Error de red:', error)
+		}
+	}
+
 	function capText(text) {
 		return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
+	}
+
+	function goBack() {
+		history.back()
 	}
 </script>
 
@@ -289,13 +344,29 @@
 			</div>
 		</div>
 		<div class="flex items-center justify-center flex-col w-full mx-auto pt-32">
-			<MainButton title="Publish Event" href="/" />
-			<MainButton title="Save it in draft" href="/" />
-			<MainButton title="Edit" href={`/events/edit/${id}`} />
-			<MainButton title="Close preview" href="/" />
+			<MainButton title="Publish Event" handleClick={handleOpenModal} />
+			<MainButton title="Save it in draft" handleClick={handleOpenDraftModal} />
+			<MainButton title="Edit" href={`/events/${id}/edit`} />
+			<MainButton title="Close preview" handleClick={goBack} />
 		</div>
 	</div>
 </section>
+<div class="w-full fixed max-h-screen z-50 px-16">
+	<Modal isOpen={isOpenDraft} handleClose={handleCloseDraftModal}>
+		<ApprovedModal
+			text="Are you sure you would like to save as draft this event?"
+			onConfirm={handleConfirmDraft}
+			onCancel={handleCloseDraftModal}
+		/>
+	</Modal>
+	<Modal {isOpen} handleClose={handleCloseModal}>
+		<ApprovedModal
+			text="Are you sure you would like to publish this event?"
+			onConfirm={handleConfirm}
+			onCancel={handleCloseModal}
+		/>
+	</Modal>
+</div>
 
 <style>
 	div {

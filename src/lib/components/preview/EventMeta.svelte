@@ -8,11 +8,6 @@
 	import MarkButton from './MarkButton.svelte'
 	export let events: any
 	export let loading: boolean
-
-	console.log(events)
-	function capText(text) {
-		return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
-	}
 </script>
 
 <div

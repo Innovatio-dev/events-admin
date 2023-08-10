@@ -652,7 +652,7 @@
 			</div>
 			<MainButton {loading} on:click={handleSubmit}>Save as draft</MainButton>
 			{#if eventSaved}
-				<MainButton href={`/events/preview/${eventId}`}>View Preview</MainButton>
+				<MainButton href={`/events/${eventId}/preview`}>View Preview</MainButton>
 			{:else}
 				<MainButton disabled={!eventSaved}>View Preview</MainButton>
 			{/if}

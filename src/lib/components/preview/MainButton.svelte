@@ -5,7 +5,7 @@
 </script>
 
 {#if href}
-	<a {href} class="hover:no-underline">
+	<a {href} class="hover:no-underline w-[80%]">
 		<button class="bgMavie">
 			<div class="bgBlack">
 				{title}
@@ -13,7 +13,7 @@
 		</button>
 	</a>
 {:else}
-	<button class="bgMavie" on:click={handleClick}>
+	<button class="bgMavie !w-[80%]" on:click={handleClick}>
 		<div class="bgBlack">
 			{title}
 		</div>
