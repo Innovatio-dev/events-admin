@@ -115,14 +115,13 @@
 	]
 
 	const statuses = [
-		{ value: 0, title: 'Inactive', variant: 'alert' },
-		{ value: 1, title: 'Active', variant: 'success' },
-		{ value: 2, title: 'Suspended', variant: 'error' }
+		{ value: 1, title: 'Inactive', variant: 'alert' },
+		{ value: 0, title: 'Active', variant: 'success' }
 	]
 
 	const types = [
-		{ value: 0, title: 'Live Events', variant: 'secondary' },
-		{ value: 1, title: 'Virtual', variant: 'secondary' }
+		{ value: 0, title: 'Virtual', variant: 'secondary' },
+		{ value: 1, title: 'Live Events', variant: 'secondary' }
 	]
 
 	afterNavigate(async () => {
