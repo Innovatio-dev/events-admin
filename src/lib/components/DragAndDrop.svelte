@@ -247,7 +247,9 @@
 							</div>
 						</div>
 					{/each}
-					<MainButton on:click={() => inputRef.click()}>Upload photo</MainButton>
+					<MainButton type="button" on:click={() => inputRef.click()}
+						>Upload photo</MainButton
+					>
 				</div>
 			</div>
 		</div>

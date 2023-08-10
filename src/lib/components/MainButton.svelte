@@ -7,6 +7,7 @@
 	export let loading = false
 	export let fit = false
 	export let href: string | undefined = undefined
+	export let type: any = undefined
 
 	const disabledStyle = 'bg-neutral-1 text-neutral-4 border-0 pointer-events-none'
 
@@ -19,6 +20,7 @@
 {#if href}
 	<a {href} class="hover:no-underline">
 		<button
+			{type}
 			class="{disabled ? disabledStyle : ''} {loading
 				? 'cursor-wait'
 				: ''} hover:no-underline group test hover:bg-gd-icon hover:!text-white hover:!fill-white hover:border-neutral-1 border-2 border-neutral-2 text-neutral-4 fill-neutral-4 p-2 flex w-full justify-evenly gap-2 rounded-lg font-medium transition-all ease-in-out px-4 py-2 items-center"
@@ -39,6 +41,7 @@
 	</a>
 {:else}
 	<button
+		{type}
 		style={`${fit ? 'width: fit-content' : ''}`}
 		class="{disabled ? disabledStyle : ''} {loading
 			? 'cursor-wait'

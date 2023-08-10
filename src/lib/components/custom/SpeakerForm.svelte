@@ -61,6 +61,7 @@
 		} else {
 			loading = true
 			const formattedData = {
+				...speaker,
 				twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
 				facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
 				instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
@@ -68,7 +69,7 @@
 				youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
 				pictureId: speaker.picture[0]
 			}
-			await submitAction({ ...speaker, ...formattedData })
+			await submitAction(formattedData)
 			loading = false
 		}
 	}

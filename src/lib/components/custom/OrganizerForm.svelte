@@ -31,7 +31,6 @@
 		youtube: string
 		description: string
 		countryId: any
-		logos: number[]
 	}
 
 	// Props
@@ -55,7 +54,7 @@
 		youtube: '',
 		description: '',
 		countryId: '',
-		logos: []
+		logo: null
 	}
 	let updatedOrganizer = {
 		status: addOrganizer?.status,
@@ -76,13 +75,15 @@
 		} else {
 			loading = true
 			const formattedData = {
+				...organizer,
 				twitter: 'https://twitter.com/' + organizer.twitter.replace(/\s/g, '_'),
 				facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
 				instagram: 'https://instagram.com/' + organizer.instagram.replace(/\s/g, '_'),
 				youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_'),
-				logoId: organizer.logos[0]
+				logoId: organizer.logo[0]
 			}
-			await submitAction({ ...organizer, ...formattedData })
+			await submitAction(formattedData)
+			console.log(formattedData)
 			loading = false
 		}
 	}
@@ -207,7 +208,7 @@
 		<UploadedImage image={addOrganizer.logo?.url ?? ''} />
 	{:else}
 		<DragAndDrop
-			bind:uploaded={organizer.logos}
+			bind:uploaded={organizer.logo}
 			url="/api/resources"
 			name="file"
 			title="Upload your image (Optional)"
