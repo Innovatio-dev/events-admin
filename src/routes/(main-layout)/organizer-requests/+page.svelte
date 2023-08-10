@@ -253,7 +253,7 @@
 		/>
 	{/if}
 	{#if !loading && !data?.results.length}
-		<EmptyResults />
+		<EmptyResults title="There are no organizer requests" />
 	{/if}
 </section>
 

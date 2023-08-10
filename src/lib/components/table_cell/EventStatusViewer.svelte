@@ -17,7 +17,7 @@
 		{:else if value == 1}
 			{'Published'}
 		{:else if value == 2}
-			{'Canceled'}
+			{'Cancelled'}
 		{:else}
 			{'Suspended'}
 		{/if}
@@ -29,15 +29,15 @@
 
 <style lang="scss">
 	.draft {
-		background-color: var(--alert-success);
-		box-shadow: 0px 4px 4px #8bc510;
+		background-color: var(--alert-warning);
+		box-shadow: 0px 4px 4px #ffe587;
 	}
 	.draft > :first-child {
 		left: -50%;
 	}
 	.published {
-		background-color: var(--alert-warning);
-		box-shadow: 0px 4px 4px #FFE587;
+		background-color: var(--alert-success);
+		box-shadow: 0px 4px 4px #8bc510;
 	}
 	.published > :first-child {
 		left: -110%;
@@ -51,7 +51,7 @@
 	}
 	.suspended {
 		background-color: var(--primary-purple);
-		box-shadow: 0px 4px 4px #6750A3;
+		box-shadow: 0px 4px 4px #6750a3;
 	}
 	.suspended > :first-child {
 		left: -110%;

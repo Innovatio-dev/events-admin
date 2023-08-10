@@ -22,6 +22,7 @@
 	import LocationViewer from '$lib/components/table_cell/LocationViewer.svelte'
 	import { organizerListSchema } from '$lib/utils/validation/schemas'
 	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
+	import EmptyResults from '$lib/components/EmptyResults.svelte'
 
 	let inputElement
 	let loading: boolean = true
@@ -241,6 +242,12 @@
 			sortedColumns={params.order}
 			{loading}
 			{pageCount}
+		/>
+	{/if}
+	{#if !loading && !data?.results.length}
+		<EmptyResults
+			title="No results found"
+			text="Try adjusting your search or filter to find what you’re looking for"
 		/>
 	{/if}
 </section>
