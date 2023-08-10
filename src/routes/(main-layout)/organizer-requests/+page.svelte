@@ -22,7 +22,6 @@
 	} from '$lib/utils/validation/validation'
 	// Icons
 	import Icon from 'svelte-icons-pack'
-	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
 	// Constants
 	import { OrganizerRequestColumns } from '$lib/utils/constants/ListTables'
@@ -156,7 +155,6 @@
 	<title>Organizer</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
-
 <section class="flex flex-col w-full px-4">
 	<div class="flex justify-between pt-12">
 		<div>
@@ -253,9 +251,13 @@
 		/>
 	{/if}
 	{#if !loading && !data?.results.length}
-		<EmptyResults title="There are no organizer requests" />
+		<EmptyResults
+			title={`${!params.search ? 'Hurray!' : 'No results found'} `}
+			text={` ${
+				!params.search
+					? 'You don’t have more organizer requests to review'
+					: 'Try adjusting your search or filter to find what you’re looking for'
+			}`}
+		/>
 	{/if}
 </section>
-
-<style>
-</style>
