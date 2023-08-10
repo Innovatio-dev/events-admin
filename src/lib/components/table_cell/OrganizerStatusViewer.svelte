@@ -30,8 +30,8 @@
 		left: -60%;
 	}
 	.suspended {
-		background-color: var(--alert-warning);
-		box-shadow: 0px 4px 4px #FFE587;
+		background-color: var(--alert-error);
+		box-shadow: 0px 4px 4px #d33030;
 	}
 	.suspended > :first-child {
 		left: -110%;

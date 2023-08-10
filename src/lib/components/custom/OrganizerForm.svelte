@@ -83,7 +83,7 @@
 				logoId: organizer.logo[0]
 			}
 			await submitAction(formattedData)
-			console.log(formattedData)
+			// console.log(formattedData)
 			loading = false
 		}
 	}
