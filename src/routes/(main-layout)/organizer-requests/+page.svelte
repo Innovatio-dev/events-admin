@@ -160,7 +160,7 @@
 <section class="flex flex-col w-full px-4">
 	<div class="flex justify-between pt-12">
 		<div>
-			<h2>Organizer Request</h2>
+			<h2>{'Organizer Requests'}</h2>
 		</div>
 		<div class="flex gap-x-4 max-h-12 z-50">
 			<Input
