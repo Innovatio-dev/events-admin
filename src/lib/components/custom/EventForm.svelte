@@ -379,6 +379,13 @@
 			</div>
 			<div>
 				<SectionHeader>Event Photo</SectionHeader>
+				{#if eventData.pictures}
+					{#each eventData.pictures as picture}
+						<div class="flex flex-wrap">
+							<UploadedImage image={picture.url} />
+						</div>
+					{/each}
+				{/if}
 				<DragAndDrop
 					bind:uploaded={eventData.pictures}
 					url="/api/resources"
@@ -390,7 +397,7 @@
 			</div>
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
-				{#if eventData.pictures}
+				{#if eventData.pictures.length > 0}
 					<UploadedImage image={banner ?? ''} />
 				{:else}
 					<DragAndDrop
