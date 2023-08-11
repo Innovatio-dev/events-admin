@@ -29,15 +29,18 @@
 	let files: FileUpload[] = []
 	let inputRef: HTMLInputElement
 
+	const allowedFormats = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp']
+
 	function handleDrop(event: any) {
 		event.preventDefault()
 		for (const file of event.dataTransfer.files) {
 			if (file.size > 2097152) {
 				alert('File is too big!')
-			} else if (file.type != ('image/png' || 'image/jpg' || 'image/jpeg' || 'image/webp')) {
-				alert("File's format not supported")
-			} else {
+			} else if (allowedFormats.includes(file.type)) {
 				uploadFile(file)
+				console.log(file)
+			} else {
+				alert("File's format not supported")
 			}
 		}
 	}
@@ -50,11 +53,11 @@
 		for (const file of inputRef.files || []) {
 			if (file.size > 2097152) {
 				alert('File is too big!')
-			} else if (file.type != ('image/png' || 'image/jpg' || 'image/jpeg' || 'image/webp')) {
-				alert("File's format not supported")
-			} else {
-				console.log(file)
+			} else if (allowedFormats.includes(file.type)) {
 				uploadFile(file)
+				console.log(file)
+			} else {
+				alert("File's format not supported")
 			}
 		}
 	}
@@ -163,7 +166,7 @@
 	<input
 		bind:this={inputRef}
 		on:change={handleInputFile}
-		accept=".png,jpg,.jpeg,.webp"
+		accept=".png,.jpg,.jpeg,.webp"
 		type="file"
 		hidden
 		{multiple}
