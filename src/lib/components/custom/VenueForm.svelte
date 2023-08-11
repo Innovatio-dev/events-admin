@@ -132,7 +132,7 @@
 				name="file"
 				title="Upload your image"
 				subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-				body="1000x1000"
+				body="510x410"
 			/>
 		{/if}
 		<div class="w-full flex gap-5 my-3 items-center">
@@ -157,7 +157,7 @@
 			name="file"
 			title="Upload your image"
 			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-			body="600x500"
+			body="700x410"
 		/>
 		<span
 			class="w-full h-10 rounded-xl bg-alert-warning my-3 text-sm flex items-center pl-5 gap-3"
