@@ -42,7 +42,6 @@
 		typeEvent: [],
 		status: [],
 		order: [],
-		locations: [],
 		search: null,
 		page: 1
 	}
@@ -127,16 +126,16 @@
 		}
 	]
 
-	const locations = [
-		{ value: 0, title: 'Asia', variant: 'secondary' },
-		{ value: 1, title: 'Africa', variant: 'secondary' },
-		{ value: 2, title: 'North America', variant: 'secondary' },
-		{ value: 3, title: 'Europe', variant: 'secondary' },
-		{ value: 4, title: 'Oceania', variant: 'secondary' },
-		{ value: 5, title: 'South America', variant: 'secondary' },
-		{ value: 6, title: 'Antartica', variant: 'secondary' },
-		{ value: 7, title: 'Virtual', variant: 'secondary' }
-	]
+	// const locations = [
+	// 	{ value: 0, title: 'Asia', variant: 'secondary' },
+	// 	{ value: 1, title: 'Africa', variant: 'secondary' },
+	// 	{ value: 2, title: 'North America', variant: 'secondary' },
+	// 	{ value: 3, title: 'Europe', variant: 'secondary' },
+	// 	{ value: 4, title: 'Oceania', variant: 'secondary' },
+	// 	{ value: 5, title: 'South America', variant: 'secondary' },
+	// 	{ value: 6, title: 'Antartica', variant: 'secondary' },
+	// 	{ value: 7, title: 'Virtual', variant: 'secondary' }
+	// ]
 
 	const statuses = [
 		{ value: 0, title: 'Inactive', variant: 'alert' },
@@ -152,9 +151,9 @@
 	afterNavigate(async () => {
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
-			if (params.locations.length) {
-				params.locations = mapArrayIntoCollection(params.locations, locations, 'value')
-			}
+			// if (params.locations.length) {
+			// 	params.locations = mapArrayIntoCollection(params.locations, locations, 'value')
+			// }
 			if (params.status.length) {
 				params.status = mapArrayIntoCollection(params.status, statuses, 'value')
 			}
@@ -262,7 +261,7 @@
 			>
 				<Icon slot="trailing" src={AiOutlineSearch} color="currentColor" />
 			</Input>
-			<Dropdown
+			<!-- <Dropdown
 				width="200px"
 				items={locations}
 				bind:selected={params.locations}
@@ -279,8 +278,8 @@
 				<div class="text-xl" slot="leading">
 					<Board />
 				</div>
-			</Dropdown>
-			<Dropdown
+			</Dropdown> -->
+			<!-- <Dropdown
 				width="200px"
 				items={statuses}
 				bind:selected={params.status}
@@ -297,7 +296,7 @@
 				<div class="text-xl" slot="leading">
 					<Board />
 				</div>
-			</Dropdown>
+			</Dropdown> -->
 			<Dropdown
 				items={types}
 				bind:selected={params.typeEvent}
@@ -320,7 +319,7 @@
 	</div>
 	<div class="w-full flex py-4 gap-4">
 		<div class="flex-grow flex gap-4 flex-row-reverse flex-wrap">
-			{#each params.locations as location, index}
+			<!-- {#each params.locations as location, index}
 				<Badge
 					hideOnClose={false}
 					type={location.variant}
@@ -332,7 +331,7 @@
 						})
 					}}>{location.title}</Badge
 				>
-			{/each}
+			{/each} -->
 			{#each params.typeEvent as type, index}
 				<Badge
 					hideOnClose={false}
