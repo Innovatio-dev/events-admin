@@ -24,7 +24,7 @@
 	import { page } from '$app/stores'
 	import { createDebouncer } from '$lib/utils/debounce'
 	import { afterNavigate, goto } from '$app/navigation'
-	import { organizerListSchema } from '$lib/utils/validation/schemas'
+	import { eventListSchema } from '$lib/utils/validation/schemas'
 	import {
 		createUrl,
 		mapArrayIntoCollection,
@@ -151,7 +151,7 @@
 
 	afterNavigate(async () => {
 		try {
-			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
+			params = validateUrlSearchParams($page.url.searchParams, eventListSchema)
 			if (params.regionId.length) {
 				params.regionId = mapArrayIntoCollection(params.regionId, locations, 'value')
 			}
@@ -171,9 +171,10 @@
 	async function fetchEvents() {
 		loading = true
 		const url = new URL('/api/events', window.location.origin)
+		console.log(params)
 		const cUrl = createUrl(url, {
-			typeEvent: params.typeEvent ? params.typeEvent.map((type) => type.value) : [],
-			regionId: params.regionId ? params.regionId.map((location) => location.value) : [],
+			typeEvent: params.typeEvent.map((type) => type.value),
+			regionId: params.regionId.map((location) => location.value),
 			status: params.status.map((status) => status.value),
 			order: params.order.map(
 				(sortedCol) => `${sortedCol.type == 'asc' ? '' : '-'}${sortedCol.column.dataKey}`

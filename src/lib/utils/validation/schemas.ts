@@ -71,6 +71,15 @@ export const organizerListSchema = Joi.object({
 	search: Joi.string().default(null)
 })
 
+export const eventListSchema = Joi.object({
+	page: Joi.number().min(1).default(1),
+	status: encodedIntegerArray.default([]),
+	typeEvent: encodedIntegerArray.default([]),
+	regionId: encodedIntegerArray.default([]),
+	order: encodedStringArray.default([]),
+	search: Joi.string().default(null)
+})
+
 export const challengeNewPasswordSchema = Joi.object({
 	email: emailSchema,
 	session: Joi.string().required(),
