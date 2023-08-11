@@ -42,8 +42,14 @@
 
 	function handleInputFile(event: any) {
 		for (const file of inputRef.files || []) {
-			console.log(file)
-			uploadFile(file)
+			if (file.size > 2097152) {
+				alert('File is too big!')
+			} else if (file.type != ('image/png' || 'image/jpg' || 'image/jpeg' || 'image/webp')) {
+				alert("File's format not supported")
+			} else {
+				console.log(file)
+				uploadFile(file)
+			}
 		}
 	}
 
@@ -148,7 +154,14 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="mainContainer">
-	<input bind:this={inputRef} on:change={handleInputFile} type="file" hidden {multiple} />
+	<input
+		bind:this={inputRef}
+		on:change={handleInputFile}
+		accept=".png,jpg,.jpeg,.webp"
+		type="file"
+		hidden
+		{multiple}
+	/>
 	{#if files.length == 0}
 		<div
 			class="content"
