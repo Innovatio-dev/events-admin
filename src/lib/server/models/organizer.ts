@@ -9,6 +9,7 @@ export class Organizer extends Model {
 	public static STATUS_SUSPENDED = 2
 	public static TYPE_EVENT_LIVE = 0
 	public static TYPE_EVENT_VIRTUAL = 1;
+	public static TYPE_EVENT_BOTH = 2;
 	[x: string]: any
 
 	get logoUrl(): string | null {

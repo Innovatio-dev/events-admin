@@ -27,8 +27,14 @@ export async function GET(event: RequestEvent) {
 		where.status = { [Op.in]: filter.status }
 	}
 	if (filter.typeEvent != null) {
-		where.typeEvent = { [Op.in]: filter.typeEvent }
+		if(filter.typeEvent.includes(Organizer.TYPE_EVENT_LIVE) && filter.typeEvent.includes(Organizer.TYPE_EVENT_VIRTUAL)) {
+			where.typeEvent = Organizer.TYPE_EVENT_BOTH
+		}
+		else {
+			where.typeEvent = { [Op.in]: filter.typeEvent }
+		}
 	}
+	
 	if (filter.order) {
 		for (const col of filter.order) {
 			let name = col.name
@@ -107,7 +113,7 @@ export async function GET(event: RequestEvent) {
 				region: AS_REGION
 			})
 
-			let organizers: Array<string | any> = []
+			const organizers: Array<string | any> = []
 			for (const iterator of results) {
 				organizers.push({
 					name: iterator.name,
@@ -120,7 +126,7 @@ export async function GET(event: RequestEvent) {
 
 			const csv = parser.parse(organizers)
 
-			var data = {
+			const data = {
 				Bucket: s3BucketName,
 				Key: 'data/dumpdata_organizers.csv',
 				Body: csv,
