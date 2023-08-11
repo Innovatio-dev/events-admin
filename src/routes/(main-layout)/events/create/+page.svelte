@@ -10,7 +10,7 @@
 	let eventData: EventData = {
 		slug: '',
 		organizerId: '',
-		typeEvent: '',
+		typeEvent: null,
 		isFeatured: false,
 		title: '',
 		description: '',
