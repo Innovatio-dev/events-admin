@@ -1,7 +1,6 @@
 <script lang="ts">
 	//Components
 	import Input from '$lib/components/Input.svelte'
-	import MainButton from '$lib/components/MainButton.svelte'
 	import TextViewer from '$lib/components/table_cell/TextViewer.svelte'
 	import VRegionViewer from '$lib/components/table_cell/VRegionViewer.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
@@ -18,7 +17,6 @@
 	import ExportCsvButton from '$lib/components/custom/ExportCSVButton.svelte'
 	//Icons
 	import Icon from 'svelte-icons-pack'
-	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 	import AiOutlineSearch from 'svelte-icons-pack/ai/AiOutlineSearch'
 	import Board from '$lib/components/icons/Board.svelte'
 	import Ticket from '$lib/components/icons/Ticket.svelte'
@@ -44,6 +42,7 @@
 		typeEvent: [],
 		status: [],
 		order: [],
+		locations: [],
 		search: null,
 		page: 1
 	}
@@ -129,11 +128,14 @@
 	]
 
 	const locations = [
-		{ value: 0, title: 'South America', variant: 'secondary' },
-		{ value: 1, title: 'North America', variant: 'secondary' },
-		{ value: 2, title: 'Asia', variant: 'secondary' },
+		{ value: 0, title: 'Asia', variant: 'secondary' },
+		{ value: 1, title: 'Africa', variant: 'secondary' },
+		{ value: 2, title: 'North America', variant: 'secondary' },
 		{ value: 3, title: 'Europe', variant: 'secondary' },
-		{ value: 4, title: 'Virtual', variant: 'secondary' }
+		{ value: 4, title: 'Oceania', variant: 'secondary' },
+		{ value: 5, title: 'South America', variant: 'secondary' },
+		{ value: 6, title: 'Antartica', variant: 'secondary' },
+		{ value: 7, title: 'Virtual', variant: 'secondary' }
 	]
 
 	const statuses = [
@@ -150,17 +152,17 @@
 	afterNavigate(async () => {
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
-			if (params.order.length) {
-				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
-			}
 			if (params.locations.length) {
-				params.status = mapArrayIntoCollection(params.location, locations, 'value')
+				params.locations = mapArrayIntoCollection(params.locations, locations, 'value')
 			}
 			if (params.status.length) {
 				params.status = mapArrayIntoCollection(params.status, statuses, 'value')
 			}
 			if (params.typeEvent.length) {
 				params.typeEvent = mapArrayIntoCollection(params.typeEvent, types, 'value')
+			}
+			if (params.order.length) {
+				params.order = mapArrayIntoCollectionOrder(params.order, tableColumns)
 			}
 		} catch (error) {}
 		await fetchEvents()
@@ -199,6 +201,7 @@
 
 	async function gotoFilter(filter: any) {
 		const url = createUrl($page.url, filter)
+
 		await goto(url, {
 			replaceState: true,
 			keepFocus: true
@@ -262,13 +265,13 @@
 			<Dropdown
 				width="200px"
 				items={locations}
-				bind:selected={params.status}
+				bind:selected={params.locations}
 				multiselect
 				on:change={(event) => {
 					const selected = event.detail.selected
 					const values = selected.map((status) => status.value)
 					gotoFilter({
-						status: values
+						regionId: values
 					})
 				}}
 			>
@@ -317,6 +320,19 @@
 	</div>
 	<div class="w-full flex py-4 gap-4">
 		<div class="flex-grow flex gap-4 flex-row-reverse flex-wrap">
+			{#each params.locations as location, index}
+				<Badge
+					hideOnClose={false}
+					type={location.variant}
+					onClose={() => {
+						params.locations.splice(index, 1)
+						gotoFilter({
+							page: 1,
+							locations: params.locations.map((location) => location.value)
+						})
+					}}>{location.title}</Badge
+				>
+			{/each}
 			{#each params.typeEvent as type, index}
 				<Badge
 					hideOnClose={false}
