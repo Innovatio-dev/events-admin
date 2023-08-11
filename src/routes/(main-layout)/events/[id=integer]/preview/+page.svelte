@@ -345,7 +345,6 @@
 		</div>
 		<div class="flex items-center justify-center flex-col w-full mx-auto pt-32">
 			<MainButton title="Publish Event" handleClick={handleOpenModal} />
-			<MainButton title="Save it in draft" handleClick={handleOpenDraftModal} />
 			<MainButton title="Edit" href={`/events/${id}/edit`} />
 			<MainButton title="Close preview" handleClick={goBack} />
 		</div>
