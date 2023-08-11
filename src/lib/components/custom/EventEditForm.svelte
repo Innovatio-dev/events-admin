@@ -29,6 +29,7 @@
 	// Components
 	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
+	import UploadedImage from './UploadedImage.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
@@ -86,7 +87,8 @@
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
 	let venues: any[] = []
-	let validate: boolean = false
+	let success: boolean = false
+	export let banner: string | null = null
 	export let mainSpeakers: any[] = []
 	export let secondarySpeakers: any[] = []
 	export let eventId: string | null = null
@@ -209,10 +211,10 @@
 
 	const handleSubmit = async () => {
 		loading = true
-		await createEvent()
+		await updateEvent()
 		loading = false
-		console.log(eventId)
-		if (eventId) {
+		if (success) {
+			console.log(eventId)
 			goto(`/events/${eventId}`)
 		} else {
 			$pageAlert = {
@@ -224,9 +226,9 @@
 
 	const viewPreview = async () => {
 		loading = true
-		await createEvent()
+		await updateEvent()
 		loading = false
-		if (eventId) {
+		if (success) {
 			goto(`/events/${eventId}/preview`)
 		} else {
 			$pageAlert = {
@@ -236,26 +238,24 @@
 		}
 	}
 
-	async function createEvent() {
+	async function updateEvent() {
 		try {
-			loading = true
-			eventData.slug = createSlug(eventData?.title)
-			eventData.venue = venues
+			eventData.slug = createSlug(eventData.title)
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
+			eventData.organizerId = eventData.organizerId
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
 			}
-			eventData.bannerId = eventData.bannerId
-			const res = await fetch(`/api/events`, {
-				method: 'POST',
+			loading = true
+			const res = await fetch(`/api/events/${eventId}`, {
+				method: 'PUT',
 				body: JSON.stringify({ ...eventData })
 			})
 			if (res.ok) {
 				const data = await res.json()
-				$pageAlert = { message: 'Success! Event created as draft.', status: true }
-				eventId = data.id
-				return eventId
+				$pageAlert = { message: 'Success! Event updated.', status: true }
+				success = true
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -263,11 +263,14 @@
 					status: false
 				}
 			}
+
 			loading = false
-			validate = true
 		} catch (error) {
 			console.error('Error:', error)
-			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
+			$pageAlert = {
+				message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
+				status: false
+			}
 		}
 	}
 
@@ -300,9 +303,6 @@
 				placeholder={'Select the organizer for this event'}
 				url={'/api/organizers?search={s}&limit={l}&offset={o}'}
 			/>
-			{#if eventData.organizerId.length < 1 && validate}
-				<span class="text-xs text-alert-error">* Organizer is required</span>
-			{/if}
 		</div>
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
 			<div class="w-full">
@@ -349,25 +349,32 @@
 						name="title"
 						placeholder="Type the event title"
 					/>
-					{#if eventData.title.length < 3 && validate}
-						<span class="text-xs text-alert-error">* Event title is required</span>
-					{/if}
 				</div>
 				<div>
 					<LabelInput>Write a brief description of the event</LabelInput>
 					<Input
 						bind:value={eventData.description}
-						required
 						placeholder="Write a brief description of the event"
 					/>
-					{#if eventData.description.length < 3 && validate}
-						<span class="text-xs text-alert-error">* Event description is required</span
-						>
-					{/if}
 				</div>
 			</div>
 			<div>
 				<SectionHeader>Event Photo</SectionHeader>
+				{#if eventData?.pictures.length > 0}
+					<div class="flex flex-wrap items-center justify-center gap-x-6">
+						{#each eventData.pictures as picture}
+							<div class="flex w-fit py-6">
+								<UploadedImage image={picture.url} />
+							</div>
+						{/each}
+					</div>
+				{:else}
+					<div
+						class="flex justify-center items-center w-full text-lg text-neutral-3 py-6"
+					>
+						No images found
+					</div>
+				{/if}
 				<DragAndDrop
 					bind:uploaded={eventData.pictures}
 					url="/api/resources"
@@ -375,20 +382,27 @@
 					title="Upload your image"
 					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 					body="600x500"
-					multiple={true}
 				/>
 			</div>
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
-				<DragAndDrop
-					bind:uploaded={data.banner}
-					url="/api/resources"
-					name="file"
-					title="Upload your image"
-					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-					body="600x500"
-					multiple={false}
-				/>
+				{#if eventData.pictures.length > 0}
+					<UploadedImage image={banner ?? ''} />
+				{:else}
+					<div
+						class="flex justify-center items-center w-full text-lg text-neutral-3 py-6"
+					>
+						Banner image not found, please add
+					</div>
+					<DragAndDrop
+						bind:uploaded={data.banner}
+						url="/api/resources"
+						name="file"
+						title="Upload your image"
+						subtitle="PNG, JPG, WEBP, 2MB files are allowed"
+						body="600x500"
+					/>
+				{/if}
 			</div>
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
@@ -398,10 +412,6 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.startTime}
 					/>
-
-					{#if eventData?.schedule.startTime == null && validate}
-						<span class="text-xs text-alert-error">* Date start is required</span>
-					{/if}
 				</div>
 				<div>
 					<LabelInput>Date ends</LabelInput>
@@ -409,9 +419,6 @@
 						placeholder="Choose the end date"
 						bind:value={eventData.schedule.endTime}
 					/>
-					{#if eventData?.schedule.endTime == null && validate}
-						<span class="text-xs text-alert-error">* Date ends is required</span>
-					{/if}
 				</div>
 				<div>
 					<LabelInput>Event registration date opens</LabelInput>
@@ -419,9 +426,6 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.visibleAt}
 					/>
-					{#if eventData?.schedule.visibleAt == null && validate}
-						<span class="text-xs text-alert-error">* Date opens is required</span>
-					{/if}
 				</div>
 			</div>
 			<div class="input-set">
@@ -516,9 +520,10 @@
 				</div>
 				{#if eventData?.typeEvent == '0'}
 					<div>
+						{eventData.linkZoom}
 						<LabelInput>Insert the invitation zoom link</LabelInput>
 						<Input bind:value={eventData.linkZoom} placeholder="Insert zoom link" />
-						{#if eventData?.linkZoom == null && validate}
+						{#if eventData?.linkZoom == null}
 							<span class="text-xs text-alert-error">* Zoom link is required</span>
 						{/if}
 					</div>
@@ -579,9 +584,6 @@
 					>
 						<div slot="title">Select the main language</div>
 					</Dropdown>
-					{#if eventData?.language == null && validate}
-						<span class="text-xs text-alert-error">* Language is required</span>
-					{/if}
 				</div>
 				<div>
 					<LabelInput>Translated to</LabelInput>
