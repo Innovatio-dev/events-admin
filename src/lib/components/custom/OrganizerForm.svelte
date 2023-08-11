@@ -230,7 +230,7 @@
 			bind:uploaded={organizer.logo}
 			url="/api/resources"
 			name="file"
-			title="Upload your image (Optional)"
+			title="Upload your image"
 			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 			body="1000x1000"
 		/>
