@@ -41,6 +41,7 @@
 	let params: any = {
 		typeEvent: [],
 		status: [],
+		regionId: [],
 		order: [],
 		search: null,
 		page: 1
@@ -126,16 +127,16 @@
 		}
 	]
 
-	// const locations = [
-	// 	{ value: 0, title: 'Asia', variant: 'secondary' },
-	// 	{ value: 1, title: 'Africa', variant: 'secondary' },
-	// 	{ value: 2, title: 'North America', variant: 'secondary' },
-	// 	{ value: 3, title: 'Europe', variant: 'secondary' },
-	// 	{ value: 4, title: 'Oceania', variant: 'secondary' },
-	// 	{ value: 5, title: 'South America', variant: 'secondary' },
-	// 	{ value: 6, title: 'Antartica', variant: 'secondary' },
-	// 	{ value: 7, title: 'Virtual', variant: 'secondary' }
-	// ]
+	const locations = [
+		{ value: 1, title: 'Asia', variant: 'secondary' },
+		{ value: 2, title: 'Africa', variant: 'secondary' },
+		{ value: 3, title: 'North America', variant: 'secondary' },
+		{ value: 4, title: 'Europe', variant: 'secondary' },
+		{ value: 5, title: 'Oceania', variant: 'secondary' },
+		{ value: 6, title: 'South America', variant: 'secondary' },
+		{ value: 7, title: 'Antartica', variant: 'secondary' },
+		{ value: 8, title: 'Virtual', variant: 'secondary' }
+	]
 
 	const statuses = [
 		{ value: 0, title: 'Inactive', variant: 'alert' },
@@ -151,9 +152,9 @@
 	afterNavigate(async () => {
 		try {
 			params = validateUrlSearchParams($page.url.searchParams, organizerListSchema)
-			// if (params.locations.length) {
-			// 	params.locations = mapArrayIntoCollection(params.locations, locations, 'value')
-			// }
+			if (params.regionId.length) {
+				params.regionId = mapArrayIntoCollection(params.regionId, locations, 'value')
+			}
 			if (params.status.length) {
 				params.status = mapArrayIntoCollection(params.status, statuses, 'value')
 			}
@@ -171,8 +172,9 @@
 		loading = true
 		const url = new URL('/api/events', window.location.origin)
 		const cUrl = createUrl(url, {
-			status: params.status.map((status) => status.value),
 			typeEvent: params.typeEvent.map((type) => type.value),
+			regionId: params.regionId ? params.regionId.map((location) => location.value) : [],
+			status: params.status ? params.status.map((status) => status.value) : [],
 			order: params.order.map(
 				(sortedCol) => `${sortedCol.type == 'asc' ? '' : '-'}${sortedCol.column.dataKey}`
 			),
@@ -261,14 +263,14 @@
 			>
 				<Icon slot="trailing" src={AiOutlineSearch} color="currentColor" />
 			</Input>
-			<!-- <Dropdown
+			<Dropdown
 				width="200px"
 				items={locations}
-				bind:selected={params.locations}
+				bind:selected={params.regionId}
 				multiselect
 				on:change={(event) => {
 					const selected = event.detail.selected
-					const values = selected.map((status) => status.value)
+					const values = selected.map((location) => location.value)
 					gotoFilter({
 						regionId: values
 					})
@@ -278,7 +280,7 @@
 				<div class="text-xl" slot="leading">
 					<Board />
 				</div>
-			</Dropdown> -->
+			</Dropdown>
 			<!-- <Dropdown
 				width="200px"
 				items={statuses}
