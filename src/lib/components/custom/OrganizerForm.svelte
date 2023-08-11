@@ -1,6 +1,4 @@
 <script lang="ts">
-	// Svelte
-	import { goto } from '$app/navigation'
 	// Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '../MainButton.svelte'
@@ -8,6 +6,7 @@
 	import DragAndDrop from '../DragAndDrop.svelte'
 	import UploadedImage from './UploadedImage.svelte'
 	import Dropdown from '../Dropdown.svelte'
+	import LadaViewer from './data_viewer/LadaViewer.svelte'
 
 	// Constants
 	import { countries, REGIONS } from '$lib/utils/constants/Regions'
@@ -55,6 +54,7 @@
 		logo: null
 	}
 	let isMember = false
+	let phoneCode = '705'
 
 	let updatedOrganizer = {
 		status: addOrganizer?.status,
@@ -79,6 +79,7 @@
 			loading = true
 			const formattedData = {
 				...organizer,
+				phone: phoneCode + organizer.phone,
 				twitter: 'https://twitter.com/' + organizer.twitter.replace(/\s/g, '_'),
 				facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
 				instagram: 'https://instagram.com/' + organizer.instagram.replace(/\s/g, '_'),
@@ -152,13 +153,19 @@
 		bind:value={organizer.company}
 	/>
 	<div class="flex items-end gap-5">
-		<select class="max-w-[6rem]" name="" id="">
-			{#each countries as country}
-				<option value={country.phonecode}>
-					{'+'}{country.phonecode}
-				</option>
-			{/each}
-		</select>
+		<Dropdown
+			itemViewer={LadaViewer}
+			bind:value={phoneCode}
+			itemGenerator={(item) => ({ title: item.title, iso: item.iso })}
+			items={countries.map((country) => {
+				return {
+					value: country.phonecode,
+					title: '+' + country.phonecode,
+					iso: country.iso
+				}
+			})}
+			selected={{ title: '+' + phoneCode, value: phoneCode }}
+		/>
 		<Input required label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
 		<Input required label="E-mail:" type="email" name="email" bind:value={organizer.email} />
 	</div>
@@ -223,7 +230,7 @@
 			bind:uploaded={organizer.logo}
 			url="/api/resources"
 			name="file"
-			title="Upload your image (Optional)"
+			title="Upload your image"
 			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 			body="1000x1000"
 		/>

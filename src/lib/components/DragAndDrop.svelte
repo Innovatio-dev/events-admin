@@ -306,6 +306,7 @@
 	}
 
 	.content {
+		font-family: var(--font-eesti);
 		display: flex;
 		flex-flow: column;
 		align-items: center;
@@ -331,16 +332,19 @@
 			justify-content: center;
 			flex-flow: column;
 			.title {
-				font-weight: 500;
+				font-weight: 400;
+				font-size: 20px;
 			}
 			.subtitle {
-				font-weight: 300;
+				font-weight: 200;
+				font-size: 20px;
 			}
 		}
 		.body {
 			span {
+				font-size: 20px;
 				color: var(--neutral-4);
-				font-weight: 300;
+				font-weight: 200;
 			}
 		}
 		.icon {
@@ -354,6 +358,8 @@
 			color: var(--neutral-3);
 			font-weight: 375;
 			letter-spacing: 0.5px;
+			font-size: 20px;
+			line-height: 30px; /* 150% */
 		}
 
 		.filesContainer {
