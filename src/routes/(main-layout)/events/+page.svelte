@@ -172,9 +172,9 @@
 		loading = true
 		const url = new URL('/api/events', window.location.origin)
 		const cUrl = createUrl(url, {
-			typeEvent: params.typeEvent.map((type) => type.value),
+			typeEvent: params.typeEvent ? params.typeEvent.map((type) => type.value) : [],
 			regionId: params.regionId ? params.regionId.map((location) => location.value) : [],
-			status: params.status ? params.status.map((status) => status.value) : [],
+			status: params.status.map((status) => status.value),
 			order: params.order.map(
 				(sortedCol) => `${sortedCol.type == 'asc' ? '' : '-'}${sortedCol.column.dataKey}`
 			),
@@ -182,7 +182,7 @@
 			offset: (params.page - 1) * itemsPerPage,
 			limit: itemsPerPage
 		})
-
+		console.log(params)
 		const response = await fetch(cUrl)
 		if (response.ok) {
 			data = await response.json()
@@ -281,7 +281,7 @@
 					<Board />
 				</div>
 			</Dropdown>
-			<!-- <Dropdown
+			<Dropdown
 				width="200px"
 				items={statuses}
 				bind:selected={params.status}
@@ -298,7 +298,7 @@
 				<div class="text-xl" slot="leading">
 					<Board />
 				</div>
-			</Dropdown> -->
+			</Dropdown>
 			<Dropdown
 				items={types}
 				bind:selected={params.typeEvent}
@@ -321,19 +321,19 @@
 	</div>
 	<div class="w-full flex py-4 gap-4">
 		<div class="flex-grow flex gap-4 flex-row-reverse flex-wrap">
-			<!-- {#each params.locations as location, index}
+			{#each params.regionId as location, index}
 				<Badge
 					hideOnClose={false}
 					type={location.variant}
 					onClose={() => {
-						params.locations.splice(index, 1)
+						params.regionId.splice(index, 1)
 						gotoFilter({
 							page: 1,
-							locations: params.locations.map((location) => location.value)
+							regionId: params.regionId.map((location) => location.value)
 						})
 					}}>{location.title}</Badge
 				>
-			{/each} -->
+			{/each}
 			{#each params.typeEvent as type, index}
 				<Badge
 					hideOnClose={false}
