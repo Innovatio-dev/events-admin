@@ -211,15 +211,9 @@
 	]
 
 	const handleSubmit = async () => {
-		if (updateAction) {
-			loading = true
-			await updateEvent()
-			loading = false
-		} else {
-			loading = true
-			await createEvent()
-			loading = false
-		}
+		loading = true
+		await createEvent()
+		loading = false
 	}
 
 	async function createEvent() {
@@ -233,7 +227,6 @@
 				eventData.bannerId = createBanner(data.banner)
 			}
 			eventData.bannerId = eventData.bannerId
-			console.log(eventData)
 			const res = await fetch(`/api/events`, {
 				method: 'POST',
 				body: JSON.stringify({ ...eventData })
@@ -379,13 +372,6 @@
 			</div>
 			<div>
 				<SectionHeader>Event Photo</SectionHeader>
-				{#if eventData.pictures}
-					{#each eventData.pictures as picture}
-						<div class="flex flex-wrap">
-							<UploadedImage image={picture.url} />
-						</div>
-					{/each}
-				{/if}
 				<DragAndDrop
 					bind:uploaded={eventData.pictures}
 					url="/api/resources"
@@ -393,22 +379,20 @@
 					title="Upload your image"
 					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 					body="600x500"
+					multiple={true}
 				/>
 			</div>
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
-				{#if eventData.pictures.length > 0}
-					<UploadedImage image={banner ?? ''} />
-				{:else}
-					<DragAndDrop
-						bind:uploaded={data.banner}
-						url="/api/resources"
-						name="file"
-						title="Upload your image"
-						subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-						body="600x500"
-					/>
-				{/if}
+				<DragAndDrop
+					bind:uploaded={data.banner}
+					url="/api/resources"
+					name="file"
+					title="Upload your image"
+					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
+					body="600x500"
+					multiple={false}
+				/>
 			</div>
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
