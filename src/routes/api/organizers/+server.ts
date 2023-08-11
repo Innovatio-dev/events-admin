@@ -27,14 +27,27 @@ export async function GET(event: RequestEvent) {
 		where.status = { [Op.in]: filter.status }
 	}
 	if (filter.typeEvent != null) {
-		if(filter.typeEvent.includes(Organizer.TYPE_EVENT_LIVE) && filter.typeEvent.includes(Organizer.TYPE_EVENT_VIRTUAL)) {
-			where.typeEvent = Organizer.TYPE_EVENT_BOTH
+		if (filter.typeEvent.includes(Organizer.TYPE_EVENT_BOTH)) {
+			where.typeEvent = {
+				[Op.in]: [
+					Organizer.TYPE_EVENT_LIVE,
+					Organizer.TYPE_EVENT_VIRTUAL,
+					Organizer.TYPE_EVENT_BOTH
+				]
+			}
+		} else {
+			where.typeEvent = { [Op.in]: [...filter.typeEvent, Organizer.TYPE_EVENT_BOTH] }
 		}
-		else {
-			where.typeEvent = { [Op.in]: filter.typeEvent }
+	} else {
+		where.typeEvent = {
+			[Op.in]: [
+				Organizer.TYPE_EVENT_LIVE,
+				Organizer.TYPE_EVENT_VIRTUAL,
+				Organizer.TYPE_EVENT_BOTH
+			]
 		}
 	}
-	
+
 	if (filter.order) {
 		for (const col of filter.order) {
 			let name = col.name
