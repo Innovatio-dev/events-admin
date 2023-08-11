@@ -1,10 +1,10 @@
 import Joi from 'joi'
-import { emailSchema, orderSchema } from './schemas'
+import { encodedIntegerArray, orderSchema } from './schemas'
 
 export const filterSchema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
 	limit: Joi.number().min(-1).optional().default(10),
-	typeEvent: Joi.number().optional(),
+	typeEvent: encodedIntegerArray.optional(),
 	regionId: Joi.number(),
 	countryId: Joi.number(),
 	city: Joi.string(),

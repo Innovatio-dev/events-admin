@@ -52,8 +52,8 @@ export async function GET(event: RequestEvent) {
 		}
 	}
 
-	if (filter.typeEvent) {
-		where.typeEvent = filter.typeEvent
+	if (filter.typeEvent != null) {
+		where.typeEvent = { [Op.in]: filter.typeEvent }
 	}
 
 	if (filter.order) {
