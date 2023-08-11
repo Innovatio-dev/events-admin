@@ -29,7 +29,6 @@
 	// Components
 	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
-	import UploadedImage from './UploadedImage.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
@@ -87,12 +86,10 @@
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
 	let venues: any[] = []
-	export let banner: string | null = null
-	export let eventSaved: boolean = false
+	let validate: boolean = false
 	export let mainSpeakers: any[] = []
 	export let secondarySpeakers: any[] = []
 	export let eventId: string | null = null
-	export let updateAction: boolean = false
 
 	let venueColumns: Column[] = [
 		{
@@ -214,12 +211,37 @@
 		loading = true
 		await createEvent()
 		loading = false
+		console.log(eventId)
+		if (eventId) {
+			console.log(eventId)
+			goto(`/events/${eventId}`)
+		} else {
+			$pageAlert = {
+				message: 'Oops! An error has occurred. try again later.',
+				status: false
+			}
+		}
+	}
+
+	const viewPreview = async () => {
+		loading = true
+		await createEvent()
+		loading = false
+		if (eventId) {
+			console.log(eventId)
+			goto(`/events/${eventId}/preview`)
+		} else {
+			$pageAlert = {
+				message: 'Oops! An error has occurred. try again later.',
+				status: false
+			}
+		}
 	}
 
 	async function createEvent() {
 		try {
 			loading = true
-			eventData.slug = createSlug(eventData.title)
+			eventData.slug = createSlug(eventData?.title)
 			eventData.venue = venues
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
@@ -234,7 +256,6 @@
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Event created as draft.', status: true }
-				eventSaved = true
 				eventId = data.id
 				return eventId
 			} else {
@@ -245,44 +266,10 @@
 				}
 			}
 			loading = false
+			validate = true
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
-		}
-	}
-
-	async function updateEvent() {
-		try {
-			eventData.slug = createSlug(eventData.title)
-			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
-			eventData.speakers = extractSpeakerIds(mainSpeakers)
-			eventData.organizerId = eventData.organizerId
-			console.log(eventData)
-			loading = true
-			// Es posible que debas incluir el ID del evento en la URL del endpoint, por ejemplo: `/api/events/${eventId}`
-			const res = await fetch(`/api/events/${eventId}`, {
-				method: 'PUT',
-				body: JSON.stringify({ ...eventData })
-			})
-
-			if (res.ok) {
-				const data = await res.json()
-				$pageAlert = { message: '¡Éxito! Evento actualizado.', status: true }
-			} else {
-				console.log(await res.json())
-				$pageAlert = {
-					message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
-					status: false
-				}
-			}
-
-			loading = false
-		} catch (error) {
-			console.error('Error:', error)
-			$pageAlert = {
-				message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
-				status: false
-			}
 		}
 	}
 
@@ -315,6 +302,9 @@
 				placeholder={'Select the organizer for this event'}
 				url={'/api/organizers?search={s}&limit={l}&offset={o}'}
 			/>
+			{#if eventData.organizerId.length < 1 && validate}
+				<span class="text-xs text-alert-error">* Organizer is required</span>
+			{/if}
 		</div>
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
 			<div class="w-full">
@@ -361,13 +351,21 @@
 						name="title"
 						placeholder="Type the event title"
 					/>
+					{#if eventData.title.length < 3 && validate}
+						<span class="text-xs text-alert-error">* Event title is required</span>
+					{/if}
 				</div>
 				<div>
 					<LabelInput>Write a brief description of the event</LabelInput>
 					<Input
 						bind:value={eventData.description}
+						required
 						placeholder="Write a brief description of the event"
 					/>
+					{#if eventData.description.length < 3 && validate}
+						<span class="text-xs text-alert-error">* Event description is required</span
+						>
+					{/if}
 				</div>
 			</div>
 			<div>
@@ -402,6 +400,10 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.startTime}
 					/>
+
+					{#if eventData?.schedule.startTime == null && validate}
+						<span class="text-xs text-alert-error">* Date start is required</span>
+					{/if}
 				</div>
 				<div>
 					<LabelInput>Date ends</LabelInput>
@@ -409,6 +411,9 @@
 						placeholder="Choose the end date"
 						bind:value={eventData.schedule.endTime}
 					/>
+					{#if eventData?.schedule.endTime == null && validate}
+						<span class="text-xs text-alert-error">* Date ends is required</span>
+					{/if}
 				</div>
 				<div>
 					<LabelInput>Event registration date opens</LabelInput>
@@ -416,6 +421,9 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.visibleAt}
 					/>
+					{#if eventData?.schedule.visibleAt == null && validate}
+						<span class="text-xs text-alert-error">* Date opens is required</span>
+					{/if}
 				</div>
 			</div>
 			<div class="input-set">
@@ -508,11 +516,15 @@
 				<div>
 					<OrderableTable columns={speakerColumnsSecondary} data={secondarySpeakers} />
 				</div>
-				<div>
-					<LabelInput>Insert the invitation zoom link</LabelInput>
-
-					<Input bind:value={eventData.linkZoom} placeholder="Insert zoom link" />
-				</div>
+				{#if eventData?.typeEvent == '0'}
+					<div>
+						<LabelInput>Insert the invitation zoom link</LabelInput>
+						<Input bind:value={eventData.linkZoom} placeholder="Insert zoom link" />
+						{#if eventData?.linkZoom == null && validate}
+							<span class="text-xs text-alert-error">* Zoom link is required</span>
+						{/if}
+					</div>
+				{/if}
 			</div>
 
 			<div class="input-set">
@@ -569,6 +581,9 @@
 					>
 						<div slot="title">Select the main language</div>
 					</Dropdown>
+					{#if eventData?.language == null && validate}
+						<span class="text-xs text-alert-error">* Language is required</span>
+					{/if}
 				</div>
 				<div>
 					<LabelInput>Translated to</LabelInput>
@@ -642,12 +657,8 @@
 				{/if}
 			</div>
 			<MainButton {loading} on:click={handleSubmit}>Save as draft</MainButton>
-			{#if eventSaved}
-				<MainButton href={`/events/${eventId}/preview`}>View Preview</MainButton>
-			{:else}
-				<MainButton disabled={!eventSaved}>View Preview</MainButton>
-			{/if}
-			<MainButton href={`/`}>Discard</MainButton>
+			<MainButton {loading} on:click={viewPreview}>View Preview</MainButton>
+			<MainButton href={`/events`}>Discard</MainButton>
 		{/if}
 	</div>
 </div>
