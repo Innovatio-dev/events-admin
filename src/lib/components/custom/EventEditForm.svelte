@@ -214,7 +214,6 @@
 		await updateEvent()
 		loading = false
 		if (success) {
-			console.log(eventId)
 			goto(`/events/${eventId}`)
 		} else {
 			$pageAlert = {
@@ -244,6 +243,7 @@
 			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
 			eventData.speakers = extractSpeakerIds(mainSpeakers)
 			eventData.organizerId = eventData.organizerId
+			eventData.pictures = extractPictureIds(eventData.pictures)
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
 			}
@@ -253,6 +253,7 @@
 				body: JSON.stringify({ ...eventData })
 			})
 			if (res.ok) {
+				console.log(eventData)
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Event updated.', status: true }
 				success = true
@@ -286,6 +287,10 @@
 
 	function extractSpeakerIds(speakers: Speaker[]): number[] {
 		return speakers.map((speaker) => speaker.id)
+	}
+
+	function extractPictureIds(pictures: Speaker[]): number[] {
+		return pictures.map((picture) => picture.id)
 	}
 </script>
 
