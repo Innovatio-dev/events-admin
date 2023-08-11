@@ -32,7 +32,13 @@
 	function handleDrop(event: any) {
 		event.preventDefault()
 		for (const file of event.dataTransfer.files) {
-			uploadFile(file)
+			if (file.size > 2097152) {
+				alert('File is too big!')
+			} else if (file.type != ('image/png' || 'image/jpg' || 'image/jpeg' || 'image/webp')) {
+				alert("File's format not supported")
+			} else {
+				uploadFile(file)
+			}
 		}
 	}
 
