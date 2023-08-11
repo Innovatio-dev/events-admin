@@ -33,14 +33,18 @@
 
 	function handleDrop(event: any) {
 		event.preventDefault()
-		for (const file of event.dataTransfer.files) {
-			if (file.size > 2097152) {
-				alert('File is too big!')
-			} else if (allowedFormats.includes(file.type)) {
-				uploadFile(file)
-				console.log(file)
-			} else {
-				alert("File's format not supported")
+		if (!multiple && uploaded.length > 0) {
+			alert('You can only upload one file here')
+		} else {
+			for (const file of event.dataTransfer.files) {
+				if (file.size > 2097152) {
+					alert('File is too big!')
+				} else if (allowedFormats.includes(file.type)) {
+					uploadFile(file)
+					console.log(file)
+				} else {
+					alert("File's format not supported")
+				}
 			}
 		}
 	}
@@ -50,14 +54,18 @@
 	}
 
 	function handleInputFile(event: any) {
-		for (const file of inputRef.files || []) {
-			if (file.size > 2097152) {
-				alert('File is too big!')
-			} else if (allowedFormats.includes(file.type)) {
-				uploadFile(file)
-				console.log(file)
-			} else {
-				alert("File's format not supported")
+		if (!multiple && uploaded.length > 0) {
+			alert('You can only upload one file here')
+		} else {
+			for (const file of inputRef.files || []) {
+				if (file.size > 2097152) {
+					alert('File is too big!')
+				} else if (allowedFormats.includes(file.type)) {
+					uploadFile(file)
+					console.log(file)
+				} else {
+					alert("File's format not supported")
+				}
 			}
 		}
 	}
