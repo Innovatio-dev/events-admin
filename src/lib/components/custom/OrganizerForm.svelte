@@ -16,7 +16,6 @@
 		id?: number
 		logo?: any
 		status?: number
-		isMember: boolean
 		mavieId: string
 		name: string
 		company: string
@@ -40,7 +39,6 @@
 
 	// State
 	let organizer: Organizer = {
-		isMember: false,
 		mavieId: '',
 		name: '',
 		company: '',
@@ -56,6 +54,8 @@
 		countryId: '',
 		logo: null
 	}
+	let isMember = false
+
 	let updatedOrganizer = {
 		status: addOrganizer?.status,
 		reason: 'Organizer updated'
@@ -65,6 +65,9 @@
 	if (addOrganizer) {
 		organizer = JSON.parse(JSON.stringify(addOrganizer))
 		organizer.countryId = addOrganizer.country?.id
+		if (addOrganizer.mavieId && Number(addOrganizer.mavieId) >= 0) {
+			isMember = true
+		}
 	}
 
 	const handleSubmit = async () => {
@@ -123,10 +126,16 @@
 			<span>
 				{'Mavie Member'}
 			</span>
-			<ToggleButtton bind:checked={organizer.isMember} id="tid1" text right="Yes" left="No" />
+			<ToggleButtton bind:checked={isMember} id="tid1" text right="Yes" left="No" />
 		</div>
 		<div>
-			<Input label="Mavie Id:" type="number" name="mavieId" bind:value={organizer.mavieId} />
+			<Input
+				required={isMember}
+				label="Mavie Id:"
+				type="number"
+				name="mavieId"
+				bind:value={organizer.mavieId}
+			/>
 		</div>
 	</div>
 	<Input
@@ -137,8 +146,7 @@
 		bind:value={organizer.name}
 	/>
 	<Input
-		required
-		label="Organizer company name:"
+		label="Organizer company name (optional):"
 		type="text"
 		name="company"
 		bind:value={organizer.company}
@@ -156,7 +164,7 @@
 	</div>
 	<div class="flex flex-col w-full">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
-			{'Location:'}
+			{'Where would you be interested in organizing events?'}
 		</span>
 		<div class="grid grid-cols-3 gap-y-5 py-5">
 			{#each REGIONS as region}
@@ -174,9 +182,9 @@
 			{/each}
 		</div>
 	</div>
-	<!-- <Input required label="Country:" type="text" bind:value={organizer.country.name} /> -->
+	<!-- <Input required label="Where are you from?" type="text" bind:value={organizer.country.name} /> -->
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
-		{'Country:'}
+		{'Where are you from?'}
 	</span>
 	<Dropdown
 		name="countryId"
@@ -190,19 +198,23 @@
 			return { value: country.id, title: country.nicename ?? '' }
 		})}
 	/>
-	<Input required name="twitter" label="Twitter:" type="text" bind:value={organizer.twitter} />
-	<Input required name="website" label="Website:" type="url" bind:value={organizer.website} />
-	<Input required name="facebook" label="Facebook:" type="text" bind:value={organizer.facebook} />
+	<Input name="twitter" label="Twitter (optional):" type="text" bind:value={organizer.twitter} />
+	<Input name="website" label="Website (optional):" type="url" bind:value={organizer.website} />
 	<Input
-		required
+		name="facebook"
+		label="Facebook (optional):"
+		type="text"
+		bind:value={organizer.facebook}
+	/>
+	<Input
 		name="instagram"
-		label="Instagram:"
+		label="Instagram (optional):"
 		type="text"
 		bind:value={organizer.instagram}
 	/>
-	<Input required name="youtube" label="Youtube:" type="text" bind:value={organizer.youtube} />
+	<Input name="youtube" label="Youtube (optional):" type="text" bind:value={organizer.youtube} />
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
-		{'Organizer photo'}
+		{'Organizer photo (optional)'}
 	</span>
 	{#if addOrganizer}
 		<UploadedImage image={addOrganizer.logo?.url ?? ''} />

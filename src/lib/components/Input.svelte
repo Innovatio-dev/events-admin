@@ -67,6 +67,11 @@
 	{#if label}
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{label}
+			{#if required}
+				<span class="text-alert-error">
+					{'*'}
+				</span>
+			{/if}
 		</span>
 	{/if}
 	<div class="flex relative">
