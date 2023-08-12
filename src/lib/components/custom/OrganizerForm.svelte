@@ -7,6 +7,7 @@
 	import UploadedImage from './UploadedImage.svelte'
 	import Dropdown from '../Dropdown.svelte'
 	import LadaViewer from './data_viewer/LadaViewer.svelte'
+	import Editor from './Editor.svelte'
 
 	// Constants
 	import { countries, REGIONS } from '$lib/utils/constants/Regions'
@@ -154,7 +155,7 @@
 	/>
 	<div class="flex items-end gap-5">
 		<Dropdown
-		width='8rem'
+			width="8rem"
 			itemViewer={LadaViewer}
 			bind:value={phoneCode}
 			itemGenerator={(item) => ({ title: item.title, iso: item.iso })}
@@ -237,12 +238,13 @@
 			multiple={false}
 		/>
 	{/if}
-	<label class="flex flex-col w-full gap-2">
+	<div class="flex flex-col w-full gap-2 pb-12">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Description:'}
 		</span>
-		<textarea class="min-h-[150px]" bind:value={organizer.description} />
-	</label>
+		<!-- <textarea class="min-h-[150px]" bind:value={organizer.description} /> -->
+		<Editor name="description" bind:value={organizer.description} />
+	</div>
 	<div class="flex gap-10">
 		<MainButton {loading}>Submit</MainButton>
 		<MainButton on:click={onCancel}>cancel</MainButton>

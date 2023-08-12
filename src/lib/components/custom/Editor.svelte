@@ -1,9 +1,12 @@
 <script>
 	import { onMount } from 'svelte'
 
-	export let value = 'Apenas um show'
+	// Props
+	export let value = ''
 	export let name
+
 	let editor
+	let data = ''
 
 	const options = {
 		theme: 'snow',
@@ -13,6 +16,9 @@
 	onMount(async () => {
 		const quill = await import('@tadashi/svelte-editor-quill')
 		editor = quill.Editor
+		if (value) {
+			data = value
+		}
 	})
 
 	function onTextChange(event) {
@@ -27,9 +33,9 @@
 
 <svelte:component
 	this={editor}
+	{data}
 	{options}
 	on:text-change={onTextChange}
-	data={value}
-	class="[&>.ql-snow]:bg-white [&>.ql-toolbar]:rounded-t-[10px] [&>.ql-container]:rounded-b-[10px] [&>.ql-snow]:!border-2 [&>.ql-snow]:!border-input-outline"
+	class="[&>.ql-snow]:bg-white [&>.ql-toolbar]:rounded-t-[10px] [&>.ql-container]:rounded-b-[10px] [&>.ql-snow]:!border-2 [&>.ql-snow]:!border-input-outline h-32"
 />
 <input type="hidden" {name} {value} />

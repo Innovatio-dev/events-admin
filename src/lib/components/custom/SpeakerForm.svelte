@@ -1,12 +1,11 @@
 <script lang="ts">
-	// Svelte
-	import { goto } from '$app/navigation'
 	// Components
 	import Input from '$lib/components/Input.svelte'
 	import MainButton from '../MainButton.svelte'
 	import DragAndDrop from '../DragAndDrop.svelte'
 	import UploadedImage from './UploadedImage.svelte'
 	import Dropdown from '../Dropdown.svelte'
+	import Editor from './Editor.svelte'
 
 	// Constants
 	import { countries } from '$lib/utils/constants/Regions'
@@ -102,19 +101,32 @@
 			return { value: country.id, title: country.nicename ?? '' }
 		})}
 	/>
-	<Input label="Speaker company:" required type="text" name="company" bind:value={speaker.company} />
-	<Input label="Rol / Position" required type="text" name="jobRole" bind:value={speaker.jobRole} />
-	<label class="flex flex-col w-full gap-2">
+	<Input
+		label="Speaker company:"
+		required
+		type="text"
+		name="company"
+		bind:value={speaker.company}
+	/>
+	<Input
+		label="Rol / Position"
+		required
+		type="text"
+		name="jobRole"
+		bind:value={speaker.jobRole}
+	/>
+	<div class="flex flex-col w-full gap-2 pb-12">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Description:'}
 		</span>
-		<textarea
+		<!-- <textarea
 			required
 			class="min-h-[150px]"
 			name="description"
 			bind:value={speaker.description}
-		/>
-	</label>
+		/> -->
+		<Editor name="description" bind:value={speaker.description} />
+	</div>
 	<div class="grid grid-cols-2 gap-5">
 		<Input label="Twitter:" type="text" name="twitter" bind:value={speaker.twitter} />
 		<Input label="Instagram:" type="text" name="instagram" bind:value={speaker.instagram} />

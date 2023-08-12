@@ -30,7 +30,6 @@
 	}
 
 	async function updateVenue(id, venue) {
-		loading = true
 		try {
 			const res = await fetch(`/api/venues/${id}`, {
 				method: 'PUT',
@@ -51,7 +50,6 @@
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
-		loading = false
 	}
 
 	onMount(async () => {
