@@ -25,7 +25,7 @@ export async function GET(event: RequestEvent) {
 	
 	if (filter.regionId) {
 		where = {
-			'$venue.region.id$': filter.regionId
+			'$venue.region.id$': { [Op.in]: filter.regionId }
 		}
 	}
 	// const whereVenue: any = {} // Object for venue model's filter conditions

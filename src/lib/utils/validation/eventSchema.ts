@@ -5,7 +5,7 @@ export const filterSchema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
 	limit: Joi.number().min(-1).optional().default(10),
 	typeEvent: encodedIntegerArray.optional(),
-	regionId: Joi.number(),
+	regionId: encodedIntegerArray.optional(),
 	countryId: Joi.number(),
 	city: Joi.string(),
 	dateMin: Joi.date().optional(),
