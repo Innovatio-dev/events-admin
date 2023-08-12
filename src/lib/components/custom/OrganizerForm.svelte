@@ -154,6 +154,7 @@
 	/>
 	<div class="flex items-end gap-5">
 		<Dropdown
+		width='8rem'
 			itemViewer={LadaViewer}
 			bind:value={phoneCode}
 			itemGenerator={(item) => ({ title: item.title, iso: item.iso })}

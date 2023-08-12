@@ -102,8 +102,8 @@
 			return { value: country.id, title: country.nicename ?? '' }
 		})}
 	/>
-	<Input label="Speaker company:" type="text" name="company" bind:value={speaker.company} />
-	<Input label="Rol / Position" type="text" name="jobRole" bind:value={speaker.jobRole} />
+	<Input label="Speaker company:" required type="text" name="company" bind:value={speaker.company} />
+	<Input label="Rol / Position" required type="text" name="jobRole" bind:value={speaker.jobRole} />
 	<label class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Description:'}

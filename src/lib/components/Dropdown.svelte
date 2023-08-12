@@ -22,6 +22,7 @@
 	import SimpleTextViewer from './custom/data_viewer/SimpleTextViewer.svelte'
 	import TextWithImageViewer from './custom/data_viewer/TextWithImageViewer.svelte'
 
+	export let required = false
 	export let items: any[] = []
 	export let selected: any[] | any | null = null
 	export let multiselect: boolean = false
@@ -139,7 +140,6 @@
 <!-- <svelte:window on:click={handleClickOutside} /> -->
 
 <div bind:this={containerElement} class="container" {style}>
-	<input {name} class="input" type="hidden" {value} />
 	<!-- svelte-ignore a11y-click-events-have-key-events -->
 	<div
 		class="active"
@@ -170,6 +170,7 @@
 			<Arrow />
 		</div>
 	</div>
+	<input {name} class="opacity-0 h-[1px] pointer-events-none block" {value} {required} />
 </div>
 <Popup
 	bind:this={popupRef}
