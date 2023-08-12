@@ -7,6 +7,7 @@ export const filterSchema = Joi.object({
 	typeEvent: encodedIntegerArray.optional(),
 	regionId: encodedIntegerArray.optional(),
 	countryId: Joi.number(),
+	status: encodedIntegerArray.optional(),
 	city: Joi.string(),
 	dateMin: Joi.date().optional(),
 	dateMax: Joi.date().optional(),

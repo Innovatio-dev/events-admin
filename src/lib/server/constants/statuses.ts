@@ -7,8 +7,7 @@ const organizerRequestStatuses = {
 const eventStatuses = {
 	DRAFT: 0,
 	PUBLISHED: 1,
-	CANCELLED: 2,
-	SUSPENDED: 3
+	CANCELLED: 2
 }
 
 const organizerStatuses = {

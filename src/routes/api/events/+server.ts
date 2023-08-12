@@ -59,6 +59,9 @@ export async function GET(event: RequestEvent) {
 	if (filter.typeEvent != null) {
 		where.typeEvent = { [Op.in]: filter.typeEvent }
 	}
+	if (filter.status != null) {
+		where.status = { [Op.in]: filter.status }
+	}
 
 	if (filter.order) {
 		for (const col of filter.order) {
