@@ -17,7 +17,9 @@ import {
 	ConfirmSignUpCommand,
 	RespondToAuthChallengeCommand,
 	AdminSetUserPasswordCommand,
-	AdminUpdateUserAttributesCommand
+	AdminUpdateUserAttributesCommand,
+	ForgotPasswordCommand,
+	ConfirmForgotPasswordCommand
 } from '@aws-sdk/client-cognito-identity-provider'
 
 export class CognitoFacade {
@@ -196,6 +198,26 @@ export class CognitoFacade {
 		}
 
 		const command = new AdminUpdateUserAttributesCommand(params)
+		return await this.client.send(command)
+	}
+
+	async recoverPassword(username: string ) {
+		const params = {
+			ClientId: this.clientId,
+			Username: username,
+		}
+		const command = new ForgotPasswordCommand(params)
+		return await this.client.send(command)
+	}
+	
+	async recoverPasswordChange(code: string, username: string, password: string ) {
+		const params = {
+			ClientId: this.clientId,
+			ConfirmationCode: code,
+			Password: password,
+			Username: username,
+		}
+		const command = new ConfirmForgotPasswordCommand(params)
 		return await this.client.send(command)
 	}
 }
