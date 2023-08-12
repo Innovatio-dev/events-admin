@@ -21,17 +21,21 @@ import { HttpResponses } from '$lib/server/constants/httpResponses'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
-	const where: any = {}
-	const whereVenue: any = {} // Object for venue model's filter conditions
-	const whereRegion: any = {} // Object for region model's filter conditions
+	let where: any = {}
+	
+	if (filter.regionId) {
+		where = {
+			'$venue.region.id$': filter.regionId
+		}
+	}
+	// const whereVenue: any = {} // Object for venue model's filter conditions
+	// const whereRegion: any = {} // Object for region model's filter conditions
 	const whereCountry: any = {} // Object for country model's filter conditions
 	const whereSchedule: any = {}
 	const order: Order = [] // Array to store order conditions
 
 	// Filter conditions for event model
-	if (filter.regionId) {
-		whereRegion.id = filter.regionId
-	}
+	
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
 	}
@@ -84,6 +88,9 @@ export async function GET(event: RequestEvent) {
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
 	}
+
+	// console.log(where);
+	
 	// Count events based on filter conditions and associations
 	const count = await Event.count({
 		where,
@@ -95,8 +102,7 @@ export async function GET(event: RequestEvent) {
 				include: [
 					{
 						model: Region,
-						as: 'region',
-						where: whereRegion // Apply region filter conditions
+						as: 'region' // Apply region filter conditions
 					},
 					{
 						model: Country,
@@ -123,7 +129,6 @@ export async function GET(event: RequestEvent) {
 					{
 						model: Region,
 						as: 'region',
-						where: whereRegion // Apply region filter conditions
 					},
 					{
 						model: Country.scope('full'),
@@ -231,10 +236,32 @@ export async function POST(event: RequestEvent) {
 		createList.folderId = 5
 
 		const data = await apiInstance.createList(createList)
+		console.log('data from brevo', data)
 		values.mailing = data.id
 		values.userId = user.id
-		values.venueId = venue[0].id
-		values.regionId = venue[0].region.id
+		console.log('Before getting to venue')
+		if(venue.length > 0) {
+			values.venueId = venue[0].id
+			values.regionId = venue[0].region.id
+		}
+		else {
+			const virtual = await Venue.findOne({
+				where: {
+					address: 'Online' 
+				},
+				include: [
+					{
+						model: Region,
+						as: 'region'
+					}
+				]
+			})
+			if(virtual) {
+				values.venueId = virtual.id
+				values.regionId = virtual.region.id	
+			}
+		}
+		console.log('after venue')
 
 		let event = await Event.create(
 			{
@@ -337,8 +364,8 @@ async function createSpeakerSnapshot(
 		},
 		{ transaction }
 	)
-	speakerSnapshot.setPicture(image)
-	speakerSnapshot.setCountry(country)
+	speakerSnapshot.setPicture(image, {transaction})
+	speakerSnapshot.setCountry(country, {transaction})
 	await speakerSnapshot.save()
 	return speakerSnapshot
 }

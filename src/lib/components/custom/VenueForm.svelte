@@ -14,15 +14,16 @@
 <script lang="ts">
 	// Components
 	import Input from '$lib/components/Input.svelte'
-	import MainButton from '../MainButton.svelte'
-	import DragAndDrop from '../DragAndDrop.svelte'
-	import UploadedImage from './UploadedImage.svelte'
 	import Icon from 'svelte-icons-pack/Icon.svelte'
+	import DragAndDrop from '../DragAndDrop.svelte'
+	import MainButton from '../MainButton.svelte'
 	import LocationInput from './LocationInput.svelte'
+	import UploadedImage from './UploadedImage.svelte'
 	// Constants
 	import ToggleButtton from '../ToggleButtton.svelte'
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
+	import Editor from './Editor.svelte'
 
 	// Props
 	export let addVenue: any = null
@@ -102,17 +103,18 @@
 		type="text"
 		value={`${geoData.location.lat}, ${geoData.location.lng}`}
 	/>
-	<label class="flex flex-col w-full gap-2">
+	<div class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Venue Description'}
 		</span>
-		<textarea
+		<!-- <textarea
 			required
 			class="min-h-[150px]"
 			name="description"
 			bind:value={venue.description}
-		/>
-	</label>
+		/> -->
+		<Editor name="description" bind:value={venue.description} />
+	</div>
 	<div class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Featured venue photo'}
