@@ -49,7 +49,7 @@
 	let avatarLogo
 
 	const items = [
-		{ path: '/events/create', name: 'Create a event', icon: Add },
+		{ path: '/events/create', name: 'Create an event', icon: Add },
 		{ path: '/organizer-requests', name: 'Organizer requests', icon: Request },
 		{ path: '/organizers', name: 'Organizer list', icon: User },
 		{ path: '/events', name: 'View events', icon: Ticket },
