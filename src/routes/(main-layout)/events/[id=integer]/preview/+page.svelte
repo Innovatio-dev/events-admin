@@ -179,7 +179,7 @@
 				<div>
 					<Skeleton wFull height={600} />
 				</div>
-			{:else if events}
+			{:else if events?.banner}
 				<div class="w-fiit h-fit mx-auto">
 					<img
 						src={events.banner.url}

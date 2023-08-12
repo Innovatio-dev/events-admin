@@ -29,10 +29,23 @@
 	let files: FileUpload[] = []
 	let inputRef: HTMLInputElement
 
+	const allowedFormats = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp']
+
 	function handleDrop(event: any) {
 		event.preventDefault()
-		for (const file of event.dataTransfer.files) {
-			uploadFile(file)
+		if (!multiple && uploaded.length > 0) {
+			alert('You can only upload one file here')
+		} else {
+			for (const file of event.dataTransfer.files) {
+				if (file.size > 2097152) {
+					alert('File is too big!')
+				} else if (allowedFormats.includes(file.type)) {
+					uploadFile(file)
+					console.log(file)
+				} else {
+					alert("File's format not supported")
+				}
+			}
 		}
 	}
 
@@ -41,14 +54,18 @@
 	}
 
 	function handleInputFile(event: any) {
-		for (const file of inputRef.files || []) {
-			if (file.size > 2097152) {
-				alert('File is too big!')
-			} else if (file.type != ('image/png' || 'image/jpg' || 'image/jpeg' || 'image/webp')) {
-				alert("File's format not supported")
-			} else {
-				console.log(file)
-				uploadFile(file)
+		if (!multiple && uploaded.length > 0) {
+			alert('You can only upload one file here')
+		} else {
+			for (const file of inputRef.files || []) {
+				if (file.size > 2097152) {
+					alert('File is too big!')
+				} else if (allowedFormats.includes(file.type)) {
+					uploadFile(file)
+					console.log(file)
+				} else {
+					alert("File's format not supported")
+				}
 			}
 		}
 	}
@@ -157,7 +174,7 @@
 	<input
 		bind:this={inputRef}
 		on:change={handleInputFile}
-		accept=".png,jpg,.jpeg,.webp"
+		accept=".png,.jpg,.jpeg,.webp"
 		type="file"
 		hidden
 		{multiple}
@@ -297,6 +314,7 @@
 	}
 
 	.content {
+		font-family: var(--font-eesti);
 		display: flex;
 		flex-flow: column;
 		align-items: center;
@@ -322,16 +340,19 @@
 			justify-content: center;
 			flex-flow: column;
 			.title {
-				font-weight: 500;
+				font-weight: 400;
+				font-size: 20px;
 			}
 			.subtitle {
-				font-weight: 300;
+				font-weight: 200;
+				font-size: 20px;
 			}
 		}
 		.body {
 			span {
+				font-size: 20px;
 				color: var(--neutral-4);
-				font-weight: 300;
+				font-weight: 200;
 			}
 		}
 		.icon {
@@ -345,6 +366,8 @@
 			color: var(--neutral-3);
 			font-weight: 375;
 			letter-spacing: 0.5px;
+			font-size: 20px;
+			line-height: 30px; /* 150% */
 		}
 
 		.filesContainer {

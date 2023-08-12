@@ -121,8 +121,8 @@
 	]
 
 	const types = [
-		{ value: 0, title: 'Virtual', variant: 'secondary' },
-		{ value: 1, title: 'Live Events', variant: 'secondary' }
+		{ value: 0, title: 'Live Events', variant: 'secondary' },
+		{ value: 1, title: 'Virtual', variant: 'secondary' }
 	]
 
 	afterNavigate(async () => {

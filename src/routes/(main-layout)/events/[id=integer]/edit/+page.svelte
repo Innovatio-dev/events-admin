@@ -2,7 +2,7 @@
 	//Svelte
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
-	import EventForm, { type EventData } from '$lib/components/custom/EventForm.svelte'
+	import EventEditForm, { type EventData } from '$lib/components/custom/EventEditForm.svelte'
 	// Store
 	import { pageStatus } from '$lib/stores/pageStatus'
 
@@ -24,7 +24,9 @@
 		const response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
-			bannerImage = events.banner.url
+			if (events.banner) {
+				bannerImage = events.banner.url
+			}
 			updateEventData(events)
 		}
 		loading = false
@@ -93,13 +95,5 @@
 </script>
 
 <section>
-	<EventForm
-		{eventData}
-		{mainSpeakers}
-		{secondarySpeakers}
-		eventSaved={true}
-		{eventId}
-		banner={bannerImage}
-		updateAction={true}
-	/>
+	<EventEditForm {eventData} {mainSpeakers} {secondarySpeakers} {eventId} banner={bannerImage} />
 </section>

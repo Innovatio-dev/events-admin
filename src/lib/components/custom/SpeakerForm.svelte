@@ -140,7 +140,8 @@
 				name="file"
 				title="Upload your image"
 				subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-				body="600x500"
+				body="1000x1000"
+				multiple={false}
 			/>
 		{/if}
 	</div>
