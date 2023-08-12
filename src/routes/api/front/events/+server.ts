@@ -1,29 +1,28 @@
-import { getConnection } from '$lib/server/config/database'
 import { eventStatuses } from '$lib/server/constants/statuses'
-import { checkUser } from '$lib/server/middlewares/permission'
-import { validateBody, validateSearchParam } from '$lib/server/middlewares/validator'
+import { validateSearchParam } from '$lib/server/middlewares/validator'
 import { Country } from '$lib/server/models/country'
 import { Event } from '$lib/server/models/event'
 import { Region } from '$lib/server/models/region'
 import { Schedule } from '$lib/server/models/schedule'
 import { Venue } from '$lib/server/models/venue'
-import { createSchema, filterSchema } from '$lib/utils/validation/eventSchema'
+import { filterSchema } from '$lib/utils/validation/eventSchema'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import sequelize, { Op, type Order } from 'sequelize'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
-	const where: any = {}
-	const whereVenue: any = {} // Object for venue model's filter conditions
-	const whereRegion: any = {} // Object for region model's filter conditions
+	let where: any = {}
+	
+	if (filter.regionId) {
+		where = {
+			'$venue.region.id$': { [Op.in]: filter.regionId }
+		}
+	}
 	const whereCountry: any = {} // Object for country model's filter conditions
 	const whereSchedule: any = {}
 	const order: Order = [] // Array to store order conditions
 
-	// Filter conditions for event model
-	if (filter.regionId) {
-		whereRegion.id = filter.regionId
-	}
+	
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
 	}
@@ -44,17 +43,23 @@ export async function GET(event: RequestEvent) {
 		}
 	}
 
-	if (filter.typeEvent) {
-		where.typeEvent = filter.typeEvent
+	if (filter.typeEvent != null) {
+		where.typeEvent = { [Op.in]: filter.typeEvent }
 	}
+
+	where.status = eventStatuses.PUBLISHED
 
 	if (filter.order) {
 		for (const col of filter.order) {
 			let name = col.name
 			if (col.name == 'uid') {
 				name = 'id'
+				order.push([name, col.type])
+			} else if (col.name == 'country') {
+				order.push(['venue','country', 'name', col.type])
+			} else {
+				order.push([name, col.type])
 			}
-			order.push([name, col.type])
 		}
 	}
 	if (filter.search) {
@@ -72,8 +77,7 @@ export async function GET(event: RequestEvent) {
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
 	}
-
-	where.status = eventStatuses.PUBLISHED
+	
 	// Count events based on filter conditions and associations
 	const count = await Event.count({
 		where,
@@ -81,12 +85,11 @@ export async function GET(event: RequestEvent) {
 			{
 				model: Venue,
 				as: 'venue',
-				where: whereVenue, // Apply venue filter conditions
+				// where: whereVenue, // Apply venue filter conditions
 				include: [
 					{
 						model: Region,
-						as: 'region',
-						where: whereRegion // Apply region filter conditions
+						as: 'region' // Apply region filter conditions
 					},
 					{
 						model: Country,
@@ -101,19 +104,18 @@ export async function GET(event: RequestEvent) {
 	// Fetch events based on filter conditions and associations
 	const results = await Event.scope('list').findAll({
 		where,
-		limit: filter.limit >= 0 ? filter.limit : undefined,
+		limit: filter.limit >= 0 ? filter.limit : 50,
 		offset: filter.offset,
 		order,
 		include: [
 			{
 				model: Venue,
 				as: 'venue',
-				where: whereVenue, // Apply venue filter conditions
+				// where: whereVenue, // Apply venue filter conditions
 				include: [
 					{
 						model: Region,
 						as: 'region',
-						where: whereRegion // Apply region filter conditions
 					},
 					{
 						model: Country.scope('full'),
@@ -125,12 +127,11 @@ export async function GET(event: RequestEvent) {
 			{
 				model: Schedule,
 				as: 'schedule',
-				where: whereSchedule,
-				required: filter.dateMax != null || filter.dateMin != null
+				where: whereSchedule
+				// required: filter.dateMax != null || filter.dateMin != null
 			}
 		]
 	})
-
 	// Return the count and results as JSON response
 	return json({
 		count,
