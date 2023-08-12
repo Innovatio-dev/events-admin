@@ -214,6 +214,10 @@
 		await updateEvent()
 		loading = false
 		if (success) {
+			$pageAlert = {
+				message: 'Event updated succesfully.',
+				status: true
+			}
 			goto(`/events/${eventId}`)
 		} else {
 			$pageAlert = {
@@ -228,6 +232,10 @@
 		await updateEvent()
 		loading = false
 		if (success) {
+			$pageAlert = {
+				message: 'Event updated succesfully.',
+				status: true
+			}
 			goto(`/events/${eventId}/preview`)
 		} else {
 			$pageAlert = {
@@ -250,10 +258,9 @@
 			loading = true
 			const res = await fetch(`/api/events/${eventId}`, {
 				method: 'PUT',
-				body: JSON.stringify({ ...eventData })
+				body: JSON.stringify({ ...eventData, reason: '' })
 			})
 			if (res.ok) {
-				console.log(eventData)
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Event updated.', status: true }
 				success = true

@@ -10,14 +10,16 @@
 		<!-- <span class="font-semibold">
 			{'Organizer Photo'}
 		</span> -->
-		<div class='w-full flex justify-center'>
-			<div class="w-32  h-32 min-w-[8rem]">
+		<div class="w-full flex justify-center">
+			<div class="w-32 h-32 min-w-[8rem]">
 				<ProfilePic img={image} />
 			</div>
 		</div>
 		<div class="flex items-center justify-center gap-5">
-			<span class='font-light'>
-				{image.slice(0, 20) + '...'}
+			<span class="font-light">
+				{#if image}
+					{image.slice(0, 20) + '...'}
+				{/if}
 			</span>
 			<TrashButton />
 		</div>

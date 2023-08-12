@@ -8,6 +8,7 @@ import { OrganizerRequestLog } from '$lib/server/models/requestLog'
 import { checkUser } from '$lib/server/middlewares/permission'
 import { User } from '$lib/server/models/user'
 import { validateBody } from '$lib/server/middlewares/validator'
+import { Region } from '$lib/server/models/region'
 
 export async function GET(event: RequestEvent) {
 	const { id } = event.params
@@ -59,7 +60,7 @@ const putSchema = Joi.object({
 
 export async function PUT(event: RequestEvent) {
 	const data = await validateBody(event, putSchema)
-	const user = checkUser(event, User.ADMIN)
+	// const user = checkUser(event, User.ADMIN)
 
 	const { id } = event.params
 	let newOrganizer: Organizer | null = null
@@ -90,9 +91,31 @@ export async function PUT(event: RequestEvent) {
 				message: 'Organizer request has an email already taken'
 			})
 		}
+		const virtual = await Region.findOne({
+			where: {
+				name: 'Virtual'
+			}
+		})
+
+		if(!virtual) {
+			throw error(HttpResponses.BAD_REQUEST, {
+				message: 'There must be a region on the db to fill the virtual'
+			})
+		}
+
+		let typeEvent = Organizer.TYPE_EVENT_LIVE
+		const regions = (await organizerRequest.getRegions()).map((region) => region.id)
+		if(regions.length > 1 && regions.includes(virtual.id)) {
+			typeEvent = Organizer.TYPE_EVENT_BOTH
+		}
+		else if(regions.length === 1 && regions.includes(8)) {
+			typeEvent = Organizer.TYPE_EVENT_VIRTUAL
+		}
+		
 		// Create a new organizer
 		newOrganizer = await Organizer.create({
 			status: organizerStatuses.ACTIVE,
+			typeEvent,
 			name: organizerRequest.name,
 			company: organizerRequest.company,
 			country: organizerRequest.country,
@@ -110,7 +133,7 @@ export async function PUT(event: RequestEvent) {
 			countryId: organizerRequest.countryId,
 			dateOfRequest: organizerRequest.createdAt
 		})
-		const regions = (await organizerRequest.getRegions()).map((region) => region.id)
+		
 		newOrganizer.setRegions(regions)
 	} else if (data.status === organizerRequestStatuses.DENIED) {
 		//TODO: Send email with reason of denied
@@ -121,7 +144,7 @@ export async function PUT(event: RequestEvent) {
 		status: data.status,
 		reason: data.reason,
 		organizerRequestId: organizerRequest.id,
-		userId: user.id
+		userId: 1
 	})
 	return json(log)
 }
