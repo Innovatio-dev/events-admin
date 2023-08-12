@@ -97,6 +97,10 @@
 		updatedOrganizer[e.target.name] = e.target.value
 	}
 
+	const customUpdate = (e) => {
+		updatedOrganizer[e.detail.name] = e.detail.value
+	}
+
 	const handleCheck = (e: any) => {
 		if (e.target.checked) {
 			organizer.regions.push(e.target.value)
@@ -119,7 +123,7 @@
 <form
 	on:change={updateOrganizer}
 	on:submit|preventDefault={handleSubmit}
-	class="flex flex-col w-full gap-5"
+	class="flex flex-col w-full gap-5 max-w-[650px]"
 >
 	<div class="flex justify-between items-center">
 		<div
@@ -243,42 +247,10 @@
 			{'Description:'}
 		</span>
 		<!-- <textarea class="min-h-[150px]" bind:value={organizer.description} /> -->
-		<Editor name="description" bind:value={organizer.description} />
+		<Editor on:change={customUpdate} name="description" bind:value={organizer.description} />
 	</div>
 	<div class="flex gap-10">
 		<MainButton {loading}>Submit</MainButton>
 		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>
-
-<style lang="scss">
-	textarea,
-	select {
-		font-size: 0.9rem;
-		border-radius: 10px;
-		padding: 0.7rem calc(0.6rem * 20 / 12);
-		border: 2px solid var(--input-outline);
-		background-color: var(--input-bg);
-		color: var(--input-text);
-		font-weight: 400;
-		font-size: 0.9rem;
-		transition: border 0.3s ease-in-out;
-		outline: none;
-		&:focus {
-			border: 2px solid var(--input-text);
-		}
-	}
-	textarea,
-	select::placeholder {
-		color: var(--input-placeholder);
-	}
-	textarea,
-	select:active {
-		-webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
-		box-shadow: 0 0 0 30px var(--input-bg) inset !important;
-	}
-	textarea,
-	select:-webkit-autofill {
-		-webkit-text-fill-color: var(--input-text) !important;
-	}
-</style>

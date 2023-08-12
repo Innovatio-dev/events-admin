@@ -1,12 +1,16 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
+	// Svelte
+	import { createEventDispatcher, onMount } from 'svelte'
 
 	// Props
 	export let value = ''
 	export let name
 
+	// State
 	let editor
 	let data = ''
+
+	const dispatch = createEventDispatcher()
 
 	const options = {
 		theme: 'snow',
@@ -23,6 +27,7 @@
 
 	function onTextChange(event) {
 		value = event.detail.html
+		dispatch('change', { value: event.detail.html, name: name })
 	}
 </script>
 
@@ -38,4 +43,3 @@
 	on:text-change={onTextChange}
 	class="[&>.ql-snow]:bg-white [&>.ql-toolbar]:rounded-t-[10px] [&>.ql-container]:rounded-b-[10px] [&>.ql-snow]:!border-2 [&>.ql-snow]:!border-input-outline h-32"
 />
-<input type="hidden" {name} {value} />

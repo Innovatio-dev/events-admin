@@ -53,7 +53,7 @@
 	if (addVenue) {
 		venue.id = addVenue.id
 		venue.name = addVenue.name
-		geoData.country = addVenue.country.nicename
+		geoData.country = addVenue.country?.nicename
 		venue.name = addVenue.name
 		geoData.city = addVenue.city
 		geoData.address = addVenue.address
@@ -83,13 +83,17 @@
 		updatedVenue[e.target.name] = e.target.value
 	}
 
+	const customUpdate = (e) => {
+		updatedVenue[e.detail.name] = e.detail.value
+	}
+
 	const onCancel = () => {}
 </script>
 
 <form
 	on:change={updateVenue}
 	on:submit|preventDefault={handleSubmit}
-	class="flex min-w-[500px] flex-col w-full gap-5"
+	class="flex min-w-[500px] max-w-[650px] flex-col w-full gap-5"
 >
 	<Input required label="Venue name" type="text" name="name" bind:value={venue.name} />
 	<LocationInput bind:data={geoData} />
@@ -113,7 +117,7 @@
 			name="description"
 			bind:value={venue.description}
 		/> -->
-		<Editor name="description" bind:value={venue.description} />
+		<Editor on:change={customUpdate} name="description" bind:value={venue.description} />
 	</div>
 	<div class="flex flex-col w-full gap-2">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
@@ -173,21 +177,3 @@
 		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>
-
-<style lang="scss">
-	textarea {
-		font-size: 0.9rem;
-		border-radius: 10px;
-		padding: 0.7rem calc(0.6rem * 20 / 12);
-		border: 2px solid var(--input-outline);
-		background-color: var(--input-bg);
-		color: var(--input-text);
-		font-weight: 400;
-		font-size: 0.9rem;
-		transition: border 0.3s ease-in-out;
-		outline: none;
-		&:focus {
-			border: 2px solid var(--input-text);
-		}
-	}
-</style>
