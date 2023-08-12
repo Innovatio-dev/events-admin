@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte'
 
 	// Props
@@ -22,7 +22,7 @@
 	})
 
 	function onTextChange(event) {
-		value = JSON.stringify(event.detail.html)
+		value = event.detail.html
 	}
 </script>
 

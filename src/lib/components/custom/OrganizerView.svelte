@@ -101,7 +101,7 @@
 					<p>{organizer.mavieId ?? '---'}</p>
 					<p>{organizer.company ?? '---'}</p>
 					<p>{organizer.website ?? '---'}</p>
-					<p>{organizer.description ?? '---'}</p>
+					<p>{@html organizer.description ?? '---'}</p>
 				</div>
 			{/if}
 		</div>

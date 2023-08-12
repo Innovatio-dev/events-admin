@@ -109,7 +109,7 @@
 				<a href={gMapsLink(venue.location.lat, venue.location.lng)} target="_blank">
 					<p>Abrir mapa</p>
 				</a>
-				<p>{venue.description ?? '---'}</p>
+				<p>{@html venue.description.toString() ?? '---'}</p>
 			</div>
 		{/if}
 	</div>

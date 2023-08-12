@@ -112,7 +112,7 @@
 				<p>{speaker.linkedin?.substring(speaker.linkedin.lastIndexOf('/') + 1) ?? '-'}</p>
 				<p>{speaker.facebook?.substring(speaker.facebook.lastIndexOf('/') + 1) ?? '-'}</p>
 				<p>{speaker.youtube?.substring(speaker.youtube.lastIndexOf('/') + 1) ?? '-'}</p>
-				<p>{speaker.description ?? '-'}</p>
+				<p>{@html speaker.description ?? '-'}</p>
 			</div>
 		{/if}
 	</div>
