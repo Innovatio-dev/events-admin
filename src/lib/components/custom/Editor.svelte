@@ -5,6 +5,7 @@
 	// Props
 	export let value = ''
 	export let name
+	export let placeholder = 'Write a description...'
 
 	// State
 	let editor
@@ -14,7 +15,9 @@
 
 	const options = {
 		theme: 'snow',
-		plainclipboard: true
+		plainclipboard: true,
+		placeholder: placeholder,
+		modules: {}
 	}
 
 	onMount(async () => {
