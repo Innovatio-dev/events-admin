@@ -623,8 +623,8 @@
 					{/each}
 				</div>
 			</div>
-
-			<div class="input-set">
+			<!-- Secondary Organizer -->
+			<!-- <div class="input-set">
 				<SectionHeader>Organizer Assigned</SectionHeader>
 				<div>
 					<LabelInput>Organizer Info</LabelInput>
@@ -654,7 +654,7 @@
 						/>
 					</div>
 				{/if}
-			</div>
+			</div> -->
 			<MainButton {loading} on:click={handleSubmit}>Save as draft</MainButton>
 			<MainButton {loading} on:click={viewPreview}>View Preview</MainButton>
 			<MainButton href={`/events`}>Discard</MainButton>
