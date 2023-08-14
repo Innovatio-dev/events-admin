@@ -20,10 +20,22 @@ export async function GET(event: RequestEvent) {
 	}
 	const whereCountry: any = {} // Object for country model's filter conditions
 	const whereSchedule: any = {}
-	const order: Order = [
+	let order: Order = [
 		['schedule', 'startTime', 'ASC']	
 	] 
+	let flag = false 
 
+	if (filter.order) {
+		for (const col of filter.order) {
+			if (col.name == 'startTime') {
+				flag = true
+				break
+			} 
+		}
+	}
+	if(flag) {
+		order = []
+	}
 	
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
@@ -68,7 +80,7 @@ export async function GET(event: RequestEvent) {
 			}
 		}
 	}
-
+	
 	if (filter.search) {
 		const search = `%${filter.search}%`
 
