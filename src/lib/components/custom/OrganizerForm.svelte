@@ -226,9 +226,14 @@
 		bind:value={organizer.instagram}
 	/>
 	<Input name="youtube" label="Youtube (optional):" type="text" bind:value={organizer.youtube} />
-	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
+	<!-- <span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 		{'Organizer photo (optional)'}
-	</span>
+	</span> -->
+	<div class="text-neutral-4 w-full flex justify-center py-3">
+		<h2 class="text-2xl">
+			{'Organizer photo'}
+		</h2>
+	</div>
 	{#if addOrganizer}
 		<UploadedImage image={addOrganizer.logo?.url ?? ''} />
 	{:else}

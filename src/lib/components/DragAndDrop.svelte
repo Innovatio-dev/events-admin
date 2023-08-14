@@ -172,6 +172,7 @@
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="mainContainer">
 	<input
+		{name}
 		bind:this={inputRef}
 		on:change={handleInputFile}
 		accept=".png,.jpg,.jpeg,.webp"

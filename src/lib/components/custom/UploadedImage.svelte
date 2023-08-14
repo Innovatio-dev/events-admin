@@ -1,8 +1,21 @@
 <script>
+	// Svelte
+	import { createEventDispatcher } from 'svelte'
+	// Components
 	import ProfilePic from '../ProfilePic.svelte'
-	import TrashButton from '../TrashButton.svelte'
+	// Icons
+	import Icon from 'svelte-icons-pack'
+	import CgTrash from 'svelte-icons-pack/cg/CgTrash'
 
+	// Props
 	export let image
+	export let clickAction = () => {}
+
+	const dispatch = createEventDispatcher()
+
+	function handleClick() {
+		clickAction()
+	}
 </script>
 
 <div class="w-full flex justify-center items-center text-neutral-4">
@@ -21,7 +34,12 @@
 					{image.slice(0, 20) + '...'}
 				{/if}
 			</span>
-			<TrashButton />
+			<button
+				class="bg-white rounded-lg w-8 h-8 flex justify-center items-center"
+				on:click={handleClick}
+			>
+				<Icon src={CgTrash} color="currentColor" size="20px" />
+			</button>
 		</div>
 	</div>
 </div>

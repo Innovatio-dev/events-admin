@@ -65,7 +65,12 @@
 	const handleSubmit = async () => {
 		if (updateAction) {
 			loading = true
-			await updateAction(venue?.id ?? 0, updatedVenue)
+			const formattedData = {
+				...updatedVenue,
+				pictures: [venue.pictures[0], ...extraPictures]
+			}
+			await updateAction(venue?.id ?? 0, formattedData)
+			// console.log(formattedData)
 			loading = false
 		} else {
 			loading = true
@@ -80,11 +85,17 @@
 	}
 
 	const updateVenue = (e) => {
-		updatedVenue[e.target.name] = e.target.value
+		if (e.target.name.length) {
+			updatedVenue[e.target.name] = e.target.value
+		}
 	}
 
 	const customUpdate = (e) => {
 		updatedVenue[e.detail.name] = e.detail.value
+	}
+
+	const deletePicture = () => {
+		addVenue.pictures = []
 	}
 
 	const onCancel = () => {}
@@ -107,7 +118,7 @@
 		type="text"
 		value={`${geoData.location.lat}, ${geoData.location.lng}`}
 	/>
-	<div class="flex flex-col w-full gap-2">
+	<div class="flex flex-col w-full gap-2 pb-12">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Venue Description'}
 		</span>
@@ -119,23 +130,23 @@
 		/> -->
 		<Editor on:change={customUpdate} name="description" bind:value={venue.description} />
 	</div>
-	<div class="flex flex-col w-full gap-2">
-		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
+	<div class="flex flex-col text-neutral-4 w-full gap-2">
+		<h2 class="text-3xl mb-5">
 			{'Featured venue photo'}
-		</span>
+		</h2>
 		<div class="text-neutral-4 w-full flex justify-center py-3">
 			<h2 class="text-2xl">
 				{'Venue featured photo'}
 			</h2>
 		</div>
-		{#if addVenue}
-			<UploadedImage image={addVenue.pictures[0]?.url ?? ''} />
+		{#if addVenue?.pictures?.length}
+			<UploadedImage clickAction={deletePicture} image={addVenue.pictures[0]?.url ?? ''} />
 		{:else}
 			<DragAndDrop
 				multiple={false}
-				bind:uploaded={extraPictures}
+				bind:uploaded={venue.pictures}
 				url="/api/resources"
-				name="file"
+				name="pictures"
 				title="Upload your image"
 				subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 				body="510x410"
@@ -158,9 +169,9 @@
 			</h2>
 		</div>
 		<DragAndDrop
-			bind:uploaded={venue.pictures}
+			bind:uploaded={extraPictures}
 			url="/api/resources"
-			name="file"
+			name="pictures"
 			title="Upload your image"
 			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 			body="700x410"
