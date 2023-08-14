@@ -212,7 +212,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function POST(event: RequestEvent) {
-	// const user = checkUser(event)
+	const user = checkUser(event)
 	//TODO: Create eventSpeakers based on array of speakers
 	const {
 		pictures,
@@ -237,7 +237,7 @@ export async function POST(event: RequestEvent) {
 
 		createList.name = values.title
 		createList.folderId = 5
-		values.userId = 1
+		values.userId = user.id
 
 		if(venue.length > 0) {
 			values.venueId = venue[0].id
@@ -262,9 +262,8 @@ export async function POST(event: RequestEvent) {
 		}
 		console.log('after venue')
 
-		// const data = await apiInstance.createList(createList)
-		// console.log('data from brevo', data)
-		// values.mailing = data.id
+		const data = await apiInstance.createList(createList)
+		values.mailing = data.id
 
 		let event = await Event.create(
 			{
