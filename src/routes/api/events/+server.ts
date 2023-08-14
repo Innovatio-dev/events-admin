@@ -212,7 +212,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function POST(event: RequestEvent) {
-	const user = checkUser(event)
+	// const user = checkUser(event)
 	//TODO: Create eventSpeakers based on array of speakers
 	const {
 		pictures,
@@ -237,12 +237,8 @@ export async function POST(event: RequestEvent) {
 
 		createList.name = values.title
 		createList.folderId = 5
+		values.userId = 1
 
-		const data = await apiInstance.createList(createList)
-		console.log('data from brevo', data)
-		values.mailing = data.id
-		values.userId = user.id
-		console.log('Before getting to venue')
 		if(venue.length > 0) {
 			values.venueId = venue[0].id
 			values.regionId = venue[0].region.id
@@ -265,6 +261,10 @@ export async function POST(event: RequestEvent) {
 			}
 		}
 		console.log('after venue')
+
+		// const data = await apiInstance.createList(createList)
+		// console.log('data from brevo', data)
+		// values.mailing = data.id
 
 		let event = await Event.create(
 			{
@@ -330,9 +330,18 @@ export async function POST(event: RequestEvent) {
 		await transaction.commit()
 		event = (await Event.scope('full').findByPk(event.id)) as Event
 		return json(event)
-	} catch (err) {
-		console.log(err)
+	} catch (err: any) {
 		await transaction.rollback()
+		if(err.name === 'SequelizeUniqueConstraintError') {
+			if(err.errors[0].path === 'slug') {
+				throw error(HttpResponses.UNIQUE_CONSTRAINT, {
+					message: 'Validation Error:  Unique, This Event Name and Slud Already Exists'
+				})
+			}
+			throw error(HttpResponses.UNIQUE_CONSTRAINT, {
+				message: 'Validation Error:  Unique constrain Error'
+			})
+		}
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
 			message: 'Something happend, try again later ' + err
 		})

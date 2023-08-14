@@ -7,6 +7,7 @@ const HttpResponses = {
     NOT_FOUND: 404,
     METHOD_NOT_ALLOWED: 405,
     BAR_REQUEST: 422,
+    UNIQUE_CONSTRAINT: 427, 
     UNEXPECTED_ERROR: 513
 }
 

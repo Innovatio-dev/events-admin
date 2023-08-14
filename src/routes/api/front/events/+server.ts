@@ -20,7 +20,9 @@ export async function GET(event: RequestEvent) {
 	}
 	const whereCountry: any = {} // Object for country model's filter conditions
 	const whereSchedule: any = {}
-	const order: Order = [] // Array to store order conditions
+	const order: Order = [
+		['schedule', 'startTime', 'ASC']	
+	] 
 
 	
 	if (filter.countryId) {
@@ -48,7 +50,7 @@ export async function GET(event: RequestEvent) {
 	}
 
 	where.status = eventStatuses.PUBLISHED
-
+	
 	if (filter.order) {
 		for (const col of filter.order) {
 			let name = col.name
@@ -56,12 +58,17 @@ export async function GET(event: RequestEvent) {
 				name = 'id'
 				order.push([name, col.type])
 			} else if (col.name == 'country') {
-				order.push(['venue','country', 'name', col.type])
-			} else {
+				order.push(['venue', 'country', 'name', col.type])
+			}
+			else if (col.name == 'startTime') {
+				order.push(['schedule', 'startTime', col.type])
+			} 
+			else {
 				order.push([name, col.type])
 			}
 		}
 	}
+
 	if (filter.search) {
 		const search = `%${filter.search}%`
 
@@ -132,45 +139,9 @@ export async function GET(event: RequestEvent) {
 			}
 		]
 	})
-	// Return the count and results as JSON response
+
 	return json({
 		count,
 		results
 	})
 }
-
-// export async function POST(event: RequestEvent) {
-// 	const user = checkUser(event)
-// 	//TODO: Create eventSpeakers based on array of speakers
-// 	const { pictures, bannerId, bannerMobileId, ...values } = await validateBody(
-// 		event,
-// 		createSchema
-// 	)
-// 	const connection = await getConnection()
-// 	const transaction = await connection.transaction()
-// 	try {
-// 		let event = await Event.create(
-// 			{
-// 				...values
-// 			},
-// 			{ transaction, include: [{ model: Schedule, as: 'schedule' }] }
-// 		)
-
-// 		if (pictures) {
-// 			await event.setPictures(pictures, { transaction })
-// 		}
-// 		if (bannerId) {
-// 			await event.setBanner(bannerId, { transaction })
-// 		}
-// 		if (bannerMobileId) {
-// 			await event.setBannerMobile(bannerMobileId, { transaction })
-// 		}
-// 		await transaction.commit()
-// 		event = (await Event.scope('full').findByPk(event.id)) as Event
-// 		return json(event)
-// 	} catch (error) {
-// 		console.log(error)
-// 		await transaction.rollback()
-// 		throw error
-// 	}
-// }
