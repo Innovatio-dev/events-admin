@@ -212,14 +212,8 @@
 		loading = true
 		await createEvent()
 		loading = false
-		console.log(eventId)
 		if (eventId) {
 			goto(`/events/${eventId}`)
-		} else {
-			$pageAlert = {
-				message: 'Oops! An error has occurred. try again later.',
-				status: false
-			}
 		}
 	}
 
@@ -229,11 +223,6 @@
 		loading = false
 		if (eventId) {
 			goto(`/events/${eventId}/preview`)
-		} else {
-			$pageAlert = {
-				message: 'Oops! An error has occurred. try again later.',
-				status: false
-			}
 		}
 	}
 
@@ -258,9 +247,13 @@
 				eventId = data.id
 				return eventId
 			} else {
-				console.log(await res.json())
+				const errorResponse = await res.json() // Almacenar la respuesta de error en una variable
+				console.log(errorResponse)
 				$pageAlert = {
-					message: 'Oops! An error has occurred. try again later.',
+					message:
+						errorResponse.message == 'Validation error'
+							? 'Please fill out all required fields.'
+							: errorResponse.message,
 					status: false
 				}
 			}
@@ -354,11 +347,11 @@
 						<span class="text-xs text-alert-error">* Event title is required</span>
 					{/if}
 				</div>
-				<div class="flex flex-col w-full gap-2 pb-12">
+				<div class="flex flex-col w-full gap-2 pb-10">
 					<LabelInput>Write a brief description of the event</LabelInput>
 					<Editor bind:value={eventData.description} name="description" />
-					{#if eventData.description.length < 12 && validate}
-						<span class="text-xs text-alert-error pt-4"
+					{#if eventData.description.length < 12 && !validate}
+						<span class="text-xs text-alert-error pt-12"
 							>* Event description is required</span
 						>
 					{/if}
