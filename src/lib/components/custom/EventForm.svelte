@@ -13,7 +13,7 @@
 		venue: any
 		translation: { name: string; flagIso: string }[]
 		secondaryOrganizer: string | null
-		secondaryOrganizerDescription: string | null
+		secondaryOrganizerDescription: string
 		speakers: any[]
 		speakersSecondary: any[]
 		schedule: {
@@ -50,6 +50,7 @@
 	// Icons
 	import CgMathEqual from 'svelte-icons-pack/cg/CgMathEqual'
 	import { pageAlert } from '$lib/stores/pageStatus'
+	import Editor from './Editor.svelte'
 
 	const typeEvents = [
 		{
@@ -353,15 +354,12 @@
 						<span class="text-xs text-alert-error">* Event title is required</span>
 					{/if}
 				</div>
-				<div>
+				<div class="flex flex-col w-full gap-2 pb-12">
 					<LabelInput>Write a brief description of the event</LabelInput>
-					<Input
-						bind:value={eventData.description}
-						required
-						placeholder="Write a brief description of the event"
-					/>
-					{#if eventData.description.length < 3 && validate}
-						<span class="text-xs text-alert-error">* Event description is required</span
+					<Editor bind:value={eventData.description} name="description" />
+					{#if eventData.description.length < 12 && validate}
+						<span class="text-xs text-alert-error pt-4"
+							>* Event description is required</span
 						>
 					{/if}
 				</div>
@@ -524,43 +522,46 @@
 					</div>
 				{/if}
 			</div>
-
-			<div class="input-set">
-				<SectionHeader>Venue</SectionHeader>
-				<div>
-					<LabelInput>Venue</LabelInput>
-					<div class="flex gap-2">
-						<div class="w-full">
-							<DropdownFetcher
-								filterPlaceholder={'Search'}
-								itemGenerator={(item) => ({ title: item.name })}
-								valueGenerator={(item) => item.id}
-								selectedGenerator={(item) => ({ title: item.name })}
-								placeholder={'Choose a venue'}
-								url={'/api/venues'}
-								multiselect={false}
-								selected={eventData.venue ? eventData.venue : null}
-								on:change={(e) => {
-									const venue = e.detail.selected
+			{#if eventData?.typeEvent == '1'}
+				<div class="input-set">
+					<SectionHeader>Venue</SectionHeader>
+					<div>
+						<LabelInput>Venue</LabelInput>
+						<div class="flex gap-2">
+							<div class="w-full">
+								<DropdownFetcher
+									filterPlaceholder={'Search'}
+									itemGenerator={(item) => ({ title: item.name })}
+									valueGenerator={(item) => item.id}
+									selectedGenerator={(item) => ({ title: item.name })}
+									placeholder={'Choose a venue'}
+									url={'/api/venues'}
+									multiselect={false}
+									selected={eventData.venue ? eventData.venue : null}
+									on:change={(e) => {
+										const venue = e.detail.selected
+										venues = [venue]
+									}}
+								/>
+							</div>
+							<MainButton fit on:click={() => (isModalVenue = true)}
+								>Create</MainButton
+							>
+							<VenuesFormModal
+								isOpen={isModalVenue}
+								on:save={(event) => {
+									const venue = event.detail
 									venues = [venue]
 								}}
+								handleClose={() => (isModalVenue = false)}
 							/>
 						</div>
-						<MainButton fit on:click={() => (isModalVenue = true)}>Create</MainButton>
-						<VenuesFormModal
-							isOpen={isModalVenue}
-							on:save={(event) => {
-								const venue = event.detail
-								venues = [venue]
-							}}
-							handleClose={() => (isModalVenue = false)}
-						/>
+					</div>
+					<div>
+						<OrderableTable columns={venueColumns} data={venues} />
 					</div>
 				</div>
-				<div>
-					<OrderableTable columns={venueColumns} data={venues} />
-				</div>
-			</div>
+			{/if}
 			<div class="input-set">
 				<SectionHeader>Language</SectionHeader>
 				<div>
@@ -645,11 +646,11 @@
 							bind:value={eventData.secondaryOrganizer}
 						/>
 					</div>
-					<div>
+					<div class="flex flex-col w-full gap-2 pb-12">
 						<LabelInput>Description</LabelInput>
-						<Input
-							placeholder="Organizer Assigned to this event"
+						<Editor
 							bind:value={eventData.secondaryOrganizerDescription}
+							name="secondaryOrganizerDescription"
 						/>
 					</div>
 				{/if}

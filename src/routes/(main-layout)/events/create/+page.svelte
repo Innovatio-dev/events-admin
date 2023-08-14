@@ -21,7 +21,7 @@
 		venue: null,
 		translation: [],
 		secondaryOrganizer: null,
-		secondaryOrganizerDescription: null,
+		secondaryOrganizerDescription: '',
 		speakers: [],
 		speakersSecondary: [],
 		schedule: {
