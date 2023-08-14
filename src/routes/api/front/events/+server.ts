@@ -20,7 +20,9 @@ export async function GET(event: RequestEvent) {
 	}
 	const whereCountry: any = {} // Object for country model's filter conditions
 	const whereSchedule: any = {}
-	const order: Order = [] 
+	const order: Order = [
+		['schedule', 'startTime', 'ASC']	
+	] 
 
 	
 	if (filter.countryId) {
@@ -137,7 +139,7 @@ export async function GET(event: RequestEvent) {
 			}
 		]
 	})
-	
+
 	return json({
 		count,
 		results
