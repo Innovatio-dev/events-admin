@@ -16,6 +16,7 @@ export const filterSchema = Joi.object({
 		'uid',
 		'title',
 		'createdAt',
+		'startTime',
 		'country',
 		'typeEvent',
 		'status',
