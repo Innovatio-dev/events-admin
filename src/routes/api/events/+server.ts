@@ -78,7 +78,7 @@ export async function GET(event: RequestEvent) {
 	}
 	if (filter.search) {
 		let search = `%${filter.search}%`
-		const regex = new RegExp("^[E][0-9]*");
+		const regex = new RegExp("^[eE][0-9]*");
 
 		if(regex.test(filter.search)) {
 			search = '%' + parseInt(filter.search.substring(1)) + '%'

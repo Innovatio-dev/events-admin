@@ -70,7 +70,12 @@ export async function GET(event: RequestEvent) {
 		}
 	}
 	if (filter.search) {
-		const search = `%${filter.search}%`
+		let search = `%${filter.search}%`
+		const regex = new RegExp("^[uU][0-9]*");
+
+		if(regex.test(filter.search)) {
+			search = '%' + parseInt(filter.search.substring(1)) + '%'
+		}
 
 		where[Op.or] = [
 			sequelize.where(sequelize.fn('unaccent', sequelize.col('Organizer.name')), {
@@ -78,6 +83,9 @@ export async function GET(event: RequestEvent) {
 			}),
 			sequelize.where(sequelize.cast(sequelize.col('Organizer.id'), 'text'), {
 				[sequelize.Op.iLike]: search
+			}),
+			sequelize.where(sequelize.fn('unaccent', sequelize.col('Organizer.email')), {
+				[sequelize.Op.iLike]: sequelize.fn('unaccent', search)
 			})
 		]
 	}
@@ -106,7 +114,7 @@ export async function GET(event: RequestEvent) {
 						as: 'regions',
 						through: {
 							attributes: []
-						}
+						},
 					}
 				],
 				order,
