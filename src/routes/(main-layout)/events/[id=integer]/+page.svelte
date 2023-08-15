@@ -234,7 +234,7 @@
 							{events.isFeatured ? 'Featured' : 'Regular'}
 						</p>
 						<p>{events.title ?? '---'}</p>
-						<p>{events.description ?? '---'}</p>
+						<p>{@html events.description ?? '---'}</p>
 					</div>
 				{/if}
 			</div>
@@ -439,7 +439,7 @@
 						<SimpleSkeleton width={600} height={20} items={4} />
 					</div>
 				{:else if events.organizer}
-					<p>{events.organizer.description ?? '---'}</p>
+					<p>{@html events.organizer.description ?? '---'}</p>
 				{/if}
 			</div>
 			<div class="grid grid-cols-2 min-w-[400px] mb-8">
@@ -460,7 +460,7 @@
 			</div>
 			<div class="grid grid-cols-2 min-w-[400px] mb-8">
 				<div class="flex items-center justify-center w-[200px] h-[200px]">
-					<ProfilePic img={events?.organizer.logo.url} />
+					<ProfilePic img={events?.organizer?.logo?.url} />
 				</div>
 				{#if loading}
 					<div class="w-full h-full flex">
@@ -494,7 +494,9 @@
 						<SimpleSkeleton width={200} height={20} items={1} />
 					</div>
 				{:else if events.organizer}
+				<div class='field'>
 					<p>{events.mailing ?? '---'}</p>
+				</div>
 				{/if}
 			</div>
 			<div class="flex flex-row gap-6 max-w-fit">
