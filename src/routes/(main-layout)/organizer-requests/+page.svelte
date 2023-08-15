@@ -81,7 +81,7 @@
 		loading = true
 		const url = new URL('/api/organizersRequests', window.location.origin)
 		const cUrl = createUrl(url, {
-			status: params.status.map((status) => status.value),
+			status: params.status.length ? params.status.map((status) => status.value) : 0,
 			typeEvent: params.typeEvent.map((type) => type.value),
 			order: params.order.map(
 				(sortedCol) => `${sortedCol.type == 'asc' ? '' : '-'}${sortedCol.column.dataKey}`
