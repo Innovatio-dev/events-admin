@@ -35,6 +35,7 @@
 				{/if}
 			</span>
 			<button
+				type="button"
 				class="bg-white rounded-lg w-8 h-8 flex justify-center items-center"
 				on:click={handleClick}
 			>
