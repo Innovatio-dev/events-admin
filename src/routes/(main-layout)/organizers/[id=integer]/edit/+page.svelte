@@ -41,6 +41,7 @@
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Organizer updated correctly.', status: true }
+				goto('/organizers')
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -48,7 +49,6 @@
 					status: false
 				}
 			}
-			goto('/organizers')
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }

@@ -38,6 +38,7 @@
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Venue updated correctly.', status: true }
+				goto('/venues')
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -45,7 +46,6 @@
 					status: false
 				}
 			}
-			goto('/venues')
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }

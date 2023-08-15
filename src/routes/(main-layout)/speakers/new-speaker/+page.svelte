@@ -22,6 +22,7 @@
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Speaker added correctly.', status: true }
+				goto('/speakers')
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -29,7 +30,6 @@
 					status: false
 				}
 			}
-			goto('/speakers')
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
