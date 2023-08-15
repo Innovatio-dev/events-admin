@@ -77,7 +77,12 @@ export async function GET(event: RequestEvent) {
 		}
 	}
 	if (filter.search) {
-		const search = `%${filter.search}%`
+		let search = `%${filter.search}%`
+		const regex = new RegExp("^[E][0-9]*");
+
+		if(regex.test(filter.search)) {
+			search = '%' + parseInt(filter.search.substring(1)) + '%'
+		}
 
 		where[Op.or] = [
 			sequelize.where(sequelize.fn('unaccent', sequelize.col('Event.title')), {
