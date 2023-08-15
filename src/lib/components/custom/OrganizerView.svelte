@@ -101,7 +101,7 @@
 					<p>{organizer.mavieId ?? '---'}</p>
 					<p>{organizer.company ?? '---'}</p>
 					<p>{organizer.website ?? '---'}</p>
-					<p>{@html organizer.description ?? '---'}</p>
+					<p class="!h-fit">{@html organizer.description ?? '---'}</p>
 				</div>
 			{/if}
 		</div>
@@ -154,6 +154,6 @@
 		@apply text-neutral-4 font-dm capitalize w-[180px] py-2;
 	}
 	.content p {
-		@apply text-neutral-3 font-thin font-eesti min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
+		@apply text-neutral-3 font-thin font-eesti h-[40px] min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
 	}
 </style>

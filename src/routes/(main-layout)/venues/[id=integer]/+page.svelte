@@ -109,7 +109,7 @@
 				<a href={gMapsLink(venue.location.lat, venue.location.lng)} target="_blank">
 					<p>Abrir mapa</p>
 				</a>
-				<p>{@html venue.description.toString() ?? '---'}</p>
+				<p class="!h-fit">{@html venue.description.toString() ?? '---'}</p>
 			</div>
 		{/if}
 	</div>
@@ -197,6 +197,6 @@
 		@apply text-neutral-4 font-dm capitalize w-[180px] py-2;
 	}
 	.content p {
-		@apply text-neutral-3 font-thin font-eesti min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
+		@apply text-neutral-3 font-thin font-eesti h-[40px] min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
 	}
 </style>

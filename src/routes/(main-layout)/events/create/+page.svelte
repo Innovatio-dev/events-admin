@@ -20,7 +20,7 @@
 		language: null,
 		venue: null,
 		translation: [],
-		secondaryOrganizer: null,
+		secondaryOrganizer: '',
 		secondaryOrganizerDescription: '',
 		speakers: [],
 		speakersSecondary: [],
