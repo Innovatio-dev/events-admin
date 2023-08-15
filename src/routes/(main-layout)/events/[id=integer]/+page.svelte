@@ -307,7 +307,7 @@
 					</div>
 					<div class="w-full h-[100px]">
 						<SpeakerBadge
-							size={'80'}
+							size={'100'}
 							image={speaker.picture?.url ?? ''}
 							jobRole={speaker.jobRole}
 							company={speaker.company}
@@ -334,7 +334,7 @@
 					</div>
 					<div class="w-full h-[60px]">
 						<SpeakerBadge
-							size={'60'}
+							size={'75'}
 							image={speaker.picture?.url ?? ''}
 							jobRole={speaker.jobRole}
 							company={speaker.company}
@@ -494,9 +494,9 @@
 						<SimpleSkeleton width={200} height={20} items={1} />
 					</div>
 				{:else if events.organizer}
-				<div class='field'>
-					<p>{events.mailing ?? '---'}</p>
-				</div>
+					<div class="field">
+						<p>{events.mailing ?? '---'}</p>
+					</div>
 				{/if}
 			</div>
 			<div class="flex flex-row gap-6 max-w-fit">

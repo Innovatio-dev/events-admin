@@ -11,7 +11,7 @@
 </script>
 
 <div class="w-full h-full flex items-center py-2 px-4 gap-x-4">
-	<div class={`w-[${size}px] h-[${size}px]`}>
+	<div class={`w-[${size}px] h-[${size}px] min-h-[${size}px] min-w-[${size}px]`}>
 		<ProfilePic img={image} />
 	</div>
 	{#if iso}
@@ -21,7 +21,7 @@
 		</div>
 	{/if}
 	{#if company}
-		<div class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md">
+		<div class="flex min-w-fit gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md">
 			{company}
 		</div>
 	{/if}

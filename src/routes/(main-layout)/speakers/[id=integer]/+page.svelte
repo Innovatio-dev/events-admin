@@ -112,7 +112,7 @@
 				<p>{speaker.linkedin?.substring(speaker.linkedin.lastIndexOf('/') + 1) ?? '-'}</p>
 				<p>{speaker.facebook?.substring(speaker.facebook.lastIndexOf('/') + 1) ?? '-'}</p>
 				<p>{speaker.youtube?.substring(speaker.youtube.lastIndexOf('/') + 1) ?? '-'}</p>
-				<p>{@html speaker.description ?? '-'}</p>
+				<p class="!h-fit">{@html speaker.description ?? '-'}</p>
 			</div>
 		{/if}
 	</div>
@@ -122,13 +122,13 @@
 	<div class="flex gap-10 mb-10">
 		<MainButton on:click={() => goto(`${$page.url}/edit`)}>
 			<div class="flex gap-3 items-center">
-				<Icon size="20" src={BiEditAlt}/>
+				<Icon size="20" src={BiEditAlt} />
 				{'Edit'}
 			</div>
 		</MainButton>
 		<MainButton on:click={handleOpenModal}>
 			<div class="flex gap-3 items-center">
-				<Icon size="20" src={BsTrash3}/>
+				<Icon size="20" src={BsTrash3} />
 				{'Remove'}
 			</div>
 		</MainButton>
@@ -163,6 +163,6 @@
 		@apply text-neutral-4 font-dm capitalize w-[180px] py-2;
 	}
 	.content p {
-		@apply text-neutral-3 font-thin font-eesti min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
+		@apply text-neutral-3 font-thin font-eesti  min-h-fit h-[40px] min-w-fit w-[360px] py-2 max-w-[320px] md:max-w-none;
 	}
 </style>
