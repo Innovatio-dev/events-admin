@@ -118,7 +118,7 @@
                                 Remember me
                             </label>
                             <span class="text-sm">
-                                <a href="/auth/resend-password">Recover your password</a>
+                                <a href="/recover-password">Recover your password</a>
                             </span>
                         </div>
                         {#if form?.error}
