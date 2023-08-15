@@ -380,8 +380,12 @@ async function createSpeakerSnapshot(
 		},
 		{ transaction }
 	)
-	speakerSnapshot.setPicture(speaker.picture.id, {transaction})
-	speakerSnapshot.setCountry(speaker.country.id, {transaction})
+	if(speaker.picture) {
+		speakerSnapshot.setPicture(speaker.picture.id, {transaction})
+	}
+	if(speaker.country) {
+		speakerSnapshot.setCountry(speaker.country.id, {transaction})
+	}
 	// speakerSnapshot.setPicture(image, {transaction})
 	// speakerSnapshot.setCountry(country, {transaction})
 	await speakerSnapshot.save()
