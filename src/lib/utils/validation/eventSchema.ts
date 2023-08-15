@@ -29,7 +29,7 @@ export const filterSchema = Joi.object({
 })
 
 export const createSchema = Joi.object({
-	speakers: Joi.array().items(Joi.number()),
+	speakers: Joi.array(),
 	slug: Joi.string()
 		.regex(/^[a-zA-Z0-9-]+$/)
 		.min(1)
@@ -76,7 +76,7 @@ export const createSchema = Joi.object({
 // })
 
 export const updateSchema = Joi.object({
-	speakers: Joi.array().items(Joi.number()),
+	speakers: Joi.array(),
 	slug: Joi.string()
 		.regex(/^[a-zA-Z0-9-]+$/)
 		.min(1)

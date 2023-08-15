@@ -15,7 +15,7 @@ import AWS from 'aws-sdk'
 import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
 import { SENDINBLUE_API_KEY } from '$env/static/private'
 import SibApiV3Sdk from 'sib-api-v3-sdk'
-import { Speaker } from '$lib/server/models/speaker'
+import type { Speaker } from '$lib/server/models/speaker'
 import { EventSpeaker } from '$lib/server/models/eventSpeaker'
 import { HttpResponses } from '$lib/server/constants/httpResponses'
 
@@ -187,7 +187,7 @@ export async function GET(event: RequestEvent) {
 				ContentEncoding: 'base64'
 			}
 
-			// const putObjectRequest: PutObjectRequest
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			S3.upload(data, function (err, data) {
 				if (err) {
 					console.log(err)
@@ -287,33 +287,33 @@ export async function POST(event: RequestEvent) {
 			await event.setBannerMobile(bannerMobileId, { transaction })
 		}
 
-		let speakersMap: Array<Speaker> = []
+		// let speakersMap: Array<Speaker> = []
 
 		if (speakers && speakers.length > 0) {
-			for (const iterator of speakers) {
-				const element = await Speaker.findByPk(iterator)
-				if (element) {
-					speakersMap.push(element)
-				}
-			}
+			// for (const iterator of speakers) {
+			// 	const element = await Speaker.findByPk(iterator)
+			// 	if (element) {
+			// 		speakersMap.push(element)
+			// 	}
+			// }
 			const snapshotSpeakers = await Promise.all(
-				speakersMap.map((speaker: Speaker, index: number) =>
+				speakers.map((speaker: Speaker, index: number) =>
 					createSpeakerSnapshot(speaker, event, true, index, transaction)
 				)
 			)
 			await event.setEventSpeakers(snapshotSpeakers)
 		}
 
-		speakersMap = []
+		// speakersMap = []
 		if (speakersSecondary && speakersSecondary.length > 0) {
-			for (const iterator of speakersSecondary) {
-				const element = await Speaker.findByPk(iterator)
-				if (element) {
-					speakersMap.push(element)
-				}
-			}
+			// for (const iterator of speakersSecondary) {
+			// 	const element = await Speaker.findByPk(iterator)
+			// 	if (element) {
+			// 		speakersMap.push(element)
+			// 	}
+			// }
 			const snapshotSpeakers = await Promise.all(
-				speakersMap.map((speaker: Speaker, index: number) =>
+				speakersSecondary.map((speaker: Speaker, index: number) =>
 					createSpeakerSnapshot(speaker, event, false, index, transaction)
 				)
 			)
