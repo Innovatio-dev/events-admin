@@ -43,6 +43,7 @@
 	import Input from '$lib/components/Input.svelte'
 	import LabelInput from '$lib/components/LabelInput.svelte'
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
+	import Editor from './Editor.svelte'
 	import TextWithIcon from '$lib/components/table_cell/TextWithIcon.svelte'
 	import OrderableTable, { type Column } from '$lib/components/OrderableTable.svelte'
 	import TextWithImageViewer from '$lib/components/custom/data_viewer/TextWithImageViewer.svelte'
@@ -265,9 +266,13 @@
 				$pageAlert = { message: 'Success! Event updated.', status: true }
 				success = true
 			} else {
-				console.log(await res.json())
+				const errorResponse = await res.json()
+				console.log(errorResponse)
 				$pageAlert = {
-					message: 'Oops! An error has occurred. try again later.',
+					message:
+						errorResponse.message == 'Validation error'
+							? 'Please fill out all required fields.'
+							: errorResponse.message,
 					status: false
 				}
 			}
@@ -362,12 +367,14 @@
 						placeholder="Type the event title"
 					/>
 				</div>
-				<div>
+				<div class="flex flex-col w-full gap-2 pb-10">
 					<LabelInput>Write a brief description of the event</LabelInput>
-					<Input
-						bind:value={eventData.description}
-						placeholder="Write a brief description of the event"
-					/>
+					<Editor bind:value={eventData.description} name="description" />
+					{#if eventData.description.length < 12}
+						<span class="text-xs text-alert-error pt-12"
+							>* Event description is required</span
+						>
+					{/if}
 				</div>
 			</div>
 			<div>
@@ -636,8 +643,7 @@
 					{/each}
 				</div>
 			</div>
-
-			<div class="input-set">
+			<!-- <div class="input-set">
 				<SectionHeader>Organizer Assigned</SectionHeader>
 				<div>
 					<LabelInput>Organizer Info</LabelInput>
@@ -667,7 +673,7 @@
 						/>
 					</div>
 				{/if}
-			</div>
+			</div> -->
 			<MainButton {loading} on:click={handleSubmit}>Save as draft</MainButton>
 			<MainButton {loading} on:click={viewPreview}>View Preview</MainButton>
 			<MainButton href={`/events`}>Discard</MainButton>
