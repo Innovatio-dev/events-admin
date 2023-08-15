@@ -217,7 +217,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function POST(event: RequestEvent) {
-	const user = checkUser(event)
+	// const user = checkUser(event)
 	//TODO: Create eventSpeakers based on array of speakers
 	const {
 		pictures,
@@ -242,7 +242,7 @@ export async function POST(event: RequestEvent) {
 
 		createList.name = values.title
 		createList.folderId = 5
-		values.userId = user.id
+		values.userId = 1
 
 		if(venue.length > 0) {
 			values.venueId = venue[0].id
@@ -360,8 +360,8 @@ async function createSpeakerSnapshot(
 	transaction: sequelize.Transaction
 ) {
 	//increase refCount of image
-	const image = await speaker.getPicture()
-	const country = await speaker.getCountry()
+	// const image = await speaker.getPicture()
+	// const country = await speaker.getCountry()
 	const speakerSnapshot = await EventSpeaker.create(
 		{
 			status: speaker.status,
@@ -380,8 +380,10 @@ async function createSpeakerSnapshot(
 		},
 		{ transaction }
 	)
-	speakerSnapshot.setPicture(image, {transaction})
-	speakerSnapshot.setCountry(country, {transaction})
+	speakerSnapshot.setPicture(speaker.picture.id, {transaction})
+	speakerSnapshot.setCountry(speaker.country.id, {transaction})
+	// speakerSnapshot.setPicture(image, {transaction})
+	// speakerSnapshot.setCountry(country, {transaction})
 	await speakerSnapshot.save()
 	return speakerSnapshot
 }
