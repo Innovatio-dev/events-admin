@@ -84,6 +84,8 @@
 	const data: { banner: number[] } = { banner: [] }
 	let organizerInfoEnabled: boolean = false
 	let isModalMainSpeaker = false
+	let venueSelected = null
+	let speakerSelected = null
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
 	let venues: any[] = []
@@ -123,7 +125,8 @@
 			cellDataGenerator: (item) => {
 				return {
 					onEdit: () => {
-						goto(`/venues/${item.id}/edit`)
+						isModalVenue = true
+						venueSelected = item
 					},
 					onRemove: () => {
 						let index = venues.indexOf(item)
@@ -158,7 +161,8 @@
 			cellDataGenerator: (item) => {
 				return {
 					onEdit: () => {
-						goto(`/speakers/${item.id}/edit`)
+						isModalMainSpeaker = true
+						speakerSelected = item
 					},
 					onRemove: () => {
 						let index = mainSpeakers.indexOf(item)
@@ -194,7 +198,8 @@
 			cellDataGenerator: (item) => {
 				return {
 					onEdit: () => {
-						goto(`/speakers/${item.id}/edit`)
+						isModalSecondarySpeaker = true
+						speakerSelected = item
 					},
 					onRemove: () => {
 						let index = secondarySpeakers.indexOf(item)
@@ -231,8 +236,8 @@
 			loading = true
 			eventData.slug = createSlug(eventData?.title)
 			eventData.venue = venues
-			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
-			eventData.speakers = extractSpeakerIds(mainSpeakers)
+			eventData.speakersSecondary = secondarySpeakers
+			eventData.speakers = mainSpeakers
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
 			}
@@ -447,6 +452,7 @@
 						>
 						<SpeakersFormModal
 							isOpen={isModalMainSpeaker}
+							speaker={speakerSelected}
 							on:save={(event) => {
 								const speaker = event.detail
 								if (!mainSpeakers.some((item) => item.id == speaker.id)) {
@@ -491,6 +497,7 @@
 						>
 						<SpeakersFormModal
 							isOpen={isModalSecondarySpeaker}
+							speaker={speakerSelected}
 							on:save={(event) => {
 								const speaker = event.detail
 								if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
@@ -542,6 +549,7 @@
 							>
 							<VenuesFormModal
 								isOpen={isModalVenue}
+								venue={venueSelected}
 								on:save={(event) => {
 									const venue = event.detail
 									venues = [venue]
