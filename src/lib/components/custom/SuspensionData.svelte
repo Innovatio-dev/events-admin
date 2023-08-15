@@ -4,15 +4,16 @@
 
 	export let logData: any
 	export let loading: any
+	export let title = 'Suspension'
 </script>
 
 <div class="flex flex-col w-[400px] h-fit gap-y-4">
-	<h3>Suspension details:</h3>
+	<h3>{title}{' details:'}</h3>
 	<div class="grid grid-cols-2 min-w-[400px] mb-8">
 		<div class="field">
-			<p>Date suspension:</p>
-			<p>Past suspension:</p>
-			<p>Reason for suspension:</p>
+			<p>Date {title}:</p>
+			<p>Past {title}:</p>
+			<p>Reason for {title}:</p>
 		</div>
 		{#if loading}
 			<div class="w-full h-full flex">
@@ -26,15 +27,14 @@
 						.split('/')
 						.join('/')}
 				</p>
-                <div class='flex gap-3'>
-
-                    {#each logData as suspend}
-                        <p>
-                            {'S: '}
-                            {new Date(suspend.createdAt).toLocaleDateString().split('/').join('/')}
-                        </p>
-                    {/each}
-                </div>
+				<div class="flex gap-3">
+					{#each logData as suspend}
+						<p>
+							{'S: '}
+							{new Date(suspend.createdAt).toLocaleDateString().split('/').join('/')}
+						</p>
+					{/each}
+				</div>
 				<p>{logData[logData.length - 1].reason}</p>
 			</div>
 		{/if}

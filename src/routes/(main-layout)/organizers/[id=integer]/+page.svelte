@@ -176,7 +176,7 @@
 		let response = await fetch(`/api/organizers/${id}`)
 		if (response.ok) {
 			organizer = await response.json()
-			// console.log(organizer)
+			console.log(organizer)
 			$pageStatus.title = organizer.name
 		}
 		loading = false

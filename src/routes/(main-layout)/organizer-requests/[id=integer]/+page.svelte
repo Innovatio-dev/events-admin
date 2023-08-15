@@ -15,6 +15,7 @@
 	import VscClose from 'svelte-icons-pack/vsc/VscClose'
 	import BsCheck2 from 'svelte-icons-pack/bs/BsCheck2'
 	import Icon from 'svelte-icons-pack/Icon.svelte'
+	import SuspensionData from '$lib/components/custom/SuspensionData.svelte'
 
 	// Modal Approved
 	let isOpenApproved = false
@@ -44,6 +45,7 @@
 	let organizer: any = null
 	let loading: boolean = true
 	let fetchLoading = false
+	let logData: any = null
 
 	const setDenied = async () => {
 		fetchLoading = true
@@ -133,7 +135,19 @@
 		let response = await fetch(`/api/organizersRequests/${id}`)
 		if (response.ok) {
 			organizer = await response.json()
+			// console.log(organizer)
 			$pageStatus.status = organizer.status
+		}
+		loading = false
+	}
+
+	const fetchDeniedData = async (id) => {
+		loading = true
+		let response = await fetch(`/api/organizersRequests/${id}/logs`)
+		if (response.ok) {
+			const data = await response.json()
+			logData = data.requests
+			// console.log(logData)
 		}
 		loading = false
 	}
@@ -142,6 +156,7 @@
 		let id = $page.params.id
 		$pageStatus.title = 'Organizer Aplication'
 		await fetchOrganizerRequest(id)
+		await fetchDeniedData(id)
 	})
 </script>
 
@@ -150,8 +165,8 @@
 		<OrganizerView {organizer} {loading} />
 	</div>
 	<div class="flex flex-row w-[95%] gap-x-6 py-6">
-		{#if organizer?.status === 0}
-			<div class="flex flex-row w-[95%] mx-auto gap-x-6 py-6">
+		<div class="flex flex-row w-[95%] mx-auto gap-x-6 py-6">
+			{#if organizer?.status === 0}
 				<div class="w-fit">
 					<MainButton on:click={handleOpenModalApproved}>
 						<div class="flex gap-3 items-center">
@@ -184,7 +199,9 @@
 						/>
 					</Modal>
 				</div>
-			</div>
-		{/if}
+			{:else if organizer?.status === 2}
+				<SuspensionData title='Dennied' {loading} {logData} />
+			{/if}
+		</div>
 	</div>
 </div>
