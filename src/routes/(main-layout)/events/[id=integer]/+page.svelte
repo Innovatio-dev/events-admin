@@ -4,6 +4,7 @@
 	import { page } from '$app/stores'
 	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	import { format } from 'date-fns'
+	import { goto } from '$app/navigation'
 	// Components
 	import SimpleSkeleton from '$lib/components/skeletons/Skeleton.svelte'
 	import Socials from '$lib/components/preview/Socials.svelte'
@@ -18,6 +19,7 @@
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
 	import IoClose from 'svelte-icons-pack/io/IoClose'
 	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
+	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
 
 	// State
 	let events: any = null
@@ -25,6 +27,7 @@
 	let primarySpeakers: any[] = []
 	let secondarySpeakers: any[] = []
 	let eventPhoto: string
+	let exportLoading = false
 
 	onMount(async () => {
 		let id = $page.params.id
@@ -131,379 +134,424 @@
 			$pageAlert = { message: 'Oops! An error has occurred. try again later.', status: false }
 		}
 	}
+
+	const handleExport = async () => {
+		exportLoading = true
+		try {
+			const res = await fetch(`/api/mailing/${events.id}/suscribe?export=true`, {
+				method: 'GET'
+			})
+			if (res.ok) {
+				const data = await res.json()
+				goto(data.formedUrl)
+				$pageStatus.title = events.title
+			} else {
+				$pageAlert = {
+					message: 'No subscriptions on this event',
+					status: false
+				}
+			}
+		} catch (error) {
+			$pageAlert = {
+				message: 'No subscriptions on this events',
+				status: false
+			}
+		}
+		exportLoading = false
+	}
 </script>
 
-<div class="w-1/2 p-6">
-	<!-- Event -->
-	<div>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Status:</p>
-				<p>Event ID:</p>
-				<p>Date published:</p>
-				<p>Date of suspension:</p>
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={4} />
+<div class="flex">
+	<div class="w-1/2 p-6">
+		<!-- Event -->
+		<div class="flex justify-between w-full">
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Status:</p>
+					<p>Event ID:</p>
+					<p>Date published:</p>
+					<p>Date of suspension:</p>
 				</div>
-			{:else if events.venue}
-				<div class="content">
-					<p>{events.status === 0 ? 'Inactive ' : 'Active'}</p>
-					<p>{events.uid ?? '---'}</p>
-					<p>{formatDate(events.createdAt) ?? '---'}</p>
-					<p>{formatDate(events.updatedAt) ?? '---'}</p>
-				</div>
-			{/if}
-		</div>
-	</div>
-	<!-- Organizer Details -->
-	<div>
-		<h2>Organizer Details</h2>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Organizer full name:</p>
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={1} />
-				</div>
-			{:else if events.venue}
-				<div class="content">
-					<p>{events.organizer.name ?? '---'}</p>
-				</div>
-			{/if}
-		</div>
-	</div>
-	<!-- Event Information -->
-	<div>
-		<h2>Event Information</h2>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Type Event:</p>
-				<p>Featured/Regular:</p>
-				<p>Event Title:</p>
-				<p>Description:</p>
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={4} />
-				</div>
-			{:else if events.venue}
-				<div class="content">
-					<p>{events.typeEvent === 0 ? 'Virtual' : 'Live'}</p>
-					<p
-						class={`flex items-center gap-x-2 ${
-							events.isFeatured ? '!text-primary-purple' : ''
-						} `}
-					>
-						<span
-							class={`w-3 h-3 rounded-full  ${
-								events.isFeatured ? 'bg-primary-purple' : 'bg-neutral-3'
-							}`}
-						/>
-						{events.isFeatured ? 'Featured' : 'Regular'}
-					</p>
-					<p>{events.title ?? '---'}</p>
-					<p>{events.description ?? '---'}</p>
-				</div>
-			{/if}
-		</div>
-	</div>
-	<!-- Location, date & time of the event -->
-	<div>
-		<h2>Location, date & time of the event</h2>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Location:</p>
-				<p>Country:</p>
-				<p>City:</p>
-				<p>Event Photo:</p>
-				<p>Pin Photo:</p>
-				<p>Date Starts:</p>
-				<p>Date Ends:</p>
-				<p>Time Starts:</p>
-				<p>Time zone:</p>
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={8} />
-				</div>
-			{:else if events.venue}
-				<div class="content">
-					<p>{events.venue.region.name ?? '---'}</p>
-					<p>{events.venue.country.nicename ?? '---'}</p>
-					<p>{events.venue.city ?? '---'}</p>
-					{#if events.venue.pictures}
-						<div class="text-ellipsis underline">
-							<a target="_blank" href={`${eventPhoto}`}> Event Photo </a>
-						</div>
-					{:else}
-						<p>{'---'}</p>
-					{/if}
-					{#if events.venue.pictures}
-						<div class="text-ellipsis underline">
-							<a target="_blank" href={`${eventPhoto}`}> Pin Photo </a>
-						</div>
-					{:else}
-						<p>{'---'}</p>
-					{/if}
-					<p>{formatDate(events.schedule.startTime) ?? '---'}</p>
-					<p>{formatDate(events.schedule.endTime) ?? '---'}</p>
-					<p>{formatTime(events.schedule.startTime) ?? '---'}</p>
-					<p>{events.schedule.timeZone ?? '---'}</p>
-				</div>
-			{/if}
-		</div>
-	</div>
-	<!-- Speakers -->
-	<div>
-		<h2>Speakers</h2>
-		{#each primarySpeakers as speaker}
-			<div class="flex flex-col my-6">
-				<div class="grid grid-cols-2 min-w-[400px] mb-8">
-					<div class="field">
-						<p>Primary Speaker:</p>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={4} />
 					</div>
-					{#if loading}
-						<div class="w-full h-full flex">
-							<SimpleSkeleton width={200} height={20} items={1} />
-						</div>
-					{:else if events}
-						<div class="flex content">
-							<p class="!w-fit pr-4">{speaker.name}</p>
-							<Socials {speaker} color={'#000'} />
-						</div>
-					{/if}
-				</div>
-				<div class="w-full h-[100px]">
-					<SpeakerBadge
-						size={'80'}
-						image={speaker.picture?.url ?? ''}
-						jobRole={speaker.jobRole}
-						company={speaker.company}
-					/>
-				</div>
-			</div>
-		{/each}
-		{#each secondarySpeakers as speaker}
-			<div class="flex flex-col my-2">
-				<div class="grid grid-cols-2 min-w-[400px] mb-8">
-					<div class="field">
-						<p>Secondary Speaker:</p>
+				{:else if events.venue}
+					<div class="content">
+						<p>{events.status === 0 ? 'Inactive ' : 'Active'}</p>
+						<p>{events.uid ?? '---'}</p>
+						<p>{formatDate(events.createdAt) ?? '---'}</p>
+						<p>{formatDate(events.updatedAt) ?? '---'}</p>
 					</div>
-					{#if loading}
-						<div class="w-full h-full flex">
-							<SimpleSkeleton width={200} height={20} items={1} />
-						</div>
-					{:else if events}
-						<div class="flex content">
-							<p class="!w-fit pr-4">{speaker.name}</p>
-							<Socials {speaker} color={'#000'} />
-						</div>
-					{/if}
-				</div>
-				<div class="w-full h-[60px]">
-					<SpeakerBadge
-						size={'60'}
-						image={speaker.picture?.url ?? ''}
-						jobRole={speaker.jobRole}
-						company={speaker.company}
-					/>
-				</div>
+				{/if}
 			</div>
-		{/each}
-	</div>
-	<!-- Venues -->
-	<div>
-		<h2>Venue</h2>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Venue Name:</p>
-				<p>Venue Country</p>
-				<p>Venue address:</p>
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={3} />
-				</div>
-			{:else if events.venue}
-				<div class="content">
-					<p>{events.venue.name ?? '---'}</p>
-					<p>{events.venue.country.nicename ?? '---'}</p>
-					{#if events.venue.location}
-						<div class="text-ellipsis underline">
-							<a
-								target="_blank"
-								href={`${gMapsLink(
-									events.venue.location.lat,
-									events.venue.location.lng
-								)}`}
-							>
-								Abrir Mapa
-							</a>
-						</div>
-					{:else}
-						<p>{'---'}</p>
-					{/if}
-				</div>
-			{/if}
 		</div>
-		<div class="flex !max-w-[300px] mb-8">
-			<div class="field">
-				<p>Photo:</p>
+		<!-- Organizer Details -->
+		<div>
+			<h2>Organizer Details</h2>
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Organizer full name:</p>
+				</div>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={1} />
+					</div>
+				{:else if events.venue}
+					<div class="content">
+						<p>{events.organizer.name ?? '---'}</p>
+					</div>
+				{/if}
 			</div>
-			{#if loading}
-				<div class="w-full h-fit flex">
-					<SimpleSkeleton width={280} height={180} items={1} />
-				</div>
-			{:else if events}
-				<div class="min-w-[280px] min-h-[160px] flex">
-					<img
-						src={events.venue.pictures[0].url}
-						alt={events.venue.pictures[0].name}
-						class="rounded-lg"
-					/>
-				</div>
-			{/if}
 		</div>
-		<div class="flex !max-w-[280px] mb-8">
-			<div class="field">
-				<p>Aditional photo:</p>
-			</div>
-			{#if loading}
-				<div class="min-w-[280px] min-h-[160px] flex gap-x-12">
-					<SimpleSkeleton wFull height={180} items={1} />
+		<!-- Event Information -->
+		<div>
+			<h2>Event Information</h2>
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Type Event:</p>
+					<p>Featured/Regular:</p>
+					<p>Event Title:</p>
+					<p>Description:</p>
 				</div>
-			{:else if events}
-				<div class="flex gap-x-12 w-full">
-					{#each events.pictures as picture, index}
-						<div class="min-w-[280px] min-h-[160px]">
-							<img src={picture?.url ?? ''} alt={picture.name} class="rounded-lg" />
-						</div>
-					{/each}
-				</div>
-			{/if}
-		</div>
-		<!-- Organizer -->
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Organizer full name:</p>
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={1} />
-				</div>
-			{:else if events.organizer}
-				<div class="content">
-					<p>{events.organizer.name ?? '---'}</p>
-				</div>
-			{/if}
-		</div>
-		<div class="w-[600px] min-h-[100px] text-neutral-3">
-			{#if loading}
-				<div class="h-[100px]">
-					<SimpleSkeleton width={600} height={20} items={4} />
-				</div>
-			{:else if events.organizer}
-				<p>{events.organizer.description ?? '---'}</p>
-			{/if}
-		</div>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Photo</p>
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={1} />
-				</div>
-			{:else if events.organizer}
-				<div class="text-ellipsis underline">
-					<a target="_blank" href={`${events.organizer.logo?.url ?? ''}`}>
-						Organizer Photo
-					</a>
-				</div>
-			{/if}
-		</div>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="flex items-center justify-center w-[200px] h-[200px]">
-				<ProfilePic img={events?.organizer.logo.url} />
-			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={1} />
-				</div>
-			{:else if events.organizer}
-				<div class="flex flex-col gap-y-4">
-					<Socials speaker={events.organizer} color={'#000'} />
-					<div class="flex gap-x-2">
-						<div
-							class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={4} />
+					</div>
+				{:else if events.venue}
+					<div class="content">
+						<p>{events.typeEvent === 0 ? 'Virtual' : 'Live'}</p>
+						<p
+							class={`flex items-center gap-x-2 ${
+								events.isFeatured ? '!text-primary-purple' : ''
+							} `}
 						>
-							{#if events.organizer}
-								<svelte:component
-									this={Flag[capText(events.organizer.country.iso)]}
-									size="20"
-								/>
-								{events.organizer.country.nicename}
-							{/if}
+							<span
+								class={`w-3 h-3 rounded-full  ${
+									events.isFeatured ? 'bg-primary-purple' : 'bg-neutral-3'
+								}`}
+							/>
+							{events.isFeatured ? 'Featured' : 'Regular'}
+						</p>
+						<p>{events.title ?? '---'}</p>
+						<p>{events.description ?? '---'}</p>
+					</div>
+				{/if}
+			</div>
+		</div>
+		<!-- Location, date & time of the event -->
+		<div>
+			<h2>Location, date & time of the event</h2>
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Location:</p>
+					<p>Country:</p>
+					<p>City:</p>
+					<p>Event Photo:</p>
+					<p>Pin Photo:</p>
+					<p>Date Starts:</p>
+					<p>Date Ends:</p>
+					<p>Time Starts:</p>
+					<p>Time zone:</p>
+				</div>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={8} />
+					</div>
+				{:else if events.venue}
+					<div class="content">
+						<p>{events.venue.region.name ?? '---'}</p>
+						<p>{events.venue.country.nicename ?? '---'}</p>
+						<p>{events.venue.city ?? '---'}</p>
+						{#if events.venue.pictures}
+							<div class="text-ellipsis underline">
+								<a target="_blank" href={`${eventPhoto}`}> Event Photo </a>
+							</div>
+						{:else}
+							<p>{'---'}</p>
+						{/if}
+						{#if events.venue.pictures}
+							<div class="text-ellipsis underline">
+								<a target="_blank" href={`${eventPhoto}`}> Pin Photo </a>
+							</div>
+						{:else}
+							<p>{'---'}</p>
+						{/if}
+						<p>{formatDate(events.schedule.startTime) ?? '---'}</p>
+						<p>{formatDate(events.schedule.endTime) ?? '---'}</p>
+						<p>{formatTime(events.schedule.startTime) ?? '---'}</p>
+						<p>{events.schedule.timeZone ?? '---'}</p>
+					</div>
+				{/if}
+			</div>
+		</div>
+		<!-- Speakers -->
+		<div>
+			<h2>Speakers</h2>
+			{#each primarySpeakers as speaker}
+				<div class="flex flex-col my-6">
+					<div class="grid grid-cols-2 min-w-[400px] mb-8">
+						<div class="field">
+							<p>Primary Speaker:</p>
 						</div>
+						{#if loading}
+							<div class="w-full h-full flex">
+								<SimpleSkeleton width={200} height={20} items={1} />
+							</div>
+						{:else if events}
+							<div class="flex content">
+								<p class="!w-fit pr-4">{speaker.name}</p>
+								<Socials {speaker} color={'#000'} />
+							</div>
+						{/if}
+					</div>
+					<div class="w-full h-[100px]">
+						<SpeakerBadge
+							size={'80'}
+							image={speaker.picture?.url ?? ''}
+							jobRole={speaker.jobRole}
+							company={speaker.company}
+						/>
 					</div>
 				</div>
-			{/if}
+			{/each}
+			{#each secondarySpeakers as speaker}
+				<div class="flex flex-col my-2">
+					<div class="grid grid-cols-2 min-w-[400px] mb-8">
+						<div class="field">
+							<p>Secondary Speaker:</p>
+						</div>
+						{#if loading}
+							<div class="w-full h-full flex">
+								<SimpleSkeleton width={200} height={20} items={1} />
+							</div>
+						{:else if events}
+							<div class="flex content">
+								<p class="!w-fit pr-4">{speaker.name}</p>
+								<Socials {speaker} color={'#000'} />
+							</div>
+						{/if}
+					</div>
+					<div class="w-full h-[60px]">
+						<SpeakerBadge
+							size={'60'}
+							image={speaker.picture?.url ?? ''}
+							jobRole={speaker.jobRole}
+							company={speaker.company}
+						/>
+					</div>
+				</div>
+			{/each}
 		</div>
-		<div class="grid grid-cols-2 min-w-[400px] mb-8">
-			<div class="field">
-				<p>Subscription to event</p>
+		<!-- Venues -->
+		<div>
+			<h2>Venue</h2>
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Venue Name:</p>
+					<p>Venue Country</p>
+					<p>Venue address:</p>
+				</div>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={3} />
+					</div>
+				{:else if events.venue}
+					<div class="content">
+						<p>{events.venue.name ?? '---'}</p>
+						<p>{events.venue.country.nicename ?? '---'}</p>
+						{#if events.venue.location}
+							<div class="text-ellipsis underline">
+								<a
+									target="_blank"
+									href={`${gMapsLink(
+										events.venue.location.lat,
+										events.venue.location.lng
+									)}`}
+								>
+									Abrir Mapa
+								</a>
+							</div>
+						{:else}
+							<p>{'---'}</p>
+						{/if}
+					</div>
+				{/if}
 			</div>
-			{#if loading}
-				<div class="w-full h-full flex">
-					<SimpleSkeleton width={200} height={20} items={1} />
+			<div class="flex !max-w-[300px] mb-8">
+				<div class="field">
+					<p>Photo:</p>
 				</div>
-			{:else if events.organizer}
-				<p>{events.mailing ?? '---'}</p>
-			{/if}
-		</div>
-		<div class="flex flex-row gap-6 max-w-fit">
-			<MainButton href={`/events/${$page.params.id}/edit`}>
-				<div class="flex gap-3 items-center">
-					<Icon size="20" src={BiEditAlt} />
-					{'Edit'}
+				{#if loading}
+					<div class="w-full h-fit flex">
+						<SimpleSkeleton width={280} height={180} items={1} />
+					</div>
+				{:else if events}
+					<div class="min-w-[280px] min-h-[160px] flex">
+						<img
+							src={events.venue.pictures[0].url}
+							alt={events.venue.pictures[0].name}
+							class="rounded-lg"
+						/>
+					</div>
+				{/if}
+			</div>
+			<div class="flex !max-w-[280px] mb-8">
+				<div class="field">
+					<p>Aditional photo:</p>
 				</div>
-			</MainButton>
-			{#if events?.status === 0 || events?.status === 1}
-				<MainButton on:click={handleOpenModal}>
+				{#if loading}
+					<div class="min-w-[280px] min-h-[160px] flex gap-x-12">
+						<SimpleSkeleton wFull height={180} items={1} />
+					</div>
+				{:else if events}
+					<div class="flex gap-x-12 w-full">
+						{#each events.pictures as picture, index}
+							<div class="min-w-[280px] min-h-[160px]">
+								<img
+									src={picture?.url ?? ''}
+									alt={picture.name}
+									class="rounded-lg"
+								/>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</div>
+			<!-- Organizer -->
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Organizer full name:</p>
+				</div>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={1} />
+					</div>
+				{:else if events.organizer}
+					<div class="content">
+						<p>{events.organizer.name ?? '---'}</p>
+					</div>
+				{/if}
+			</div>
+			<div class="w-[600px] min-h-[100px] text-neutral-3">
+				{#if loading}
+					<div class="h-[100px]">
+						<SimpleSkeleton width={600} height={20} items={4} />
+					</div>
+				{:else if events.organizer}
+					<p>{events.organizer.description ?? '---'}</p>
+				{/if}
+			</div>
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Photo</p>
+				</div>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={1} />
+					</div>
+				{:else if events.organizer}
+					<div class="text-ellipsis underline">
+						<a target="_blank" href={`${events.organizer.logo?.url ?? ''}`}>
+							Organizer Photo
+						</a>
+					</div>
+				{/if}
+			</div>
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="flex items-center justify-center w-[200px] h-[200px]">
+					<ProfilePic img={events?.organizer.logo.url} />
+				</div>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={1} />
+					</div>
+				{:else if events.organizer}
+					<div class="flex flex-col gap-y-4">
+						<Socials speaker={events.organizer} color={'#000'} />
+						<div class="flex gap-x-2">
+							<div
+								class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md"
+							>
+								{#if events.organizer}
+									<svelte:component
+										this={Flag[capText(events.organizer.country.iso)]}
+										size="20"
+									/>
+									{events.organizer.country.nicename}
+								{/if}
+							</div>
+						</div>
+					</div>
+				{/if}
+			</div>
+			<div class="grid grid-cols-2 min-w-[400px] mb-8">
+				<div class="field">
+					<p>Subscription to event</p>
+				</div>
+				{#if loading}
+					<div class="w-full h-full flex">
+						<SimpleSkeleton width={200} height={20} items={1} />
+					</div>
+				{:else if events.organizer}
+					<p>{events.mailing ?? '---'}</p>
+				{/if}
+			</div>
+			<div class="flex flex-row gap-6 max-w-fit">
+				<MainButton href={`/events/${$page.params.id}/edit`}>
 					<div class="flex gap-3 items-center">
-						<Icon size="20" src={IoClose} />
-						{'Suspend'}
+						{'Edit'}
 					</div>
 				</MainButton>
-			{:else if events?.status === 3}
-				<div class="w-fit">
-					<MainButton on:click={handleOpenConfirmationModal}>
-						<div class="flex gap-5">
-							{'Revoque Suspension'}
+				{#if events?.status === 0 || events?.status === 1}
+					<MainButton on:click={handleOpenModal}>
+						<div class="flex gap-3 items-center">
+							<Icon size="20" src={IoClose} />
+							{'Suspend'}
 						</div>
 					</MainButton>
-				</div>
-				<Modal isOpen={isOpenConfirmation} handleClose={handleCloseConfirmationModal}>
-					<ApprovedModal
-						text="Are you sure you would like to revoke suspension for this User?"
-						onConfirm={handleUnsuspend}
-						onCancel={handleCloseConfirmationModal}
-					/>
-				</Modal>
-			{/if}
+				{:else if events?.status === 3}
+					<div class="w-fit">
+						<MainButton on:click={handleOpenConfirmationModal}>
+							<div class="flex gap-5">
+								{'Revoque Suspension'}
+							</div>
+						</MainButton>
+					</div>
+					<Modal isOpen={isOpenConfirmation} handleClose={handleCloseConfirmationModal}>
+						<ApprovedModal
+							text="Are you sure you would like to revoke suspension for this User?"
+							onConfirm={handleUnsuspend}
+							onCancel={handleCloseConfirmationModal}
+						/>
+					</Modal>
+				{/if}
+			</div>
+			<Modal {isOpen} handleClose={handleCloseModal} title="">
+				<SuspendOrganizer
+					on:submit={handleSuspend}
+					{events}
+					items={options}
+					title={'Do you really want to suspend the event?'}
+					handleClose={handleCloseModal}
+				/>
+			</Modal>
 		</div>
-		<Modal {isOpen} handleClose={handleCloseModal} title="">
-			<SuspendOrganizer
-				on:submit={handleSuspend}
-				{events}
-				items={options}
-				title={'Do you really want to suspend the event?'}
-				handleClose={handleCloseModal}
-			/>
-		</Modal>
+	</div>
+	<div class="flex justify-end h-fit w-full pr-12">
+		{#if !loading}
+			<div class="field w-full flex items-center justify-end">
+				<p>
+					{'Event Suscriber List:'}
+				</p>
+				<div class="w-40">
+					<MainButton loading={exportLoading} on:click={handleExport}>
+						<Icon className="h-6 w-6" src={AiOutlineCloudDownload} />
+						{'Export CSV'}
+					</MainButton>
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>
 

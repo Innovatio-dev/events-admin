@@ -4,6 +4,12 @@ import { Mailing } from '$lib/server/models/mailing'
 import { error, json, type RequestEvent } from '@sveltejs/kit'
 import { SENDINBLUE_API_KEY } from '$env/static/private'
 import SibApiV3Sdk from 'sib-api-v3-sdk'
+import { Parser } from '@json2csv/plainjs'
+import { s3BucketName, s3Region } from '$lib/server/config/aws'
+import AWS from 'aws-sdk'
+import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
+import Joi from 'joi'
+import { validateSearchParam } from '$lib/server/middlewares/validator'
 
 export async function POST(event: RequestEvent) {
 	const { id } = event.params
@@ -26,7 +32,7 @@ export async function POST(event: RequestEvent) {
 		const defaultClient = SibApiV3Sdk.ApiClient.instance
 		const jsonBody = await event.request.json()
 
-		let email = jsonBody.email
+		const email = jsonBody.email
 		let listId = result.mailing
 
 		if (email === null || listId === null) {
@@ -106,5 +112,97 @@ export async function POST(event: RequestEvent) {
 	} catch (error) {
 		console.log(error)
 		throw error
+	}
+}
+
+const schema = Joi.object({
+	export: Joi.boolean().default(false)
+})
+export async function GET(event: RequestEvent) {
+	const { id } = event.params
+	const filter = validateSearchParam(event, schema)
+
+	try{
+		const result = await Event.scope('full').findByPk(id)
+
+		if (!result) {
+			return json(
+				{
+					message: 'Event with id ' + id + ' does not exists in our records'
+				},
+				{
+					status: HttpResponses.NOT_FOUND
+				}
+			)
+		}
+
+		const results = await result.getMailings()
+	
+		if (filter.export) {
+
+			if(results.length === 0) {
+				return json( {
+					message: 'This mailing list its empty, it can not be written'
+				}, {
+					status: HttpResponses.EMPTY_OBJECT_OR_LIST
+				})
+			}
+			const opts = {}
+			const parser = new Parser(opts)
+	
+			const S3 = new AWS.S3({
+				accessKeyId: AS_ACCESS_KEY_ID,
+				secretAccessKey: AS_SECRET_ACCESS_KEY,
+				region: AS_REGION
+			})
+	
+			const mailings: Array<string | any> = []
+			for (const iterator of results) {
+				mailings.push({
+					email: iterator.email,
+					name: iterator.name,
+					surname: iterator.surname,
+					mavieId: iterator.mavieId,
+					country: iterator.country
+				})
+			}
+
+			const csv = parser.parse(mailings)
+	
+			const data = {
+				Bucket: s3BucketName,
+				Key: `data/dumpdata_suscribers_${result.id}.csv`,
+				Body: csv,
+				ContentEncoding: 'base64'
+			}
+	
+			S3.upload(data, function (err, data) {
+				if (err) {
+					console.log(err)
+					console.log('Error uploading data')
+				} else {
+					console.log('succesfully uploaded!!!')
+				}
+			})
+	
+			return json({
+				results,
+				formedUrl: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/data/dumpdata_suscribers_${result.id}.csv`,
+			})
+		}
+
+		return json(
+			{
+				results
+			},
+			{
+				status: HttpResponses.OK_RESPONSE
+			}
+		)
+	} catch(err: any)  {
+		console.log(err)
+		throw error(HttpResponses.UNEXPECTED_ERROR, {
+			message: 'Something happend, error: '+ err
+		})
 	}
 }
