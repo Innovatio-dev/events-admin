@@ -11,11 +11,11 @@
 	import OrganizerView from '$lib/components/custom/OrganizerView.svelte'
 	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
 	import OrganizerAplication from '$lib/components/custom/OrganizerAplication.svelte'
+	import SuspensionData from '$lib/components/custom/SuspensionData.svelte'
 	// Icons
 	import VscClose from 'svelte-icons-pack/vsc/VscClose'
 	import BsCheck2 from 'svelte-icons-pack/bs/BsCheck2'
 	import Icon from 'svelte-icons-pack/Icon.svelte'
-	import SuspensionData from '$lib/components/custom/SuspensionData.svelte'
 
 	// Modal Approved
 	let isOpenApproved = false
