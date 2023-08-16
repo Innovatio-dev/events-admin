@@ -172,7 +172,7 @@
 			})}
 			selected={{ title: '+' + phoneCode, value: phoneCode }}
 		/>
-		<Input required label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
+		<Input label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
 		<Input required label="E-mail:" type="email" name="email" bind:value={organizer.email} />
 	</div>
 	<div class="flex flex-col w-full">
@@ -195,11 +195,11 @@
 			{/each}
 		</div>
 	</div>
-	<!-- <Input required label="Where are you from?" type="text" bind:value={organizer.country.name} /> -->
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 		{'Where are you from?'}
 	</span>
 	<Dropdown
+		required
 		name="countryId"
 		selected={{
 			value: organizer.countryId ?? 0,
@@ -226,9 +226,7 @@
 		bind:value={organizer.instagram}
 	/>
 	<Input name="youtube" label="Youtube (optional):" type="text" bind:value={organizer.youtube} />
-	<!-- <span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
-		{'Organizer photo (optional)'}
-	</span> -->
+
 	<div class="text-neutral-4 w-full flex justify-center py-3">
 		<h2 class="text-2xl">
 			{'Organizer photo'}
@@ -251,11 +249,10 @@
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Description:'}
 		</span>
-		<!-- <textarea class="min-h-[150px]" bind:value={organizer.description} /> -->
 		<Editor on:change={customUpdate} name="description" bind:value={organizer.description} />
 	</div>
 	<div class="flex gap-10">
-		<MainButton {loading}>Submit</MainButton>
+		<MainButton type="submit" {loading}>Submit</MainButton>
 		<MainButton on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>

@@ -96,6 +96,7 @@
 		{'Country'}
 	</span>
 	<Dropdown
+		required
 		name="countryId"
 		selected={{
 			value: speaker.countryId ?? 0,
