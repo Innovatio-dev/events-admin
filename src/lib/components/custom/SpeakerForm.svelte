@@ -127,6 +127,7 @@
 	</span>
 	<Dropdown
 		required
+		on:change={customUpdate}
 		name="countryId"
 		selected={{
 			value: speaker.countryId ?? 0,

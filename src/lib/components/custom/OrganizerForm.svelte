@@ -201,6 +201,7 @@
 	</span>
 	<Dropdown
 		required
+		on:change={customUpdate}
 		name="countryId"
 		selected={{
 			value: organizer.countryId ?? 0,

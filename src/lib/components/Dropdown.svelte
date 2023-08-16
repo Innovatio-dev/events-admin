@@ -119,7 +119,7 @@
 		} else {
 			const canContinue = eventDispatcher(
 				'change',
-				{ selected: internalItems[index].item },
+				{ selected: internalItems[index].item, name: name, value: index + 1 },
 				{ cancelable: true }
 			)
 			if (canContinue) {
