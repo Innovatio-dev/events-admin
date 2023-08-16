@@ -58,7 +58,7 @@
 		<div class="rows-container">
 			{#if data.length}
 				<SortableList class="" animation={150} onSort={handleOnSort}>
-					{#each data as row, index (row.id)}
+					{#each data as row, index (row?.id)}
 						<div
 							class="row"
 							data-id={row.id}

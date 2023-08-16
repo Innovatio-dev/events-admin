@@ -40,7 +40,7 @@
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Speaker updated correctly.', status: true }
-				goto('/speakers')
+				goto(`/speakers/${id}`)
 			} else {
 				console.log(await res.json())
 				$pageAlert = {
@@ -66,7 +66,12 @@
 	<div class="flex flex-col items-center justify-center w-full p-6">
 		{#if loading}
 			<div class="w-full h-[50vh] flex items-center justify-center">
-				<Circle3 />
+				<Circle3
+					ballBottomLeft={'#14dcff'}
+					ballBottomRight={'#fd369d'}
+					ballTopRight={'#8863e08f'}
+					ballTopLeft={'#ffa5d3'}
+				/>
 			</div>
 		{:else if speaker}
 			<div class="flex flex-col items-center gap-5">

@@ -443,6 +443,7 @@
 									if (!mainSpeakers.some((item) => item.id == speaker.id)) {
 										mainSpeakers.push(speaker)
 										mainSpeakers = mainSpeakers
+										console.log(mainSpeakers)
 									}
 								}}
 							/>
@@ -453,11 +454,11 @@
 						<SpeakersFormModal
 							isOpen={isModalMainSpeaker}
 							speaker={speakerSelected}
+							speakers={mainSpeakers}
 							on:save={(event) => {
 								const speaker = event.detail
 								if (!mainSpeakers.some((item) => item.id == speaker.id)) {
 									mainSpeakers.push(speaker)
-									mainSpeakers = extractSpeakerIds(mainSpeakers)
 								}
 							}}
 							handleClose={() => (isModalMainSpeaker = false)}

@@ -1,9 +1,12 @@
-<script>
-	export let img = ''
+<script lang="ts">
+	export let img: string = ''
+	export let maxSize: string = ''
 </script>
 
-<div class="relative w-full h-full rounded-full overflow-hidden">
-	<img class="object-cover h-full" src={img} alt="" />
+<div
+	class={`relative w-full h-full max-h-[${maxSize}px] max-w-[${maxSize}px] rounded-full overflow-hidden`}
+>
+	<img class="object-contain h-full" src={img} alt="" />
 </div>
 
 <style>

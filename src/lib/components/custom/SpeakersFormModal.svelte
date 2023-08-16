@@ -13,6 +13,7 @@
 	export let handleClose: () => void
 	export let speaker: any = null
 	export let loading: boolean = false
+	export let speakers: any[] = []
 
 	const dispatch = createEventDispatcher()
 
@@ -50,6 +51,15 @@
 			handleClose()
 		}
 		loading = false
+	}
+
+	async function updateEventSpeaker(updatedSpeaker) {
+		const existingIndex = speakers.findIndex((speaker) => speaker.id === updatedSpeaker.id)
+		if (existingIndex !== -1) {
+			speakers[existingIndex] = updatedSpeaker
+		} else {
+			speakers.push(updatedSpeaker)
+		}
 	}
 
 	async function updateSpeaker(id, speaker) {
@@ -92,8 +102,9 @@
 		</span>
 		<SpeakerForm
 			addSpeaker={speaker}
-			updateAction={speaker ? updateSpeaker : null}
+			editAction={updateEventSpeaker}
 			submitAction={postSpeaker}
+			onClose={handleClose}
 		/>
 	</div>
 </Modal>
