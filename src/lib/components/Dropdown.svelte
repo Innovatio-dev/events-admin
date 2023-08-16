@@ -7,6 +7,7 @@
 		selected: boolean
 		filtered: boolean
 	}
+	import { countries } from '$lib/utils/constants/Regions'
 </script>
 
 <script lang="ts">
@@ -119,7 +120,15 @@
 		} else {
 			const canContinue = eventDispatcher(
 				'change',
-				{ selected: internalItems[index].item, name: name, value: index + 1 },
+				{
+					selected: internalItems[index].item,
+					name: name,
+					value: {
+						id: countries[index].id,
+						nicename: countries[index].nicename,
+						iso: countries[index].iso
+					}
+				},
 				{ cancelable: true }
 			)
 			if (canContinue) {

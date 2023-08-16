@@ -202,7 +202,7 @@
 	<Dropdown
 		required
 		on:change={customUpdate}
-		name="countryId"
+		name="country"
 		selected={{
 			value: organizer.countryId ?? 0,
 			title: countries[organizer.countryId - 1]?.nicename ?? 'Choose the country organizer'
