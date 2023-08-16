@@ -28,7 +28,7 @@ export async function DELETE(event: RequestEvent) {
 }
 
 export async function PUT(event: RequestEvent) {
-	// checkUser(event, User.ADMIN)
+	checkUser(event, User.ADMIN)
 	const { id } = event.params
 	const data = await validateBody(event, updateSchema)
 	const speaker = await Speaker.findByPk(id)
