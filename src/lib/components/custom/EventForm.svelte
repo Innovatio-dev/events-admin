@@ -253,7 +253,6 @@
 				return eventId
 			} else {
 				const errorResponse = await res.json() // Almacenar la respuesta de error en una variable
-				console.log(errorResponse)
 				$pageAlert = {
 					message:
 						errorResponse.message == 'Validation error'
@@ -282,6 +281,16 @@
 
 	function extractSpeakerIds(speakers: Speaker[]): number[] {
 		return speakers.map((speaker) => speaker.id)
+	}
+
+	function handleClose() {
+		mainSpeakers = [...mainSpeakers]
+		isModalMainSpeaker = false
+	}
+
+	function handleCloseSecondary() {
+		secondarySpeakers = [...secondarySpeakers]
+		isModalSecondarySpeaker = false
 	}
 </script>
 
@@ -443,7 +452,6 @@
 									if (!mainSpeakers.some((item) => item.id == speaker.id)) {
 										mainSpeakers.push(speaker)
 										mainSpeakers = mainSpeakers
-										console.log(mainSpeakers)
 									}
 								}}
 							/>
@@ -458,10 +466,10 @@
 							on:save={(event) => {
 								const speaker = event.detail
 								if (!mainSpeakers.some((item) => item.id == speaker.id)) {
-									mainSpeakers.push(speaker)
+									mainSpeakers = [...mainSpeakers, speaker]
 								}
 							}}
-							handleClose={() => (isModalMainSpeaker = false)}
+							{handleClose}
 						/>
 					</div>
 				</div>
@@ -499,14 +507,14 @@
 						<SpeakersFormModal
 							isOpen={isModalSecondarySpeaker}
 							speaker={speakerSelected}
+							speakers={secondarySpeakers}
 							on:save={(event) => {
 								const speaker = event.detail
 								if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
-									secondarySpeakers.push(speaker)
-									secondarySpeakers = secondarySpeakers
+									secondarySpeakers = [...secondarySpeakers, speaker]
 								}
 							}}
-							handleClose={() => (isModalSecondarySpeaker = false)}
+							handleClose={handleCloseSecondary}
 						/>
 					</div>
 				</div>

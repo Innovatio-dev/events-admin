@@ -40,7 +40,7 @@
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Speaker updated correctly.', status: true }
-				goto(`/speakers/${id}`)
+				goto(`/speakers`)
 			} else {
 				console.log(await res.json())
 				$pageAlert = {

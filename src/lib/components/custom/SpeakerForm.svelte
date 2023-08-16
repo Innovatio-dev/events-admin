@@ -10,6 +10,7 @@
 	// Constants
 	import { countries } from '$lib/utils/constants/Regions'
 	import { goto } from '$app/navigation'
+	import { pageAlert } from '$lib/stores/pageStatus'
 
 	interface Speaker {
 		id?: number
@@ -40,6 +41,10 @@
 		company: '',
 		jobRole: '',
 		countryId: '',
+		country: {
+			id: null,
+			nicename: ''
+		},
 		twitter: '',
 		facebook: '',
 		instagram: '',
@@ -49,61 +54,18 @@
 	}
 
 	let updatedSpeaker = {}
-	let originalSpeaker = { ...addSpeaker }
-	let editedSpeaker = addSpeaker
 	let loading = false
-	let hasChanges: boolean = false
 
 	if (addSpeaker) {
 		speaker = JSON.parse(JSON.stringify(addSpeaker))
 		speaker.countryId = addSpeaker.country?.id
 	}
 
-	const handleSubmit = async () => {
-		if (editAction) {
-			loading = true
-			editedSpeaker = { ...speaker }
-			editedSpeaker.country = speaker.country
-			editedSpeaker.picture = speaker.picture
-			await editAction(editedSpeaker)
-			console.log('changes detected')
-			loading = false
-		} else if (updateAction) {
-			loading = true
-			await updateAction(speaker?.id ?? 0, updatedSpeaker)
-			if (speaker.id) {
-				goto(`/speakers/${speaker.id}`)
-			}
-			console.log('submit', updatedSpeaker)
-			loading = false
-		} else {
-			loading = true
-			const formattedData = {
-				...speaker,
-				twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
-				facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
-				instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
-				linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
-				youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
-				pictureId: speaker.picture[0]
-			}
-			await submitAction(formattedData)
-			loading = false
-		}
-	}
-
 	function handleInputChange(event) {
 		const { name, value } = event.target
-		if (editAction) {
-			if (editedSpeaker) {
-				editedSpeaker[name] = value
-			}
-		} else {
-			;(updatedSpeaker = {
-				...updatedSpeaker,
-				[name]: value
-			}),
-				console.log('updated :', updatedSpeaker)
+		updatedSpeaker = {
+			...updatedSpeaker,
+			[name]: value
 		}
 	}
 
@@ -111,8 +73,42 @@
 		updatedSpeaker[e.detail.name] = e.detail.value
 	}
 
-	console.log('original', speaker)
-	console.log('original updated', updatedSpeaker)
+	function createEditedSpeaker() {
+		return {
+			...speaker,
+			...updatedSpeaker
+		}
+	}
+	const handleSubmit = async () => {
+		try {
+			loading = true
+			if (editAction) {
+				loading = true
+				const editedSpeaker = await createEditedSpeaker()
+				await editAction(editedSpeaker)
+				$pageAlert = { message: 'Success! Changes saved', status: true }
+				onClose()
+			} else if (updateAction) {
+				await updateAction(speaker?.id ?? 0, updatedSpeaker)
+				goto(`/speakers`)
+			} else {
+				const formattedData = {
+					...speaker,
+					twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
+					facebook: 'https://facebook.com/' + speaker.facebook.replace(/\s/g, '_'),
+					instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
+					linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
+					youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
+					pictureId: speaker.picture[0]
+				}
+				await submitAction(formattedData)
+			}
+		} catch (error) {
+			console.error('An error occurred:', error)
+		} finally {
+			loading = false
+		}
+	}
 </script>
 
 <form
@@ -163,7 +159,7 @@
 			name="description"
 			bind:value={speaker.description}
 		/> -->
-		<Editor name="description" bind:value={speaker.description} />
+		<Editor name="description" on:change={customUpdate} bind:value={speaker.description} />
 	</div>
 	<div class="grid grid-cols-2 gap-5">
 		<Input label="Twitter:" type="text" name="twitter" bind:value={speaker.twitter} />
@@ -197,6 +193,6 @@
 	</div>
 	<div class="flex gap-10">
 		<MainButton type="submit" {loading}>Save</MainButton>
-		<MainButton on:click={onClose}>cancel</MainButton>
+		<MainButton on:click={onClose}>Cancel</MainButton>
 	</div>
 </form>
