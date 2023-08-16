@@ -25,7 +25,7 @@ export const updateSchema = Joi.object({
 	linkedin: Joi.string(),
 	facebook: Joi.string(),
 	youtube: Joi.string(),
-	country: Joi.array(),
+	country: Joi.object(),
 	description: Joi.string(),
 	pictureId: Joi.number().optional(),
 	countryId: Joi.number().optional()

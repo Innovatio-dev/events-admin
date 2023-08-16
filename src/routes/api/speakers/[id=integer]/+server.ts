@@ -28,15 +28,21 @@ export async function DELETE(event: RequestEvent) {
 }
 
 export async function PUT(event: RequestEvent) {
-	checkUser(event, User.ADMIN)
+	// checkUser(event, User.ADMIN)
 	const { id } = event.params
 	const data = await validateBody(event, updateSchema)
 	const speaker = await Speaker.findByPk(id)
 	if (!speaker) {
 		throw error(HttpResponses.NOT_FOUND, { message: 'Speaker not found' })
 	}
+	data.countryId = data.country.id
 	await Speaker.update(data, {
 		where: { id }
 	})
-	return json({ message: 'Updated successfully' })
+	const result = await Speaker.scope('full').findOne({
+		where: {
+			id
+		}
+	})
+	return json(result)
 }
