@@ -101,6 +101,7 @@
 					youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
 					pictureId: speaker.picture[0]
 				}
+				delete formattedData.country
 				await submitAction(formattedData)
 			}
 		} catch (error) {
