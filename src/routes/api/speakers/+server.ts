@@ -57,7 +57,7 @@ export async function GET(event: RequestEvent) {
 			region: AS_REGION
 		})
 
-		let speakers: Array<string | any> = []
+		const speakers: Array<string | any> = []
 		for (const iterator of results) {
 			speakers.push({
 				name: iterator.name,
@@ -69,7 +69,7 @@ export async function GET(event: RequestEvent) {
 
 		const csv = parser.parse(speakers)
 
-		var data = {
+		const data = {
 			Bucket: s3BucketName,
 			Key: 'data/dumpdata_speakers.csv',
 			Body: csv,
