@@ -18,7 +18,7 @@ export const init = (sequelize: Sequelize) => {
 				type: DataTypes.STRING
 			},
 			url: {
-				type: DataTypes.STRING
+				type: DataTypes.STRING(512)
 			}
 		},
 		{

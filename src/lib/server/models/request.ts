@@ -66,7 +66,7 @@ export const init = (sequelize: Sequelize) => {
 				type: DataTypes.STRING
 			},
 			description: {
-				type: DataTypes.STRING
+				type: DataTypes.TEXT
 			}
 		},
 		{
