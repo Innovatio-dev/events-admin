@@ -334,7 +334,7 @@
 					</div>
 					<div class="w-full h-[60px]">
 						<SpeakerBadge
-							size={'75'}
+							size={'60'}
 							image={speaker.picture?.url ?? ''}
 							jobRole={speaker.jobRole}
 							company={speaker.company}

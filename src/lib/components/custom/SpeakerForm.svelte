@@ -9,6 +9,7 @@
 
 	// Constants
 	import { countries } from '$lib/utils/constants/Regions'
+	import { goto } from '$app/navigation'
 
 	interface Speaker {
 		id?: number
@@ -23,13 +24,15 @@
 		linkedin: string
 		youtube: string
 		description: string
-		country?: { id: number; nicename: '' }
+		country?: { id: number | null; nicename: '' }
 	}
 
 	// Props
 	export let addSpeaker: Speaker | null = null
 	export let updateAction: ((id: number, speaker) => Promise<void> | null) | null = null
+	export let editAction: ((speaker) => Promise<void> | null) | null = null
 	export let submitAction = (speaker) => {}
+	export let onClose = () => {}
 
 	// State
 	let speaker: Speaker = {
@@ -44,8 +47,12 @@
 		youtube: '',
 		description: ''
 	}
+
 	let updatedSpeaker = {}
+	let originalSpeaker = { ...addSpeaker }
+	let editedSpeaker = addSpeaker
 	let loading = false
+	let hasChanges: boolean = false
 
 	if (addSpeaker) {
 		speaker = JSON.parse(JSON.stringify(addSpeaker))
@@ -53,10 +60,21 @@
 	}
 
 	const handleSubmit = async () => {
-		if (updateAction) {
+		if (editAction) {
+			loading = true
+			editedSpeaker = { ...speaker }
+			editedSpeaker.country = speaker.country
+			editedSpeaker.picture = speaker.picture
+			await editAction(editedSpeaker)
+			console.log('changes detected')
+			loading = false
+		} else if (updateAction) {
 			loading = true
 			await updateAction(speaker?.id ?? 0, updatedSpeaker)
-			// console.log(updatedSpeaker)
+			if (speaker.id) {
+				goto(`/speakers/${speaker.id}`)
+			}
+			console.log('submit', updatedSpeaker)
 			loading = false
 		} else {
 			loading = true
@@ -70,24 +88,35 @@
 				pictureId: speaker.picture[0]
 			}
 			await submitAction(formattedData)
-			// console.log(formattedData)
 			loading = false
 		}
 	}
 
-	const updateSpeaker = (e) => {
-		updatedSpeaker[e.target.name] = e.target.value
+	function handleInputChange(event) {
+		const { name, value } = event.target
+		if (editAction) {
+			if (editedSpeaker) {
+				editedSpeaker[name] = value
+			}
+		} else {
+			;(updatedSpeaker = {
+				...updatedSpeaker,
+				[name]: value
+			}),
+				console.log('updated :', updatedSpeaker)
+		}
 	}
 
 	const customUpdate = (e) => {
 		updatedSpeaker[e.detail.name] = e.detail.value
 	}
 
-	const onCancel = () => {}
+	console.log('original', speaker)
+	console.log('original updated', updatedSpeaker)
 </script>
 
 <form
-	on:change={updateSpeaker}
+	on:change={handleInputChange}
 	on:submit|preventDefault={handleSubmit}
 	class="flex min-w-[500px] max-w-[650px] flex-col w-full gap-5"
 >
@@ -131,7 +160,7 @@
 			name="description"
 			bind:value={speaker.description}
 		/> -->
-		<Editor on:change={customUpdate} name="description" bind:value={speaker.description} />
+		<Editor name="description" bind:value={speaker.description} />
 	</div>
 	<div class="grid grid-cols-2 gap-5">
 		<Input label="Twitter:" type="text" name="twitter" bind:value={speaker.twitter} />
@@ -164,7 +193,7 @@
 		{/if}
 	</div>
 	<div class="flex gap-10">
-		<MainButton {loading}>Save</MainButton>
-		<MainButton on:click={onCancel}>cancel</MainButton>
+		<MainButton type="submit" {loading}>Save</MainButton>
+		<MainButton on:click={onClose}>cancel</MainButton>
 	</div>
 </form>
