@@ -6,8 +6,8 @@
 	class={`w-6 group aspect-square rounded-full relative ease-in transition-all cursor-pointer`}
 	class:draft={value == 0}
 	class:published={value == 1}
-	class:canceled={value == 2}
-	class:suspended={value == 3}
+	class:suspended={value == 2}
+	class:cancelled={value == 3}
 >
 	<div
 		class="invisible shadow-tooltip group-hover:visible h-4 min-w-fit text-xs flex justify-center items-center bg-black absolute top-[-1.2rem] z-40 text-white rounded-lg px-2 ease-in transition-all"
@@ -17,9 +17,9 @@
 		{:else if value == 1}
 			{'Published'}
 		{:else if value == 2}
-			{'Cancelled'}
-		{:else}
 			{'Suspended'}
+		{:else}
+			{'Canceled'}
 		{/if}
 	</div>
 	<div
@@ -43,15 +43,15 @@
 		left: -110%;
 	}
 	.canceled {
-		background-color: var(--alert-error);
-		box-shadow: 0px 4px 4px #d33030;
+		background-color: var(--primary-purple);
+		box-shadow: 0px 4px 4px #6750a3;
 	}
 	.canceled > :first-child {
 		left: -100%;
 	}
 	.suspended {
-		background-color: var(--primary-purple);
-		box-shadow: 0px 4px 4px #6750a3;
+		background-color: var(--alert-error);
+		box-shadow: 0px 4px 4px #d33030;
 	}
 	.suspended > :first-child {
 		left: -110%;

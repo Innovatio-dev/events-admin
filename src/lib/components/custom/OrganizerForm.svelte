@@ -121,6 +121,7 @@
 </script>
 
 <form
+	autocomplete="off"
 	on:change={updateOrganizer}
 	on:submit|preventDefault={handleSubmit}
 	class="flex flex-col w-full gap-5 max-w-[650px]"

@@ -87,6 +87,7 @@
 </script>
 
 <form
+	autocomplete="off"
 	on:change={updateSpeaker}
 	on:submit|preventDefault={handleSubmit}
 	class="flex min-w-[500px] max-w-[650px] flex-col w-full gap-5"
