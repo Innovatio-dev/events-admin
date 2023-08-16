@@ -1,12 +1,33 @@
-import { Model, Sequelize } from 'sequelize'
+import { DataTypes, Model, Sequelize } from 'sequelize'
 
 export class EventVenue extends Model {
-    declare venueId: number
-    declare eventId: number
+    [x: string]: any
 }
 
 export const init = (sequelize: Sequelize) => {
     EventVenue.init({
+        status: {
+            type: DataTypes.SMALLINT,
+            defaultValue: 0
+        },
+        name: {
+            type: DataTypes.STRING
+        },
+        city: {
+            type: DataTypes.STRING
+        },
+        address: {
+            type: DataTypes.STRING
+        },
+        location: {
+            type: DataTypes.JSON
+        },
+        email: {
+            type: DataTypes.STRING
+        },
+        description: {
+            type: DataTypes.TEXT
+        }
     }, {
         sequelize,
         timestamps: false,

@@ -6,6 +6,7 @@ import * as speaker from './speaker'
 import * as venue from './venue'
 import * as category from './category'
 import * as eventSpeaker from './eventSpeaker'
+import * as eventVenue from './eventVenue'
 import * as organizerRequestLog from './requestLog'
 import * as organizerLog from './organizerLog'
 import * as eventLog from './eventLog'
@@ -40,6 +41,7 @@ const init = (sequelize: Sequelize) => {
 	venue.init(sequelize)
 	suspension.init(sequelize)
 	mailing.init(sequelize)
+	eventVenue.init(sequelize)
 
 	// associations
 	event.Event.belongsTo(user.User, { foreignKey: 'userId', as: 'user' })
@@ -201,8 +203,24 @@ const init = (sequelize: Sequelize) => {
 	venue.Venue.belongsTo(country.Country, { foreignKey: 'countryId', as: 'country' })
 	country.Country.hasMany(venue.Venue, { foreignKey: 'countryId', as: 'venues' })
 
-	event.Event.belongsTo(venue.Venue, { foreignKey: 'venueId', as: 'venue' })
-	venue.Venue.hasMany(event.Event, { foreignKey: 'venueId', as: 'events' })
+	// event.Event.belongsTo(venue.Venue, { foreignKey: 'venueId', as: 'venue' })
+	// venue.Venue.hasMany(event.Event, { foreignKey: 'venueId', as: 'events' })
+	// Make this many to many
+	event.Event.belongsTo(eventVenue.EventVenue, { foreignKey: 'eventVenueId', as: 'venue' })
+	eventVenue.EventVenue.belongsTo(event.Event, { foreignKey: 'eventId', as: 'event' })
+	eventVenue.EventVenue.belongsTo(venue.Venue, { foreignKey: 'venueId', as: 'venue' })
+	eventVenue.EventVenue.belongsTo(country.Country, { foreignKey: 'countryId', as: 'country' })
+	eventVenue.EventVenue.belongsTo(region.Region, { foreignKey: 'regionId', as: 'region' })
+	eventVenue.EventVenue.belongsToMany(resource.Resource, {
+		through: 'EventVenuePicture',
+		as: 'pictures',
+		foreignKey: 'venueId'
+	})
+	resource.Resource.belongsToMany(eventVenue.EventVenue, {
+		through: 'EventVenuePicture',
+		as: 'eventVenue',
+		foreignKey: 'resourceId'
+	})
 
 	event.Event.hasMany(eventSpeaker.EventSpeaker, { foreignKey: 'eventId', as: 'eventSpeakers' })
 	eventSpeaker.EventSpeaker.belongsTo(event.Event, { foreignKey: 'eventId', as: 'event' })

@@ -18,6 +18,7 @@ import SibApiV3Sdk from 'sib-api-v3-sdk'
 import type { Speaker } from '$lib/server/models/speaker'
 import { EventSpeaker } from '$lib/server/models/eventSpeaker'
 import { HttpResponses } from '$lib/server/constants/httpResponses'
+import { EventVenue } from '$lib/server/models/eventVenue'
 
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
@@ -96,15 +97,13 @@ export async function GET(event: RequestEvent) {
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
 	}
-
-	// console.log(where);
 	
 	// Count events based on filter conditions and associations
 	const count = await Event.count({
 		where,
 		include: [
 			{
-				model: Venue,
+				model: EventVenue,
 				as: 'venue',
 				// where: whereVenue, // Apply venue filter conditions
 				include: [
@@ -130,7 +129,7 @@ export async function GET(event: RequestEvent) {
 		order,
 		include: [
 			{
-				model: Venue,
+				model: EventVenue,
 				as: 'venue',
 				// where: whereVenue, // Apply venue filter conditions
 				include: [
@@ -218,7 +217,6 @@ export async function GET(event: RequestEvent) {
 
 export async function POST(event: RequestEvent) {
 	// const user = checkUser(event)
-	//TODO: Create eventSpeakers based on array of speakers
 	const {
 		pictures,
 		bannerId,
@@ -244,8 +242,15 @@ export async function POST(event: RequestEvent) {
 		createList.folderId = 5
 		values.userId = 1
 
-		if(venue.length > 0) {
-			values.venueId = venue[0].id
+		if (venue.length > 0) {
+			const tempVenue = await Venue.findByPk(venue[0].id)
+			if (!tempVenue) {
+				throw error(HttpResponses.NOT_FOUND, {
+					message: 'Validation Error:  Venue does not exists'
+				})
+			}
+			const eventVenueSnapshot = await createVenueSnapshot(tempVenue, venue[0], transaction)
+			values.eventVenueId = eventVenueSnapshot.id
 			values.regionId = venue[0].region.id
 		}
 		else {
@@ -265,7 +270,6 @@ export async function POST(event: RequestEvent) {
 				values.regionId = virtual.region.id	
 			}
 		}
-		console.log('after venue')
 
 		const data = await apiInstance.createList(createList)
 		values.mailing = data.id
@@ -359,9 +363,6 @@ async function createSpeakerSnapshot(
 	order: number,
 	transaction: sequelize.Transaction
 ) {
-	//increase refCount of image
-	// const image = await speaker.getPicture()
-	// const country = await speaker.getCountry()
 	const speakerSnapshot = await EventSpeaker.create(
 		{
 			status: speaker.status,
@@ -386,8 +387,27 @@ async function createSpeakerSnapshot(
 	if(speaker.country) {
 		speakerSnapshot.setCountry(speaker.country.id, {transaction})
 	}
-	// speakerSnapshot.setPicture(image, {transaction})
-	// speakerSnapshot.setCountry(country, {transaction})
 	await speakerSnapshot.save()
 	return speakerSnapshot
+}
+
+async function createVenueSnapshot(venue: Venue, venueEvent: {[x:string]:any}, transaction: sequelize.Transaction) {
+	const image = await venue.getPictures()
+	const country = await venue.getCountry()
+	const region = await venue.getRegion()
+	const venueSnapshot = await EventVenue.create({
+		status: venueEvent.status,
+		name: venueEvent.name,
+		city: venueEvent.city,
+		address: venueEvent.address,
+		location: venueEvent.location,
+		email: venueEvent.email,
+		description: venueEvent.description,
+		venueId: venue.id
+	}, { transaction })
+	venueSnapshot.setPictures(image, { transaction })
+	venueSnapshot.setCountry(country, { transaction })
+	venueSnapshot.setRegion(region, { transaction })
+	await venueSnapshot.save({ transaction })
+	return venueSnapshot
 }

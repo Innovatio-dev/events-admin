@@ -4,12 +4,16 @@ import { Country } from './country'
 import { User } from './user'
 import { Organizer } from './organizer'
 import { Category } from './category'
-import { Venue } from './venue'
 import { EventSpeaker } from './eventSpeaker'
 import { Schedule } from './schedule'
 import { Resource } from './resource'
 import { beforeSingleSaveListener } from './listeners/resourceListeners'
+import { EventVenue } from './eventVenue'
 export class Event extends Model {
+	public static DRAFT = 0
+	public static PUBLISHED = 1;
+	public static CANCELLED = 2;
+	public static OUTDATED = 3;
 	[x: string]: any
 }
 
@@ -107,7 +111,7 @@ export const init = (sequelize: Sequelize) => {
 	Event.addScope('list', () => ({
 		include: [
 			{
-				model: Venue.scope('mini'),
+				model: EventVenue,
 				as: 'venue',
 				include: [
 					{
@@ -115,7 +119,7 @@ export const init = (sequelize: Sequelize) => {
 						as: 'region'
 					},
 					{
-						model: Country,
+						model: Country.scope('mini'),
 						as: 'country'
 					}
 				]
@@ -192,15 +196,16 @@ export const init = (sequelize: Sequelize) => {
 				as: 'categories'
 			},
 			{
-				model: Venue.scope('mini'),
+				model: EventVenue,
 				as: 'venue',
 				include: [
 					{
-						model: Resource.scope('mini'),
-						as: 'pictures',
-						through: {
-							attributes: []
-						}
+						model: Region,
+						as: 'region'
+					},
+					{
+						model: Country.scope('mini'),
+						as: 'country'
 					}
 				]
 			},
@@ -282,7 +287,7 @@ export const init = (sequelize: Sequelize) => {
 				]
 			},
 			{
-				model: Venue,
+				model: EventVenue,
 				as: 'venue',
 				attributes: ['id', 'name', 'city', 'description', 'location'],
 				include: [

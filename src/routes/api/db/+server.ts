@@ -13,6 +13,7 @@ import { countries } from '$lib/server/constants/countries'
 import { EventSpeaker } from '$lib/server/models/eventSpeaker'
 import { Resource } from '$lib/server/models/resource'
 import { Schedule } from '$lib/server/models/schedule'
+import { EventVenue } from '$lib/server/models/eventVenue'
 
 export async function GET() {
 	let countries: any[] = []
@@ -71,6 +72,16 @@ function getRandomSpeakers(speakers: Speaker[], count: number) {
 	}
 	return results
 }
+function getRandomVenues(venues: Venue[], count: number) {
+	const results: Venue[] = []
+	for (let i = 0; i < count; i++) {
+		const venue = venues[Math.floor(Math.random() * venues.length)]
+		if (!results.find((item) => venue.id == item.id)) {
+			results.push(venue)
+		}
+	}
+	return results
+}
 
 function getRandomUniqueModels(models: Model[], count: number) {
 	const results: Model[] = []
@@ -105,6 +116,30 @@ async function createSpeakerSnapshot(speaker: Speaker) {
 	speakerSnapshot.setCountry(country)
 	await speakerSnapshot.save()
 	return speakerSnapshot
+}
+async function createVenueSnapshot(venue: Venue | null) {
+	//increase refCount of image
+	if(!venue) {
+		return null
+	}
+	const image = await venue.getPictures()
+	const country = await venue.getCountry()
+	const region = await venue.getRegion()
+	const venueSnapshot = await EventVenue.create({
+		status: venue.status,
+		name: venue.name,
+		city: venue.city,
+		address: venue.address,
+		location: venue.location,
+		email: venue.email,
+		description: venue.description,
+		venueId: venue.id
+	})
+	venueSnapshot.setPictures(image)
+	venueSnapshot.setCountry(country)
+	venueSnapshot.setRegion(region)
+	await venueSnapshot.save()
+	return venueSnapshot
 }
 
 async function populate(): Promise<any[]> {
@@ -145,6 +180,22 @@ async function populate(): Promise<any[]> {
 		name: 'José Jaime',
 		surname: 'Rodríguez',
 		email: 'rodriguezjjaime@hotmail.com',
+		role: 1
+	})
+
+	await User.create({
+		cognitoId: '90b692c9-47c0-44c7-bb0b-1b9365e0dc72',
+		name: 'Alex',
+		surname: 'Serrajoto',
+		email: 'admin@skupee.online',
+		role: 1
+	})
+
+	await User.create({
+		cognitoId: '8aa4846d-e479-4407-aca4-e0159b7e4af0',
+		name: 'Gregor',
+		surname: 'Grošelj',
+		email: 'gregor.g@skupee.online',
 		role: 1
 	})
 
@@ -438,7 +489,7 @@ async function populate(): Promise<any[]> {
 	]
 
 	//Creating events
-	for (let i = 0; i < 40; i++) {
+	for (let i = 0; i < 10; i++) {
 		const tempDate = faker.date.future(1)
 		const startDate = new Date(tempDate)
 		const endDate = tempDate.setDate(tempDate.getDate() + (Math.floor(Math.random() * 4) + 1))
@@ -448,13 +499,20 @@ async function populate(): Promise<any[]> {
 		const snapshotSpeakers = await Promise.all(
 			getRandomSpeakers(speakers, 5).map((speaker) => createSpeakerSnapshot(speaker))
 		)
+		
 		const organizer = getRandomUniqueModels(organizers, 1)[0]
 		const venue = await Venue.findByPk(venues[Math.floor(Math.random() * venues.length)].id, {
-			include: {
+			include: [{
 				model: Region,
 				as: 'region'
-			}
+			},
+			{
+				model: Country,
+				as: 'country'
+			}]
 		})
+
+		const venueSnapshot = await createVenueSnapshot(venue)
 
 		const language = languages[Math.floor(Math.random() * languages.length)]
 		const translations: any[] = []
@@ -468,6 +526,7 @@ async function populate(): Promise<any[]> {
 
 		const eventBody = {
 			title: title,
+			status: Event.PUBLISHED,
 			slug: slugify(title),
 			bannerId: images.id,
 			bannerMobileId: images.id,
@@ -481,7 +540,6 @@ async function populate(): Promise<any[]> {
 			timeZone: faker.address.timeZone(),
 			mailing: 8,
 			organizerId: organizers[Math.floor(Math.random() * organizers.length)].id,
-			venueId: venue?.id,
 			userId: user.id,
 			regionId: venue?.region.id,
 			twitter: faker.internet.userName(),
@@ -497,7 +555,10 @@ async function populate(): Promise<any[]> {
 
 		const event = await Event.create(eventBody)
 		event.setPictures([images.id])
+		// snapshot for speakers
 		event.setEventSpeakers(snapshotSpeakers)
+		// snapshot for venues
+		event.eventVenueId = venueSnapshot != null ? venueSnapshot.id : 1
 		event.setSchedule(
 			await Schedule.create({
 				startTime: startDate,

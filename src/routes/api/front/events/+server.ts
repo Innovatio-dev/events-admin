@@ -2,9 +2,9 @@ import { eventStatuses } from '$lib/server/constants/statuses'
 import { validateSearchParam } from '$lib/server/middlewares/validator'
 import { Country } from '$lib/server/models/country'
 import { Event } from '$lib/server/models/event'
+import { EventVenue } from '$lib/server/models/eventVenue'
 import { Region } from '$lib/server/models/region'
 import { Schedule } from '$lib/server/models/schedule'
-import { Venue } from '$lib/server/models/venue'
 import { filterSchema } from '$lib/utils/validation/eventSchema'
 import { json, type RequestEvent } from '@sveltejs/kit'
 import sequelize, { Op, type Order } from 'sequelize'
@@ -102,24 +102,25 @@ export async function GET(event: RequestEvent) {
 		where,
 		include: [
 			{
-				model: Venue,
+				model: EventVenue,
 				as: 'venue',
-				// where: whereVenue, // Apply venue filter conditions
 				include: [
 					{
 						model: Region,
-						as: 'region' // Apply region filter conditions
+						as: 'region'
 					},
 					{
 						model: Country,
 						as: 'country',
-						where: whereCountry // Apply country filter conditions
+						where: whereCountry
 					}
 				]
 			}
 		]
 	})
-
+	console.log('order ', order)
+	console.log('where ', where)
+	console.log('whereSchedule ', whereSchedule)
 	// Fetch events based on filter conditions and associations
 	const results = await Event.scope('list').findAll({
 		where,
@@ -128,7 +129,7 @@ export async function GET(event: RequestEvent) {
 		order,
 		include: [
 			{
-				model: Venue,
+				model: EventVenue,
 				as: 'venue',
 				// where: whereVenue, // Apply venue filter conditions
 				include: [
@@ -146,7 +147,7 @@ export async function GET(event: RequestEvent) {
 			{
 				model: Schedule,
 				as: 'schedule',
-				where: whereSchedule
+				// where: whereSchedule
 				// required: filter.dateMax != null || filter.dateMin != null
 			}
 		]
