@@ -265,7 +265,8 @@ export async function POST(event: RequestEvent) {
 				]
 			})
 			if (virtual) {
-				values.venueId = virtual.id
+				const eventVenueSnapshot = await createVenueSnapshot(virtual, virtual, transaction)
+				values.eventVenueId = eventVenueSnapshot.id
 				values.regionId = virtual.region.id
 			}
 		}
