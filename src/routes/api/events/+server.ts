@@ -23,7 +23,7 @@ import { EventVenue } from '$lib/server/models/eventVenue'
 export async function GET(event: RequestEvent) {
 	const filter = validateSearchParam(event, filterSchema)
 	let where: any = {}
-	
+
 	if (filter.regionId) {
 		where = {
 			'$venue.region.id$': { [Op.in]: filter.regionId }
@@ -36,7 +36,7 @@ export async function GET(event: RequestEvent) {
 	const order: Order = [] // Array to store order conditions
 
 	// Filter conditions for event model
-	
+
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
 	}
@@ -71,7 +71,7 @@ export async function GET(event: RequestEvent) {
 				name = 'id'
 				order.push([name, col.type])
 			} else if (col.name == 'country') {
-				order.push(['venue','country', 'name', col.type])
+				order.push(['venue', 'country', 'name', col.type])
 			} else {
 				order.push([name, col.type])
 			}
@@ -79,9 +79,9 @@ export async function GET(event: RequestEvent) {
 	}
 	if (filter.search) {
 		let search = `%${filter.search}%`
-		const regex = new RegExp("^[eE][0-9]*");
+		const regex = new RegExp('^[eE][0-9]*')
 
-		if(regex.test(filter.search)) {
+		if (regex.test(filter.search)) {
 			search = '%' + parseInt(filter.search.substring(1)) + '%'
 		}
 
@@ -97,7 +97,7 @@ export async function GET(event: RequestEvent) {
 	if (filter.countryId) {
 		whereCountry.id = filter.countryId
 	}
-	
+
 	// Count events based on filter conditions and associations
 	const count = await Event.count({
 		where,
@@ -135,7 +135,7 @@ export async function GET(event: RequestEvent) {
 				include: [
 					{
 						model: Region,
-						as: 'region',
+						as: 'region'
 					},
 					{
 						model: Country.scope('full'),
@@ -216,7 +216,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function POST(event: RequestEvent) {
-	// const user = checkUser(event)
+	const user = checkUser(event)
 	const {
 		pictures,
 		bannerId,
@@ -240,7 +240,7 @@ export async function POST(event: RequestEvent) {
 
 		createList.name = values.title
 		createList.folderId = 5
-		values.userId = 1
+		values.userId = user.id
 
 		if (venue.length > 0) {
 			const tempVenue = await Venue.findByPk(venue[0].id)
@@ -252,11 +252,10 @@ export async function POST(event: RequestEvent) {
 			const eventVenueSnapshot = await createVenueSnapshot(tempVenue, venue[0], transaction)
 			values.eventVenueId = eventVenueSnapshot.id
 			values.regionId = venue[0].region.id
-		}
-		else {
+		} else {
 			const virtual = await Venue.findOne({
 				where: {
-					address: 'Online' 
+					address: 'Online'
 				},
 				include: [
 					{
@@ -265,9 +264,9 @@ export async function POST(event: RequestEvent) {
 					}
 				]
 			})
-			if(virtual) {
+			if (virtual) {
 				values.venueId = virtual.id
-				values.regionId = virtual.region.id	
+				values.regionId = virtual.region.id
 			}
 		}
 
@@ -340,8 +339,8 @@ export async function POST(event: RequestEvent) {
 		return json(event)
 	} catch (err: any) {
 		await transaction.rollback()
-		if(err.name === 'SequelizeUniqueConstraintError') {
-			if(err.errors[0].path === 'slug') {
+		if (err.name === 'SequelizeUniqueConstraintError') {
+			if (err.errors[0].path === 'slug') {
 				throw error(HttpResponses.UNIQUE_CONSTRAINT, {
 					message: 'Validation Error:  Unique, This Event Name and Slud Already Exists'
 				})
@@ -381,30 +380,37 @@ async function createSpeakerSnapshot(
 		},
 		{ transaction }
 	)
-	if(speaker.picture) {
-		speakerSnapshot.setPicture(speaker.picture.id, {transaction})
+	if (speaker.picture) {
+		speakerSnapshot.setPicture(speaker.picture.id, { transaction })
 	}
-	if(speaker.country) {
-		speakerSnapshot.setCountry(speaker.country.id, {transaction})
+	if (speaker.country) {
+		speakerSnapshot.setCountry(speaker.country.id, { transaction })
 	}
 	await speakerSnapshot.save()
 	return speakerSnapshot
 }
 
-async function createVenueSnapshot(venue: Venue, venueEvent: {[x:string]:any}, transaction: sequelize.Transaction) {
+async function createVenueSnapshot(
+	venue: Venue,
+	venueEvent: { [x: string]: any },
+	transaction: sequelize.Transaction
+) {
 	const image = await venue.getPictures()
 	const country = await venue.getCountry()
 	const region = await venue.getRegion()
-	const venueSnapshot = await EventVenue.create({
-		status: venueEvent.status,
-		name: venueEvent.name,
-		city: venueEvent.city,
-		address: venueEvent.address,
-		location: venueEvent.location,
-		email: venueEvent.email,
-		description: venueEvent.description,
-		venueId: venue.id
-	}, { transaction })
+	const venueSnapshot = await EventVenue.create(
+		{
+			status: venueEvent.status,
+			name: venueEvent.name,
+			city: venueEvent.city,
+			address: venueEvent.address,
+			location: venueEvent.location,
+			email: venueEvent.email,
+			description: venueEvent.description,
+			venueId: venue.id
+		},
+		{ transaction }
+	)
 	venueSnapshot.setPictures(image, { transaction })
 	venueSnapshot.setCountry(country, { transaction })
 	venueSnapshot.setRegion(region, { transaction })

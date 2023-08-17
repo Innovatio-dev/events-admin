@@ -36,7 +36,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function PUT(req: RequestEvent) {
-	// const user = checkUser(req)
+	const user = checkUser(req)
 	const { id } = req.params
 	const {
 		reason,
@@ -127,7 +127,7 @@ export async function PUT(req: RequestEvent) {
 			{
 				status: event.status,
 				reason,
-				userId: 1
+				userId: user.id
 			},
 			{ transaction }
 		)
