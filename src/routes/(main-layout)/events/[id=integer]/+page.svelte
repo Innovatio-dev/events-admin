@@ -93,6 +93,9 @@
 		let response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
+			if (events.venue.pictures) {
+				eventPhoto = events.venue.pictures[0].url
+			}
 			for (const speaker of events.eventSpeakers) {
 				if (speaker.primary) {
 					primarySpeakers.push(speaker)
@@ -101,7 +104,6 @@
 				}
 			}
 			$pageStatus.title = events.title
-			eventPhoto = events.venue.pictures[0].url
 		}
 		loading = false
 	}
@@ -263,14 +265,14 @@
 						<p>{events.venue.region.name ?? '---'}</p>
 						<p>{events.venue.country.nicename ?? '---'}</p>
 						<p>{events.venue.city ?? '---'}</p>
-						{#if events.venue.pictures}
+						{#if eventPhoto}
 							<div class="text-ellipsis underline">
 								<a target="_blank" href={`${eventPhoto}`}> Event Photo </a>
 							</div>
 						{:else}
 							<p>{'---'}</p>
 						{/if}
-						{#if events.venue.pictures}
+						{#if eventPhoto}
 							<div class="text-ellipsis underline">
 								<a target="_blank" href={`${eventPhoto}`}> Pin Photo </a>
 							</div>
@@ -308,7 +310,7 @@
 					<div class="w-full h-[100px]">
 						<SpeakerBadge
 							size={'100'}
-							image={speaker.picture?.url ?? ''}
+							image={speaker.picture ? speaker.picture?.url : ''}
 							jobRole={speaker.jobRole}
 							company={speaker.company}
 						/>
@@ -378,6 +380,7 @@
 					</div>
 				{/if}
 			</div>
+
 			<div class="flex !max-w-[300px] mb-8">
 				<div class="field">
 					<p>Photo:</p>
@@ -386,7 +389,7 @@
 					<div class="w-full h-fit flex">
 						<SimpleSkeleton width={280} height={180} items={1} />
 					</div>
-				{:else if events}
+				{:else if events.venue.pictures > 1}
 					<div class="min-w-[280px] min-h-[160px] flex">
 						<img
 							src={events.venue.pictures[0].url}
@@ -394,8 +397,13 @@
 							class="rounded-lg"
 						/>
 					</div>
+				{:else}
+					<div class="content w-full flex items-center justify-center">
+						<p>No image found</p>
+					</div>
 				{/if}
 			</div>
+
 			<div class="flex !max-w-[280px] mb-8">
 				<div class="field">
 					<p>Aditional photo:</p>
@@ -404,7 +412,7 @@
 					<div class="min-w-[280px] min-h-[160px] flex gap-x-12">
 						<SimpleSkeleton wFull height={180} items={1} />
 					</div>
-				{:else if events}
+				{:else if events.pictures.length > 1}
 					<div class="flex gap-x-12 w-full">
 						{#each events.pictures as picture, index}
 							<div class="min-w-[280px] min-h-[160px]">
@@ -415,6 +423,10 @@
 								/>
 							</div>
 						{/each}
+					</div>
+				{:else}
+					<div class="content !w-[400px] flex items-center justify-center">
+						<p>No image found</p>
 					</div>
 				{/if}
 			</div>

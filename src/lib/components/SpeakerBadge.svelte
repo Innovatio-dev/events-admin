@@ -12,7 +12,9 @@
 
 <div class="w-full h-full flex items-center py-2 px-4 gap-x-4">
 	<div class={`w-[${size}px] h-[${size}px] min-h-[${size}px] min-w-[${size}px]`}>
-		<ProfilePic maxSize={size} img={image} />
+		{#if image}
+			<ProfilePic maxSize={size} img={image} />
+		{/if}
 	</div>
 	{#if iso}
 		<div class="flex gap-x-2 items-center bg-black py-1 px-4 text-white rounded-md">

@@ -14,10 +14,10 @@
 
 	let loading: boolean = true
 	let events: any = null
-	let mainSpeakers: any[] = []
-	let secondarySpeakers: any[] = []
 	let eventId = $page.params.id
 	let bannerImage: string
+	let mainSpeakers: any[] = []
+	let secondarySpeakers: any[] = []
 
 	async function fetchEvents(id: string) {
 		loading = true
@@ -58,15 +58,16 @@
 		eventData.schedule.startTime = new Date(schedule.startTime)
 		eventData.schedule.endTime = new Date(schedule.endTime)
 		eventData.schedule.visibleAt = new Date(schedule.visibleAt)
-		eventData.speakers = eventSpeakers ? eventSpeakers : []
 		eventData.linkZoom = linkZoom
+		eventData.venue = venue
 		eventData.language = language ? language : null
 		eventData.translation = translation ? translation : []
-		eventData.venue = venue
 		eventData.secondaryOrganizer = secondaryOrganizer
 		eventData.secondaryOrganizerDescription = secondaryOrganizerDescription
-		mainSpeakers = eventData.speakers.filter((speaker) => speaker.primary)
-		secondarySpeakers = eventData.speakers.filter((speaker) => !speaker.primary)
+		eventData.speakers = eventSpeakers.filter((speaker) => speaker.primary)
+		eventData.speakersSecondary = eventSpeakers.filter((speaker) => !speaker.primary)
+		mainSpeakers = eventData.speakers
+		secondarySpeakers = eventData.speakersSecondary
 	}
 
 	let eventData: EventData = {
@@ -82,8 +83,8 @@
 		language: null,
 		venue: null,
 		translation: [],
-		secondaryOrganizer: null,
-		secondaryOrganizerDescription: null,
+		secondaryOrganizer: '',
+		secondaryOrganizerDescription: '',
 		speakers: [],
 		speakersSecondary: [],
 		schedule: {

@@ -13,7 +13,7 @@
 		venue: any
 		translation: { name: string; flagIso: string }[]
 		secondaryOrganizer: string | null
-		secondaryOrganizerDescription: string | null
+		secondaryOrganizerDescription: string
 		speakers: any[]
 		speakersSecondary: any[]
 		schedule: {
@@ -29,7 +29,6 @@
 	// Components
 	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
 	import MainButton from '$lib/components/MainButton.svelte'
-	import UploadedImage from './UploadedImage.svelte'
 	import CountryViewer from '$lib/components/table_cell/CountryViewer.svelte'
 	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
@@ -43,7 +42,6 @@
 	import Input from '$lib/components/Input.svelte'
 	import LabelInput from '$lib/components/LabelInput.svelte'
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
-	import Editor from './Editor.svelte'
 	import TextWithIcon from '$lib/components/table_cell/TextWithIcon.svelte'
 	import OrderableTable, { type Column } from '$lib/components/OrderableTable.svelte'
 	import TextWithImageViewer from '$lib/components/custom/data_viewer/TextWithImageViewer.svelte'
@@ -52,6 +50,8 @@
 	// Icons
 	import CgMathEqual from 'svelte-icons-pack/cg/CgMathEqual'
 	import { pageAlert } from '$lib/stores/pageStatus'
+	import Editor from './Editor.svelte'
+	import UploadedImage from './UploadedImage.svelte'
 
 	const typeEvents = [
 		{
@@ -85,9 +85,12 @@
 	const data: { banner: number[] } = { banner: [] }
 	let organizerInfoEnabled: boolean = false
 	let isModalMainSpeaker = false
+	let venueSelected = null
+	let speakerSelected = null
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
 	let venues: any[] = []
+	let validate: boolean = false
 	let success: boolean = false
 	export let banner: string | null = null
 	export let mainSpeakers: any[] = []
@@ -125,7 +128,8 @@
 			cellDataGenerator: (item) => {
 				return {
 					onEdit: () => {
-						goto(`/venues/${item.id}/edit`)
+						isModalVenue = true
+						venueSelected = item
 					},
 					onRemove: () => {
 						let index = venues.indexOf(item)
@@ -160,7 +164,8 @@
 			cellDataGenerator: (item) => {
 				return {
 					onEdit: () => {
-						goto(`/speakers/${item.id}/edit`)
+						isModalMainSpeaker = true
+						speakerSelected = item
 					},
 					onRemove: () => {
 						let index = mainSpeakers.indexOf(item)
@@ -196,7 +201,8 @@
 			cellDataGenerator: (item) => {
 				return {
 					onEdit: () => {
-						goto(`/speakers/${item.id}/edit`)
+						isModalSecondarySpeaker = true
+						speakerSelected = item
 					},
 					onRemove: () => {
 						let index = secondarySpeakers.indexOf(item)
@@ -246,13 +252,45 @@
 		}
 	}
 
+	function createSlug(title: string): string {
+		const slug = title.toLowerCase().replace(/\s+/g, '-')
+		return slug
+	}
+
+	function createBanner(banner: number[]): number {
+		const bannerId = Number(banner[0])
+		return bannerId
+	}
+
+	function removeBanner() {
+		banner = null
+	}
+	function removeImage(index) {
+		eventData.pictures.splice(index, 1)
+		eventData.pictures = eventData.pictures
+	}
+
+	function handleClose() {
+		mainSpeakers = [...mainSpeakers]
+		isModalMainSpeaker = false
+	}
+
+	function handleCloseSecondary() {
+		secondarySpeakers = [...secondarySpeakers]
+		isModalSecondarySpeaker = false
+	}
+
+	function extractPictureIds(pictures: Speaker[]): number[] {
+		return pictures.map((picture) => picture.id)
+	}
+
 	async function updateEvent() {
 		try {
 			eventData.slug = createSlug(eventData.title)
-			eventData.speakersSecondary = extractSpeakerIds(secondarySpeakers)
-			eventData.speakers = extractSpeakerIds(mainSpeakers)
 			eventData.organizerId = eventData.organizerId
 			eventData.pictures = extractPictureIds(eventData.pictures)
+			eventData.speakers = mainSpeakers
+			eventData.speakersSecondary = secondarySpeakers
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
 			}
@@ -261,6 +299,7 @@
 				method: 'PUT',
 				body: JSON.stringify({ ...eventData, reason: '' })
 			})
+			console.log(eventData)
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Event updated.', status: true }
@@ -286,24 +325,6 @@
 			}
 		}
 	}
-
-	function createSlug(title: string): string {
-		const slug = title.toLowerCase().replace(/\s+/g, '-')
-		return slug
-	}
-
-	function createBanner(banner: number[]): number {
-		const bannerId = Number(banner[0])
-		return bannerId
-	}
-
-	function extractSpeakerIds(speakers: Speaker[]): number[] {
-		return speakers.map((speaker) => speaker.id)
-	}
-
-	function extractPictureIds(pictures: Speaker[]): number[] {
-		return pictures.map((picture) => picture.id)
-	}
 </script>
 
 <div class="content">
@@ -320,6 +341,9 @@
 				placeholder={'Select the organizer for this event'}
 				url={'/api/organizers?search={s}&limit={l}&offset={o}'}
 			/>
+			{#if eventData.organizerId.length < 1 && validate}
+				<span class="text-xs text-alert-error">* Organizer is required</span>
+			{/if}
 		</div>
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
 			<div class="w-full">
@@ -366,11 +390,14 @@
 						name="title"
 						placeholder="Type the event title"
 					/>
+					{#if eventData.title.length < 3 && validate}
+						<span class="text-xs text-alert-error">* Event title is required</span>
+					{/if}
 				</div>
 				<div class="flex flex-col w-full gap-2 pb-10">
 					<LabelInput>Write a brief description of the event</LabelInput>
 					<Editor bind:value={eventData.description} name="description" />
-					{#if eventData.description.length < 12}
+					{#if eventData.description.length < 12 && !validate}
 						<span class="text-xs text-alert-error pt-12"
 							>* Event description is required</span
 						>
@@ -401,18 +428,14 @@
 					title="Upload your image"
 					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 					body="600x500"
+					multiple={true}
 				/>
 			</div>
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
-				{#if eventData.pictures.length > 0}
-					<UploadedImage image={banner ?? ''} />
+				{#if banner}
+					<UploadedImage image={banner} clickAction={removeBanner} />
 				{:else}
-					<div
-						class="flex justify-center items-center w-full text-lg text-neutral-3 py-6"
-					>
-						Banner image not found, please add
-					</div>
 					<DragAndDrop
 						bind:uploaded={data.banner}
 						url="/api/resources"
@@ -420,6 +443,7 @@
 						title="Upload your image"
 						subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 						body="600x500"
+						multiple={false}
 					/>
 				{/if}
 			</div>
@@ -431,6 +455,10 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.startTime}
 					/>
+
+					{#if eventData?.schedule.startTime == null && validate}
+						<span class="text-xs text-alert-error">* Date start is required</span>
+					{/if}
 				</div>
 				<div>
 					<LabelInput>Date ends</LabelInput>
@@ -438,6 +466,9 @@
 						placeholder="Choose the end date"
 						bind:value={eventData.schedule.endTime}
 					/>
+					{#if eventData?.schedule.endTime == null && validate}
+						<span class="text-xs text-alert-error">* Date ends is required</span>
+					{/if}
 				</div>
 				<div>
 					<LabelInput>Event registration date opens</LabelInput>
@@ -445,6 +476,9 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.visibleAt}
 					/>
+					{#if eventData?.schedule.visibleAt == null && validate}
+						<span class="text-xs text-alert-error">* Date opens is required</span>
+					{/if}
 				</div>
 			</div>
 			<div class="input-set">
@@ -479,14 +513,15 @@
 						>
 						<SpeakersFormModal
 							isOpen={isModalMainSpeaker}
+							speaker={speakerSelected}
+							speakers={eventData.speakers}
 							on:save={(event) => {
 								const speaker = event.detail
 								if (!mainSpeakers.some((item) => item.id == speaker.id)) {
-									mainSpeakers.push(speaker)
-									mainSpeakers = extractSpeakerIds(mainSpeakers)
+									mainSpeakers = [...mainSpeakers, speaker]
 								}
 							}}
-							handleClose={() => (isModalMainSpeaker = false)}
+							{handleClose}
 						/>
 					</div>
 				</div>
@@ -523,14 +558,15 @@
 						>
 						<SpeakersFormModal
 							isOpen={isModalSecondarySpeaker}
+							speaker={speakerSelected}
+							speakers={secondarySpeakers}
 							on:save={(event) => {
 								const speaker = event.detail
 								if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
-									secondarySpeakers.push(speaker)
-									secondarySpeakers = secondarySpeakers
+									secondarySpeakers = [...secondarySpeakers, speaker]
 								}
 							}}
-							handleClose={() => (isModalSecondarySpeaker = false)}
+							handleClose={handleCloseSecondary}
 						/>
 					</div>
 				</div>
@@ -539,52 +575,55 @@
 				</div>
 				{#if eventData?.typeEvent == '0'}
 					<div>
-						{eventData.linkZoom}
 						<LabelInput>Insert the invitation zoom link</LabelInput>
 						<Input bind:value={eventData.linkZoom} placeholder="Insert zoom link" />
-						{#if eventData?.linkZoom == null}
+						{#if eventData?.linkZoom == null && validate}
 							<span class="text-xs text-alert-error">* Zoom link is required</span>
 						{/if}
 					</div>
 				{/if}
 			</div>
-
-			<div class="input-set">
-				<SectionHeader>Venue</SectionHeader>
-				<div>
-					<LabelInput>Venue</LabelInput>
-					<div class="flex gap-2">
-						<div class="w-full">
-							<DropdownFetcher
-								filterPlaceholder={'Search'}
-								itemGenerator={(item) => ({ title: item.name })}
-								valueGenerator={(item) => item.id}
-								selectedGenerator={(item) => ({ title: item.name })}
-								placeholder={'Choose a venue'}
-								url={'/api/venues'}
-								multiselect={false}
-								selected={eventData.venue ? eventData.venue : null}
-								on:change={(e) => {
-									const venue = e.detail.selected
+			{#if eventData?.typeEvent == '1'}
+				<div class="input-set">
+					<SectionHeader>Venue</SectionHeader>
+					<div>
+						<LabelInput>Venue</LabelInput>
+						<div class="flex gap-2">
+							<div class="w-full">
+								<DropdownFetcher
+									filterPlaceholder={'Search'}
+									itemGenerator={(item) => ({ title: item.name })}
+									valueGenerator={(item) => item.id}
+									selectedGenerator={(item) => ({ title: item.name })}
+									placeholder={'Choose a venue'}
+									url={'/api/venues'}
+									multiselect={false}
+									selected={eventData.venue ? eventData.venue : null}
+									on:change={(e) => {
+										const venue = e.detail.selected
+										venues = [venue]
+									}}
+								/>
+							</div>
+							<MainButton fit on:click={() => (isModalVenue = true)}
+								>Create</MainButton
+							>
+							<VenuesFormModal
+								isOpen={isModalVenue}
+								venue={venueSelected}
+								on:save={(event) => {
+									const venue = event.detail
 									venues = [venue]
 								}}
+								handleClose={() => (isModalVenue = false)}
 							/>
 						</div>
-						<MainButton fit on:click={() => (isModalVenue = true)}>Create</MainButton>
-						<VenuesFormModal
-							isOpen={isModalVenue}
-							on:save={(event) => {
-								const venue = event.detail
-								venues = [venue]
-							}}
-							handleClose={() => (isModalVenue = false)}
-						/>
+					</div>
+					<div>
+						<OrderableTable columns={venueColumns} data={venues} />
 					</div>
 				</div>
-				<div>
-					<OrderableTable columns={venueColumns} data={venues} />
-				</div>
-			</div>
+			{/if}
 			<div class="input-set">
 				<SectionHeader>Language</SectionHeader>
 				<div>
@@ -603,6 +642,9 @@
 					>
 						<div slot="title">Select the main language</div>
 					</Dropdown>
+					{#if eventData?.language == null && validate}
+						<span class="text-xs text-alert-error">* Language is required</span>
+					{/if}
 				</div>
 				<div>
 					<LabelInput>Translated to</LabelInput>
@@ -643,6 +685,7 @@
 					{/each}
 				</div>
 			</div>
+			<!-- Secondary Organizer -->
 			<!-- <div class="input-set">
 				<SectionHeader>Organizer Assigned</SectionHeader>
 				<div>
@@ -665,11 +708,11 @@
 							bind:value={eventData.secondaryOrganizer}
 						/>
 					</div>
-					<div>
+					<div class="flex flex-col w-full gap-2 pb-12">
 						<LabelInput>Description</LabelInput>
-						<Input
-							placeholder="Organizer Assigned to this event"
+						<Editor
 							bind:value={eventData.secondaryOrganizerDescription}
+							name="secondaryOrganizerDescription"
 						/>
 					</div>
 				{/if}
