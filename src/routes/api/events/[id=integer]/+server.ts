@@ -36,7 +36,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function PUT(req: RequestEvent) {
-	// const user = checkUser(req)
+	const user = checkUser(req)
 	const { id } = req.params
 	const {
 		reason,
@@ -127,8 +127,7 @@ export async function PUT(req: RequestEvent) {
 			{
 				status: event.status,
 				reason,
-				// userId: user.id
-				userId: 1
+				userId: user.id
 			},
 			{ transaction }
 		)
@@ -177,7 +176,7 @@ async function createSpeakerSnapshot(
 			facebook: speaker.facebook,
 			youtube: speaker.youtube,
 			description: speaker.description,
-			speakerId: speaker.speakerId,
+			speakerId: speaker.speakerId ?? speaker.id,
 			primary,
 			order,
 			eventId: event.id
