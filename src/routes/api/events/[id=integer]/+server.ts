@@ -36,7 +36,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function PUT(req: RequestEvent) {
-	const user = checkUser(req)
+	// const user = checkUser(req)
 	const { id } = req.params
 	const {
 		reason,
@@ -127,7 +127,8 @@ export async function PUT(req: RequestEvent) {
 			{
 				status: event.status,
 				reason,
-				userId: user.id
+				// userId: user.id
+				userId: 1
 			},
 			{ transaction }
 		)
@@ -135,11 +136,23 @@ export async function PUT(req: RequestEvent) {
 		await transaction.commit()
 		event = await Event.scope('full').findByPk(event.id)
 		return json(event)
-	} catch (error) {
-		// Si ocurre algún error, deshacer la transacción
+	} catch (err: any) {
+		// Si ocurre algún err, deshacer la transacción
 		await transaction.rollback()
-		console.log(error)
-		throw error
+		console.log(err)
+		if (err.name === 'SequelizeUniqueConstraintError') {
+			if (err.errors[0].path === 'slug') {
+				throw error(HttpResponses.UNIQUE_CONSTRAINT, {
+					message: 'Validation Error:  Unique, This Event Name and Slud Already Exists'
+				})
+			}
+			throw error(HttpResponses.UNIQUE_CONSTRAINT, {
+				message: 'Validation Error:  Unique constrain Error'
+			})
+		}
+		throw error(HttpResponses.UNEXPECTED_ERROR, {
+			message: 'Something happend, try again later ' + err
+		})
 	}
 }
 
