@@ -500,9 +500,14 @@
 								on:change={(e) => {
 									e.preventDefault()
 									const speaker = e.detail.selected
-									if (!mainSpeakers.some((item) => item.id == speaker.id)) {
-										mainSpeakers.push(speaker)
-										mainSpeakers = mainSpeakers
+									const existingSpeaker = mainSpeakers.find(
+										(item) => item.id === speaker.id
+									)
+									if (!existingSpeaker) {
+										mainSpeakers = [
+											...mainSpeakers,
+											{ ...speaker, copy: false }
+										]
 									}
 								}}
 							/>
@@ -548,9 +553,14 @@
 								on:change={(e) => {
 									e.preventDefault()
 									const speaker = e.detail.selected
-									if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
-										secondarySpeakers.push(speaker)
-										secondarySpeakers = secondarySpeakers
+									const existingSpeaker = secondarySpeakers.find(
+										(item) => item.id === speaker.id
+									)
+									if (!existingSpeaker) {
+										mainSpeakers = [
+											...secondarySpeakers,
+											{ ...speaker, copy: false }
+										]
 									}
 								}}
 							/>
