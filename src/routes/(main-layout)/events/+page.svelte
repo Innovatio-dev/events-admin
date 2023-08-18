@@ -171,7 +171,6 @@
 	async function fetchEvents() {
 		loading = true
 		const url = new URL('/api/events', window.location.origin)
-		console.log(params)
 		const cUrl = createUrl(url, {
 			typeEvent: params.typeEvent.map((type) => type.value),
 			regionId: params.regionId.map((location) => location.value),
@@ -183,7 +182,6 @@
 			offset: (params.page - 1) * itemsPerPage,
 			limit: itemsPerPage
 		})
-		console.log(params)
 		const response = await fetch(cUrl)
 		if (response.ok) {
 			data = await response.json()

@@ -28,6 +28,8 @@
 	let secondarySpeakers: any[] = []
 	let eventPhoto: string
 	let exportLoading = false
+	let pictures: any[] = []
+	let venuePhoto: any | null = null
 
 	onMount(async () => {
 		let id = $page.params.id
@@ -93,8 +95,11 @@
 		let response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
-			if (events.venue.pictures) {
-				eventPhoto = events.venue.pictures[0].url
+			if (events.venue && events.venue.pictures) {
+				pictures = events.venue.pictures
+				if (pictures.length > 0) {
+					venuePhoto = pictures[0]
+				}
 			}
 			for (const speaker of events.eventSpeakers) {
 				if (speaker.primary) {
@@ -178,7 +183,7 @@
 					<div class="w-full h-full flex">
 						<SimpleSkeleton width={200} height={20} items={4} />
 					</div>
-				{:else if events.venue}
+				{:else if events}
 					<div class="content">
 						<p>{events.status === 0 ? 'Inactive ' : 'Active'}</p>
 						<p>{events.uid ?? '---'}</p>
@@ -199,7 +204,7 @@
 					<div class="w-full h-full flex">
 						<SimpleSkeleton width={200} height={20} items={1} />
 					</div>
-				{:else if events.venue}
+				{:else if events}
 					<div class="content">
 						<p>{events.organizer.name ?? '---'}</p>
 					</div>
@@ -220,7 +225,7 @@
 					<div class="w-full h-full flex">
 						<SimpleSkeleton width={200} height={20} items={4} />
 					</div>
-				{:else if events.venue}
+				{:else if events}
 					<div class="content">
 						<p>{events.typeEvent === 0 ? 'Virtual' : 'Live'}</p>
 						<p
@@ -260,11 +265,11 @@
 					<div class="w-full h-full flex">
 						<SimpleSkeleton width={200} height={20} items={8} />
 					</div>
-				{:else if events.venue}
+				{:else if events}
 					<div class="content">
-						<p>{events.venue.region.name ?? '---'}</p>
-						<p>{events.venue.country.nicename ?? '---'}</p>
-						<p>{events.venue.city ?? '---'}</p>
+						<p>{events.venue ? events.venue.region.name : '---'}</p>
+						<p>{events.venue ? events.venue.country.nicename : '---'}</p>
+						<p>{events.venue ? events.venue.city : '---'}</p>
 						{#if eventPhoto}
 							<div class="text-ellipsis underline">
 								<a target="_blank" href={`${eventPhoto}`}> Event Photo </a>
@@ -358,17 +363,17 @@
 					<div class="w-full h-full flex">
 						<SimpleSkeleton width={200} height={20} items={3} />
 					</div>
-				{:else if events.venue}
+				{:else if events}
 					<div class="content">
-						<p>{events.venue.name ?? '---'}</p>
-						<p>{events.venue.country.nicename ?? '---'}</p>
-						{#if events.venue.location}
+						<p>{events.venue ? events.venue.name : '---'}</p>
+						<p>{events.venue ? events.venue.country.nicename : '---'}</p>
+						{#if events.venue}
 							<div class="text-ellipsis underline">
 								<a
 									target="_blank"
 									href={`${gMapsLink(
-										events.venue.location.lat,
-										events.venue.location.lng
+										events.venue?.location.lat,
+										events.venue?.location.lng
 									)}`}
 								>
 									Abrir Mapa
@@ -389,18 +394,16 @@
 					<div class="w-full h-fit flex">
 						<SimpleSkeleton width={280} height={180} items={1} />
 					</div>
-				{:else if events.venue.pictures > 1}
-					<div class="min-w-[280px] min-h-[160px] flex">
-						<img
-							src={events.venue.pictures[0].url}
-							alt={events.venue.pictures[0].name}
-							class="rounded-lg"
-						/>
-					</div>
-				{:else}
-					<div class="content w-full flex items-center justify-center">
-						<p>No image found</p>
-					</div>
+				{:else if events}
+					{#if venuePhoto}
+						<div class="min-w-[280px] min-h-[160px] flex">
+							<img src={venuePhoto.url} alt={venuePhoto.name} class="rounded-lg" />
+						</div>
+					{:else}
+						<div class="content w-full flex items-center justify-center">
+							<p>No image found</p>
+						</div>
+					{/if}
 				{/if}
 			</div>
 
@@ -412,12 +415,12 @@
 					<div class="min-w-[280px] min-h-[160px] flex gap-x-12">
 						<SimpleSkeleton wFull height={180} items={1} />
 					</div>
-				{:else if events.pictures.length > 1}
+				{:else if pictures && pictures.length > 0}
 					<div class="flex gap-x-12 w-full">
-						{#each events.pictures as picture, index}
+						{#each pictures as picture}
 							<div class="min-w-[280px] min-h-[160px]">
 								<img
-									src={picture?.url ?? ''}
+									src={picture.url ?? ''}
 									alt={picture.name}
 									class="rounded-lg"
 								/>

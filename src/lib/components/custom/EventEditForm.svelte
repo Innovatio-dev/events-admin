@@ -1,6 +1,7 @@
 <script context="module" lang="ts">
 	export interface EventData {
 		slug: string
+		organizer: any[]
 		organizerId: string
 		typeEvent: string | null
 		isFeatured: boolean
@@ -25,6 +26,10 @@
 </script>
 
 <script lang="ts">
+	// Utils
+	import { onMount } from 'svelte'
+	import { languages } from '$lib/utils/constants/Languages'
+	import { pageAlert } from '$lib/stores/pageStatus'
 	import { goto } from '$app/navigation'
 	// Components
 	import ActionsViewer from '$lib/components/table_cell/ActionsViewer.svelte'
@@ -33,7 +38,6 @@
 	import MapViewerPopup from '$lib/components/table_cell/MapViewerPopup.svelte'
 	import Dropdown from '$lib/components/Dropdown.svelte'
 	import Badge from '$lib/components/Badge.svelte'
-	import ToggleButtton from '$lib/components/ToggleButtton.svelte'
 	import SpeakersFormModal from '$lib/components/custom/SpeakersFormModal.svelte'
 	import VenuesFormModal from '$lib/components/custom/VenuesFormModal.svelte'
 	import DatePicker from '$lib/components/DatePicker.svelte'
@@ -43,15 +47,13 @@
 	import LabelInput from '$lib/components/LabelInput.svelte'
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
 	import TextWithIcon from '$lib/components/table_cell/TextWithIcon.svelte'
-	import OrderableTable, { type Column } from '$lib/components/OrderableTable.svelte'
-	import TextWithImageViewer from '$lib/components/custom/data_viewer/TextWithImageViewer.svelte'
-	// Utils
-	import { languages } from '$lib/utils/constants/Languages'
-	// Icons
-	import CgMathEqual from 'svelte-icons-pack/cg/CgMathEqual'
-	import { pageAlert } from '$lib/stores/pageStatus'
 	import Editor from './Editor.svelte'
 	import UploadedImage from './UploadedImage.svelte'
+	import OrderableTable, { type Column } from '$lib/components/OrderableTable.svelte'
+	import TextWithImageViewer from '$lib/components/custom/data_viewer/TextWithImageViewer.svelte'
+	// import ToggleButtton from '$lib/components/ToggleButtton.svelte'
+	// Icons
+	import CgMathEqual from 'svelte-icons-pack/cg/CgMathEqual'
 
 	const typeEvents = [
 		{
@@ -74,24 +76,22 @@
 		}
 	]
 
-	let loading = false
-
-	interface Speaker {
+	interface PictureId {
 		id: number
 	}
-
 	// Props
-	export let eventData: EventData
 	const data: { banner: number[] } = { banner: [] }
-	let organizerInfoEnabled: boolean = false
+	// let organizerInfoEnabled: boolean = false
+	let loading = false
 	let isModalMainSpeaker = false
 	let venueSelected = null
 	let speakerSelected = null
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
 	let venues: any[] = []
-	let validate: boolean = false
 	let success: boolean = false
+	let originalPictures: any[] = []
+	export let eventData: EventData
 	export let banner: string | null = null
 	export let mainSpeakers: any[] = []
 	export let secondarySpeakers: any[] = []
@@ -280,7 +280,7 @@
 		isModalSecondarySpeaker = false
 	}
 
-	function extractPictureIds(pictures: Speaker[]): number[] {
+	function extractPictureIds(pictures: PictureId[]): number[] {
 		return pictures.map((picture) => picture.id)
 	}
 
@@ -291,15 +291,15 @@
 			eventData.pictures = extractPictureIds(eventData.pictures)
 			eventData.speakers = mainSpeakers
 			eventData.speakersSecondary = secondarySpeakers
+			eventData.venue = venues
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
 			}
 			loading = true
 			const res = await fetch(`/api/events/${eventId}`, {
 				method: 'PUT',
-				body: JSON.stringify({ ...eventData, reason: '' })
+				body: JSON.stringify({ ...eventData, reason: 'SIMPLE UPDATE' })
 			})
-			console.log(eventData)
 			if (res.ok) {
 				const data = await res.json()
 				$pageAlert = { message: 'Success! Event updated.', status: true }
@@ -325,27 +325,38 @@
 			}
 		}
 	}
+
+	function initData() {
+		originalPictures = eventData.pictures
+		venues = [eventData.venue]
+	}
+
+	onMount(async () => {
+		await initData()
+	})
 </script>
 
 <div class="content">
 	<div class="form-container">
-		<LabelInput>Select Organizer</LabelInput>
-		<div class="z-50">
-			<DropdownFetcher
-				name="organizerId"
-				filterPlaceholder={'Search'}
-				selected={eventData.organizerId}
-				itemGenerator={(item) => ({ title: item.name, image: item.logo?.url })}
-				selectedGenerator={(item) => ({ title: item.name })}
-				bind:value={eventData.organizerId}
-				placeholder={'Select the organizer for this event'}
-				url={'/api/organizers?search={s}&limit={l}&offset={o}'}
-			/>
-			{#if eventData.organizerId.length < 1 && validate}
-				<span class="text-xs text-alert-error">* Organizer is required</span>
-			{/if}
+		<!-- Organizer -->
+		<div>
+			<LabelInput>Select Organizer</LabelInput>
+			<div class="z-50">
+				<DropdownFetcher
+					selected={eventData.organizer}
+					name="organizerId"
+					filterPlaceholder={'Search'}
+					itemGenerator={(item) => ({ title: item.name, image: item.logo?.url })}
+					selectedGenerator={(item) => ({ title: item.name })}
+					bind:value={eventData.organizerId}
+					placeholder={'Select the organizer for this event'}
+					url={'/api/organizers?search={s}&limit={l}&offset={o}'}
+				/>
+			</div>
 		</div>
+		<!-- Event Types -->
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
+			<!-- Event Virtual/Live -->
 			<div class="w-full">
 				<LabelInput>Your event is ...</LabelInput>
 				<div class="flex gap-4 sm:gap-8 mt-6 flex-col sm:flex-row">
@@ -362,6 +373,7 @@
 					{/each}
 				</div>
 			</div>
+			<!-- Featured/Regular -->
 			<div class="w-full">
 				<LabelInput>Mark the type of event</LabelInput>
 				<div class="flex gap-4 sm:gap-8 mt-6 flex-col sm:flex-row">
@@ -380,6 +392,7 @@
 			</div>
 		</div>
 		{#if eventData.typeEvent !== null}
+			<!-- Event Info -->
 			<div class="input-set">
 				<SectionHeader>Event Information</SectionHeader>
 				<div>
@@ -390,23 +403,16 @@
 						name="title"
 						placeholder="Type the event title"
 					/>
-					{#if eventData.title.length < 3 && validate}
-						<span class="text-xs text-alert-error">* Event title is required</span>
-					{/if}
 				</div>
 				<div class="flex flex-col w-full gap-2 pb-10">
 					<LabelInput>Write a brief description of the event</LabelInput>
 					<Editor bind:value={eventData.description} name="description" />
-					{#if eventData.description.length < 12 && !validate}
-						<span class="text-xs text-alert-error pt-12"
-							>* Event description is required</span
-						>
-					{/if}
 				</div>
 			</div>
-			<div>
+			<!-- Event Photo -->
+			<div class="input-set">
 				<SectionHeader>Event Photo</SectionHeader>
-				{#if eventData?.pictures.length > 0}
+				{#if originalPictures}
 					<div class="flex flex-wrap items-center justify-center gap-x-6">
 						{#each eventData.pictures as picture}
 							<div class="flex w-fit py-6">
@@ -431,7 +437,8 @@
 					multiple={true}
 				/>
 			</div>
-			<div>
+			<!-- Pin Photo -->
+			<div class="input-set">
 				<SectionHeader>Pin Photo</SectionHeader>
 				{#if banner}
 					<UploadedImage image={banner} clickAction={removeBanner} />
@@ -447,6 +454,7 @@
 					/>
 				{/if}
 			</div>
+			<!-- Schedule -->
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
 				<div>
@@ -455,10 +463,6 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.startTime}
 					/>
-
-					{#if eventData?.schedule.startTime == null && validate}
-						<span class="text-xs text-alert-error">* Date start is required</span>
-					{/if}
 				</div>
 				<div>
 					<LabelInput>Date ends</LabelInput>
@@ -466,9 +470,6 @@
 						placeholder="Choose the end date"
 						bind:value={eventData.schedule.endTime}
 					/>
-					{#if eventData?.schedule.endTime == null && validate}
-						<span class="text-xs text-alert-error">* Date ends is required</span>
-					{/if}
 				</div>
 				<div>
 					<LabelInput>Event registration date opens</LabelInput>
@@ -476,11 +477,9 @@
 						placeholder="Choose the start date"
 						bind:value={eventData.schedule.visibleAt}
 					/>
-					{#if eventData?.schedule.visibleAt == null && validate}
-						<span class="text-xs text-alert-error">* Date opens is required</span>
-					{/if}
 				</div>
 			</div>
+			<!-- PrimarySpeakers -->
 			<div class="input-set">
 				<SectionHeader>Speakers</SectionHeader>
 				<div>
@@ -528,6 +527,9 @@
 				<div>
 					<OrderableTable columns={speakerColumns} data={mainSpeakers} />
 				</div>
+			</div>
+			<!-- Secondary Speakers -->
+			<div class="input-set">
 				<div>
 					<LabelInput>Secondary Speaker</LabelInput>
 					<div class="flex gap-2">
@@ -573,18 +575,19 @@
 				<div>
 					<OrderableTable columns={speakerColumnsSecondary} data={secondarySpeakers} />
 				</div>
+			</div>
+			<!-- ZoomLink -->
+			<div class="input-set">
 				{#if eventData?.typeEvent == '0'}
 					<div>
 						<LabelInput>Insert the invitation zoom link</LabelInput>
 						<Input bind:value={eventData.linkZoom} placeholder="Insert zoom link" />
-						{#if eventData?.linkZoom == null && validate}
-							<span class="text-xs text-alert-error">* Zoom link is required</span>
-						{/if}
 					</div>
 				{/if}
 			</div>
-			{#if eventData?.typeEvent == '1'}
-				<div class="input-set">
+			<!-- Venue -->
+			<div class="input-set">
+				{#if eventData?.typeEvent == '1'}
 					<SectionHeader>Venue</SectionHeader>
 					<div>
 						<LabelInput>Venue</LabelInput>
@@ -594,11 +597,11 @@
 									filterPlaceholder={'Search'}
 									itemGenerator={(item) => ({ title: item.name })}
 									valueGenerator={(item) => item.id}
+									selected={eventData.venue}
 									selectedGenerator={(item) => ({ title: item.name })}
 									placeholder={'Choose a venue'}
 									url={'/api/venues'}
 									multiselect={false}
-									selected={eventData.venue ? eventData.venue : null}
 									on:change={(e) => {
 										const venue = e.detail.selected
 										venues = [venue]
@@ -622,8 +625,9 @@
 					<div>
 						<OrderableTable columns={venueColumns} data={venues} />
 					</div>
-				</div>
-			{/if}
+				{/if}
+			</div>
+			<!-- Language -->
 			<div class="input-set">
 				<SectionHeader>Language</SectionHeader>
 				<div>
@@ -642,9 +646,6 @@
 					>
 						<div slot="title">Select the main language</div>
 					</Dropdown>
-					{#if eventData?.language == null && validate}
-						<span class="text-xs text-alert-error">* Language is required</span>
-					{/if}
 				</div>
 				<div>
 					<LabelInput>Translated to</LabelInput>
