@@ -200,6 +200,14 @@ export const init = (sequelize: Sequelize) => {
 				as: 'venue',
 				include: [
 					{
+						model: Resource,
+						as: 'pictures'
+					},
+					{
+						model: Region,
+						as: 'region'
+					},
+					{
 						model: Region,
 						as: 'region'
 					},

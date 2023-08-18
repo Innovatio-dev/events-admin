@@ -6,6 +6,15 @@ export class EventVenue extends Model {
 
 export const init = (sequelize: Sequelize) => {
     EventVenue.init({
+        copy: {
+            type: DataTypes.VIRTUAL,
+            get() {
+                return true
+            },
+            set(value) {
+                throw Error('this field is readonly')
+            }
+        },
         status: {
             type: DataTypes.SMALLINT,
             defaultValue: 0

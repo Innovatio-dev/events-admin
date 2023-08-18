@@ -36,7 +36,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function PUT(req: RequestEvent) {
-	const user = checkUser(req)
+	// const user = checkUser(req)
 	const { id } = req.params
 	const {
 		reason,
@@ -45,7 +45,6 @@ export async function PUT(req: RequestEvent) {
 		pictures,
 		bannerId,
 		bannerMobileId,
-		venue,
 		...fields
 	} = await validateBody(req, updateSchema)
 
@@ -62,18 +61,32 @@ export async function PUT(req: RequestEvent) {
 			})
 		}
 
-		await event.update({ ...fields }, { transaction })
-
-		if (venue.length > 0) {
-			const tempVenue = await Venue.findByPk(venue[0].id)
-			if (!tempVenue) {
-				throw error(HttpResponses.NOT_FOUND, {
-					message: 'Validation Error:  Venue does not exists'
-				})
+		// if (venue.length > 0) {
+		const venue = fields.venue
+		if (venue) {
+			console.log('there is a venue ', venue.name);
+			
+			// if comes a Venue and its not a copy yet
+			// lets search if exists, causes why not
+			if (venue.copy === false) {
+				const tempVenue = await Venue.findByPk(venue.id)
+				if (!tempVenue) {
+					throw error(HttpResponses.NOT_FOUND, {
+						message: 'Validation Error:  Venue does not exists'
+					})
+				}
+				const eventVenueSnapshot = await createVenueSnapshot(tempVenue, venue, transaction)
+				fields.eventVenueId = eventVenueSnapshot.id
+				fields.regionId = venue.region.id
+				// await event.setVenue(eventVenueSnapshot)
 			}
-			const eventVenueSnapshot = await createVenueSnapshot(tempVenue, venue[0], transaction)
-			fields.eventVenueId = eventVenueSnapshot.id
-			fields.regionId = venue[0].region.id
+			else {
+				const eventVenueSnapshot = await createVenueSnapshot(venue, venue, transaction)
+				fields.eventVenueId = eventVenueSnapshot.id
+				fields.regionId = venue.region.id
+				// await event.setVenue(eventVenueSnapshot)
+			}
+			
 		} else {
 			const virtual = await Venue.findOne({
 				where: {
@@ -87,30 +100,36 @@ export async function PUT(req: RequestEvent) {
 				]
 			})
 			if (virtual) {
-				fields.venueId = virtual.id
+				virtual.setDataValue('copy', false)
+				const eventVenueSnapshot = await createVenueSnapshot(virtual, virtual, transaction)
+				fields.eventVenueId = eventVenueSnapshot.id
 				fields.regionId = virtual.region.id
 			}
 		}
+		await event.update({ ...fields }, { transaction })
 
+		let primarySpeakers: EventSpeaker[] = []
 		// here goes the speakers
 		if (speakers && speakers.length > 0) {
-			const snapshotSpeakers = await Promise.all(
-				speakers.map((speaker: Speaker, index: number) =>
+			primarySpeakers = await Promise.all(
+				speakers.map((speaker: any, index: number) => {
 					createSpeakerSnapshot(speaker, event, true, index, transaction)
-				)
+				})
 			)
-			await event.setEventSpeakers(snapshotSpeakers)
 		}
 
-		// speakersMap = []
+		let secondarySpeakers: EventSpeaker[] = []
 		if (speakersSecondary && speakersSecondary.length > 0) {
-			const snapshotSpeakers = await Promise.all(
+			secondarySpeakers = await Promise.all(
 				speakersSecondary.map((speaker: Speaker, index: number) =>
 					createSpeakerSnapshot(speaker, event, false, index, transaction)
 				)
 			)
-			await event.setEventSpeakers(snapshotSpeakers)
 		}
+		
+		const allSpeakers = primarySpeakers.concat(secondarySpeakers)
+		await event.setEventSpeakers(allSpeakers)
+
 		// -- end here goes the speakers
 
 		if (pictures) {
@@ -127,7 +146,7 @@ export async function PUT(req: RequestEvent) {
 			{
 				status: event.status,
 				reason,
-				userId: user.id
+				userId: 1
 			},
 			{ transaction }
 		)
@@ -156,7 +175,7 @@ export async function PUT(req: RequestEvent) {
 }
 
 async function createSpeakerSnapshot(
-	speaker: Speaker,
+	speaker: any,
 	event: Event | null,
 	primary: boolean,
 	order: number,
@@ -165,31 +184,39 @@ async function createSpeakerSnapshot(
 	if (!event) {
 		return
 	}
+
+	const data = {
+		status: speaker.status,
+		name: speaker.name,
+		jobRole: speaker.jobRole,
+		company: speaker.company,
+		instagram: speaker.instagram,
+		linkedin: speaker.linkedin,
+		facebook: speaker.facebook,
+		youtube: speaker.youtube,
+		description: speaker.description,
+		primary,
+		order,
+		eventId: event.id,
+		speakerId: speaker.id
+	}
+	
+	if (speaker.copy === true) {
+		data.speakerId = speaker.speakerId 
+	}
+
 	const speakerSnapshot = await EventSpeaker.create(
-		{
-			status: speaker.status,
-			name: speaker.name,
-			jobRole: speaker.jobRole,
-			company: speaker.company,
-			instagram: speaker.instagram,
-			linkedin: speaker.linkedin,
-			facebook: speaker.facebook,
-			youtube: speaker.youtube,
-			description: speaker.description,
-			speakerId: speaker.speakerId ?? speaker.id,
-			primary,
-			order,
-			eventId: event.id
-		},
+		data,
 		{ transaction }
 	)
 	if (speaker.picture) {
-		speakerSnapshot.setPicture(speaker.picture.id, { transaction })
+		await speakerSnapshot.setPicture(speaker.picture.id, { transaction })
 	}
-	if (speaker.countryId) {
-		speakerSnapshot.setCountry(speaker.countryId, { transaction })
+	if (speaker.country) {
+		await speakerSnapshot.setCountry(speaker.country.id, { transaction })
 	}
 	await speakerSnapshot.save()
+	
 	return speakerSnapshot
 }
 
@@ -198,25 +225,30 @@ async function createVenueSnapshot(
 	venueEvent: { [x: string]: any },
 	transaction: sequelize.Transaction
 ) {
-	const image = await venue.getPictures()
-	const country = await venue.getCountry()
-	const region = await venue.getRegion()
+	// const image = await venue.getPictures()
+	// const country = await venue.getCountry()
+	// const region = await venue.getRegion()
+	const data = {
+		status: venueEvent.status,
+		name: venueEvent.name,
+		city: venueEvent.city,
+		address: venueEvent.address,
+		location: venueEvent.location,
+		email: venueEvent.email,
+		description: venueEvent.description,
+		venueId: venue.id
+	}
+
+	if (venueEvent.copy === true) {
+		venueId: venueEvent.venueId
+	}
 	const venueSnapshot = await EventVenue.create(
-		{
-			status: venueEvent.status,
-			name: venueEvent.name,
-			city: venueEvent.city,
-			address: venueEvent.address,
-			location: venueEvent.location,
-			email: venueEvent.email,
-			description: venueEvent.description,
-			venueId: venue.id
-		},
+		data,
 		{ transaction }
 	)
-	venueSnapshot.setPictures(image, { transaction })
-	venueSnapshot.setCountry(country, { transaction })
-	venueSnapshot.setRegion(region, { transaction })
+	venueSnapshot.setPictures(await venueEvent.pictures.map(e => e.id), { transaction })
+	venueSnapshot.setCountry(venueEvent.country.id, { transaction })
+	venueSnapshot.setRegion(venueEvent.region.id, { transaction })
 	await venueSnapshot.save({ transaction })
 	return venueSnapshot
 }

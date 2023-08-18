@@ -100,8 +100,8 @@ export const updateSchema = Joi.object({
 	description: Joi.string(),
 	notes: Joi.string(),
 	linkZoom: Joi.string().allow("", null),
-	language: Joi.object(),
-	translation: Joi.array(),
+	language: Joi.object().allow(null),
+	translation: Joi.array().allow(null),
 	pictures: Joi.array().items(Joi.number()),
 	organizerId: Joi.number(),
 	schedule: Joi.object({
