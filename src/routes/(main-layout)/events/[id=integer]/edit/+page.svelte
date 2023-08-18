@@ -5,6 +5,7 @@
 	import EventEditForm, { type EventData } from '$lib/components/custom/EventEditForm.svelte'
 	// Store
 	import { pageStatus } from '$lib/stores/pageStatus'
+	import { Circle3 } from 'svelte-loading-spinners'
 
 	onMount(async () => {
 		$pageStatus.title = 'Edit Event'
@@ -49,7 +50,8 @@
 			secondaryOrganizer,
 			secondaryOrganizerDescription
 		} = events
-		eventData.organizerId = organizer
+		eventData.organizerId = organizer.id.toString()
+		eventData.organizer = organizer
 		eventData.typeEvent = typeEvent
 		eventData.isFeatured = isFeatured
 		eventData.title = title
@@ -72,6 +74,7 @@
 
 	let eventData: EventData = {
 		slug: '',
+		organizer: [],
 		organizerId: '',
 		typeEvent: '',
 		isFeatured: false,
@@ -96,5 +99,22 @@
 </script>
 
 <section>
-	<EventEditForm {eventData} {mainSpeakers} {secondarySpeakers} {eventId} banner={bannerImage} />
+	{#if loading}
+		<div class="w-full h-[60vh] flex items-center justify-center">
+			<Circle3
+				ballBottomLeft={'#14dcff'}
+				ballBottomRight={'#fd369d'}
+				ballTopRight={'#8863e08f'}
+				ballTopLeft={'#ffa5d3'}
+			/>
+		</div>
+	{:else}
+		<EventEditForm
+			{eventData}
+			{mainSpeakers}
+			{secondarySpeakers}
+			{eventId}
+			banner={bannerImage}
+		/>
+	{/if}
 </section>
