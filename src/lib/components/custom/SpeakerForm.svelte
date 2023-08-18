@@ -13,6 +13,7 @@
 	import { pageAlert } from '$lib/stores/pageStatus'
 
 	interface Speaker {
+		copy: boolean
 		id?: number
 		picture?: any
 		name: string
@@ -37,6 +38,7 @@
 
 	// State
 	let speaker: Speaker = {
+		copy: true,
 		name: '',
 		company: '',
 		jobRole: '',
@@ -55,12 +57,19 @@
 
 	let updatedSpeaker = {}
 	let loading = false
+	let hasChanges: boolean = false
+	const originalSpeaker = addSpeaker
 
 	if (addSpeaker) {
 		speaker = JSON.parse(JSON.stringify(addSpeaker))
 		speaker.countryId = addSpeaker.country?.id
 	}
-
+	function validateChanges(item) {
+		hasChanges = JSON.stringify(originalSpeaker) !== JSON.stringify(item)
+		if (hasChanges) {
+			item.copy = false
+		}
+	}
 	function handleInputChange(event) {
 		const { name, value } = event.target
 		updatedSpeaker = {
@@ -85,6 +94,7 @@
 			if (editAction) {
 				loading = true
 				const editedSpeaker = await createEditedSpeaker()
+				validateChanges(editedSpeaker)
 				await editAction(editedSpeaker)
 				$pageAlert = { message: 'Success! Changes saved', status: true }
 				onClose()
