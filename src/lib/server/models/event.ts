@@ -216,6 +216,10 @@ export const init = (sequelize: Sequelize) => {
 					{
 						model: Resource.scope('mini'),
 						as: 'picture'
+					},
+					{
+						model: Country,
+						as: 'country'
 					}
 				]
 			}

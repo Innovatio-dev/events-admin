@@ -7,6 +7,15 @@ export class EventSpeaker extends Model {
 export const init = (sequelize: Sequelize) => {
 	EventSpeaker.init(
 		{
+			copy: {
+				type: DataTypes.VIRTUAL,
+				get() {
+					return true
+				},
+				set(value) {
+					throw Error('this field is readonly')
+				}
+			},
 			primary: {
 				type: DataTypes.BOOLEAN,
 				defaultValue: false
