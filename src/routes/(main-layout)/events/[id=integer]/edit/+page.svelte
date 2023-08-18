@@ -19,12 +19,14 @@
 	let bannerImage: string
 	let mainSpeakers: any[] = []
 	let secondarySpeakers: any[] = []
+	let organizerSelected: any[] = []
 
 	async function fetchEvents(id: string) {
 		loading = true
 		const response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
+			organizerSelected = events.organizer
 			if (events.banner) {
 				bannerImage = events.banner.url
 			}
@@ -51,7 +53,6 @@
 			secondaryOrganizerDescription
 		} = events
 		eventData.organizerId = organizer.id.toString()
-		eventData.organizer = organizer
 		eventData.typeEvent = typeEvent
 		eventData.isFeatured = isFeatured
 		eventData.title = title
@@ -74,7 +75,6 @@
 
 	let eventData: EventData = {
 		slug: '',
-		organizer: [],
 		organizerId: '',
 		typeEvent: '',
 		isFeatured: false,
@@ -114,6 +114,7 @@
 			{mainSpeakers}
 			{secondarySpeakers}
 			{eventId}
+			{organizerSelected}
 			banner={bannerImage}
 		/>
 	{/if}

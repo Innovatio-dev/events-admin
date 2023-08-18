@@ -1,7 +1,6 @@
 <script context="module" lang="ts">
 	export interface EventData {
 		slug: string
-		organizer: any[]
 		organizerId: string
 		typeEvent: string | null
 		isFeatured: boolean
@@ -91,6 +90,7 @@
 	let venues: any[] = []
 	let success: boolean = false
 	let originalPictures: any[] = []
+	export let organizerSelected: any[]
 	export let eventData: EventData
 	export let banner: string | null = null
 	export let mainSpeakers: any[] = []
@@ -343,7 +343,7 @@
 			<LabelInput>Select Organizer</LabelInput>
 			<div class="z-50">
 				<DropdownFetcher
-					selected={eventData.organizer}
+					selected={organizerSelected}
 					name="organizerId"
 					filterPlaceholder={'Search'}
 					itemGenerator={(item) => ({ title: item.name, image: item.logo?.url })}
