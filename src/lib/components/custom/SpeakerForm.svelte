@@ -1,17 +1,4 @@
-<script lang="ts">
-	// Components
-	import Input from '$lib/components/Input.svelte'
-	import MainButton from '../MainButton.svelte'
-	import DragAndDrop from '../DragAndDrop.svelte'
-	import UploadedImage from './UploadedImage.svelte'
-	import Dropdown from '../Dropdown.svelte'
-	import Editor from './Editor.svelte'
-
-	// Constants
-	import { countries } from '$lib/utils/constants/Regions'
-	import { goto } from '$app/navigation'
-	import { pageAlert } from '$lib/stores/pageStatus'
-
+<script context="module" lang="ts">
 	interface Speaker {
 		copy: boolean
 		id?: number
@@ -28,13 +15,30 @@
 		description: string
 		country?: { id: number | null; nicename: '' }
 	}
+</script>
 
+<script lang="ts">
+	// Components
+	import Input from '$lib/components/Input.svelte'
+	import MainButton from '../MainButton.svelte'
+	import DragAndDrop from '../DragAndDrop.svelte'
+	import UploadedImage from './UploadedImage.svelte'
+	import Dropdown from '../Dropdown.svelte'
+	import Editor from './Editor.svelte'
+	// Constants
+	import { countries } from '$lib/utils/constants/Regions'
+	import { goto } from '$app/navigation'
+	import { pageAlert } from '$lib/stores/pageStatus'
 	// Props
 	export let addSpeaker: Speaker | null = null
 	export let updateAction: ((id: number, speaker) => Promise<void> | null) | null = null
 	export let editAction: ((speaker) => Promise<void> | null) | null = null
 	export let submitAction = (speaker) => {}
 	export let onClose = () => {}
+	let updatedSpeaker = {}
+	let loading = false
+	let hasChanges: boolean = false
+	const originalSpeaker = addSpeaker
 
 	// State
 	let speaker: Speaker = {
@@ -55,21 +59,18 @@
 		description: ''
 	}
 
-	let updatedSpeaker = {}
-	let loading = false
-	let hasChanges: boolean = false
-	const originalSpeaker = addSpeaker
-
 	if (addSpeaker) {
 		speaker = JSON.parse(JSON.stringify(addSpeaker))
 		speaker.countryId = addSpeaker.country?.id
 	}
+
 	function validateChanges(item) {
 		hasChanges = JSON.stringify(originalSpeaker) !== JSON.stringify(item)
 		if (hasChanges) {
 			item.copy = false
 		}
 	}
+
 	function handleInputChange(event) {
 		const { name, value } = event.target
 		updatedSpeaker = {
@@ -88,6 +89,7 @@
 			...updatedSpeaker
 		}
 	}
+
 	const handleSubmit = async () => {
 		try {
 			loading = true

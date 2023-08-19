@@ -326,6 +326,11 @@
 		}
 	}
 
+	function handleCloseVenue() {
+		venues = venues
+		isModalVenue = false
+	}
+
 	function initData() {
 		originalPictures = eventData.pictures
 		venues = [eventData.venue]
@@ -334,6 +339,8 @@
 	onMount(async () => {
 		await initData()
 	})
+
+	console.log(venues)
 </script>
 
 <div class="content">
@@ -624,11 +631,14 @@
 							<VenuesFormModal
 								isOpen={isModalVenue}
 								venue={venueSelected}
+								handleCloseModal={handleCloseVenue}
+								handleClose={() => {
+									isModalVenue = false
+								}}
 								on:save={(event) => {
 									const venue = event.detail
 									venues = [venue]
 								}}
-								handleClose={() => (isModalVenue = false)}
 							/>
 						</div>
 					</div>

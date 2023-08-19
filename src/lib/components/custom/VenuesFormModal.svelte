@@ -11,6 +11,7 @@
 	// props
 	export let isOpen: boolean
 	export let handleClose: () => void
+	export let handleCloseModal: () => void
 	export let venue: any = null
 	export let loading: boolean = false
 
@@ -48,6 +49,10 @@
 			handleClose()
 		}
 		loading = false
+	}
+
+	async function updateEventVenue(updatedVenue) {
+		venue = updatedVenue
 	}
 
 	async function updateVenue(id, venue) {
@@ -90,8 +95,9 @@
 		</span>
 		<VenueForm
 			addVenue={venue}
-			updateAction={venue ? updateVenue : null}
 			submitAction={postVenue}
+			onClose={handleCloseModal}
+			editAction={updateEventVenue}
 		/>
 	</div>
 </Modal>

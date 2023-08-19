@@ -292,6 +292,11 @@
 		secondarySpeakers = [...secondarySpeakers]
 		isModalSecondarySpeaker = false
 	}
+
+	function handleCloseVenue() {
+		venues = [...venues]
+		isModalVenue = false
+	}
 </script>
 
 <div class="content">
@@ -559,11 +564,14 @@
 							<VenuesFormModal
 								isOpen={isModalVenue}
 								venue={venueSelected}
+								handleCloseModal={handleCloseVenue}
 								on:save={(event) => {
 									const venue = event.detail
 									venues = [venue]
 								}}
-								handleClose={() => (isModalVenue = false)}
+								handleClose={() => {
+									isModalVenue = false
+								}}
 							/>
 						</div>
 					</div>

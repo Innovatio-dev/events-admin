@@ -8,6 +8,8 @@
 		location: { lat: string; lng: string }
 		description: string
 		pictures: number[]
+		copy: boolean
+		region: { id: number | null; name: string }
 	}
 </script>
 
@@ -19,17 +21,23 @@
 	import MainButton from '../MainButton.svelte'
 	import LocationInput from './LocationInput.svelte'
 	import UploadedImage from './UploadedImage.svelte'
-	// Constants
+	import Editor from './Editor.svelte'
 	import ToggleButtton from '../ToggleButtton.svelte'
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
-	import Editor from './Editor.svelte'
-
+	import { pageAlert } from '$lib/stores/pageStatus'
 	// Props
 	export let addVenue: any = null
+	export let editAction: ((speaker) => Promise<void> | null) | null = null
 	export let updateAction: any = null
 	export let submitAction = (venue) => {}
-
+	let extraPictures = []
+	let updatedVenue = {}
+	let loading = false
+	const onCancel = () => {}
+	export let onClose = () => {}
+	let originalVenue: any
+	let hasChanges
 	// State
 	let venue: Venue = {
 		name: '',
@@ -37,8 +45,10 @@
 		city: '',
 		address: '',
 		location: { lat: '', lng: '' },
+		region: { id: null, name: '' },
 		description: '',
-		pictures: []
+		pictures: [],
+		copy: false
 	}
 	let geoData = {
 		country: '',
@@ -46,24 +56,37 @@
 		address: '',
 		location: { lat: '', lng: '' }
 	}
-	let extraPictures = []
-	let updatedVenue = {}
-	let loading = false
 
 	if (addVenue) {
 		venue.id = addVenue.id
 		venue.name = addVenue.name
 		geoData.country = addVenue.country?.nicename
 		venue.name = addVenue.name
+		venue.region = addVenue.region
 		geoData.city = addVenue.city
 		geoData.address = addVenue.address
 		geoData.location.lng = addVenue.location.lng
 		geoData.location.lat = addVenue.location.lat
 		venue.description = addVenue.description
+		venue.copy = addVenue.copy
+		originalVenue = addVenue
 	}
 
 	const handleSubmit = async () => {
-		if (updateAction) {
+		if (editAction) {
+			loading = true
+			const editedVenue = await createEditedVenue()
+			editedVenue.city = geoData.city
+			editedVenue.address = geoData.address
+			editedVenue.country = geoData.country
+			editedVenue.location.lat = geoData.location.lat
+			editedVenue.location.lng = geoData.location.lng
+			editedVenue.copy = false
+			console.log('edited', editedVenue)
+			await editAction(editedVenue)
+			$pageAlert = { message: 'Success! Changes saved', status: true }
+			onClose()
+		} else if (updateAction) {
 			loading = true
 			const formattedData = {
 				...updatedVenue,
@@ -85,8 +108,10 @@
 	}
 
 	const updateVenue = (e) => {
-		if (e.target.name.length) {
-			updatedVenue[e.target.name] = e.target.value
+		const { name, value } = e.target
+		updatedVenue = {
+			...updatedVenue,
+			[name]: value
 		}
 	}
 
@@ -94,11 +119,17 @@
 		updatedVenue[e.detail.name] = e.detail.value
 	}
 
+	function createEditedVenue() {
+		return {
+			...venue,
+			...updatedVenue
+		}
+	}
+
 	const deletePicture = () => {
 		addVenue.pictures = []
 	}
-
-	const onCancel = () => {}
+	console.log('original', originalVenue)
 </script>
 
 <form
@@ -185,7 +216,7 @@
 		</span>
 	</div>
 	<div class="flex gap-10">
-		<MainButton {loading}>Save</MainButton>
-		<MainButton on:click={onCancel}>cancel</MainButton>
+		<MainButton type="submit" {loading}>Save</MainButton>
+		<MainButton on:click={onClose}>Cancel</MainButton>
 	</div>
 </form>
