@@ -104,6 +104,7 @@ export const updateSchema = Joi.object({
 	translation: Joi.array().allow(null),
 	pictures: Joi.array().items(Joi.number()),
 	organizerId: Joi.number(),
+	publishingUpdate: Joi.boolean().default(false),
 	schedule: Joi.object({
 		startTime: Joi.date(),
 		endTime: Joi.date(),

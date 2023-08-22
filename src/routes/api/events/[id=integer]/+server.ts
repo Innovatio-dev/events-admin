@@ -38,7 +38,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function PUT(req: RequestEvent) {
-	// const user = checkUser(req)
+	const user = checkUser(req)
 	const { id } = req.params
 	const {
 		reason,
@@ -47,6 +47,7 @@ export async function PUT(req: RequestEvent) {
 		pictures,
 		bannerId,
 		bannerMobileId,
+		publishingUpdate,
 		...fields
 	} = await validateBody(req, updateSchema)
 
@@ -62,6 +63,22 @@ export async function PUT(req: RequestEvent) {
 				message: 'Event with id ' + id + ' does not exist in our records'
 			})
 		}
+
+		// Just for the status changes
+		if (publishingUpdate === true) {
+			await event.update({ ...fields }, { transaction })
+			await EventLog.create(
+				{
+					status: event.status,
+					reason,
+					userId: user.id
+				},
+				{ transaction }
+			)
+			event = await Event.scope('full').findByPk(event.id)
+			return json({message: 'update from status', event})
+		}
+
 
 		// if (venue.length > 0) {
 		const venue = fields.venue
@@ -168,7 +185,7 @@ export async function PUT(req: RequestEvent) {
 			{
 				status: event.status,
 				reason,
-				userId: 1
+				userId: user.id
 			},
 			{ transaction }
 		)
