@@ -12,6 +12,8 @@ import { EventSpeaker } from '$lib/server/models/eventSpeaker'
 import { EventVenue } from '$lib/server/models/eventVenue'
 import { Venue } from '$lib/server/models/venue'
 import { Region } from '$lib/server/models/region'
+import { Resource } from '$lib/server/models/resource'
+import { Country } from '$lib/server/models/country'
 
 export async function GET(event: RequestEvent) {
 	const { id } = event.params
@@ -88,6 +90,8 @@ export async function PUT(req: RequestEvent) {
 			}
 			
 		} else {
+			console.log('There is not venue ');
+			
 			const virtual = await Venue.findOne({
 				where: {
 					address: 'Online'
@@ -96,16 +100,34 @@ export async function PUT(req: RequestEvent) {
 					{
 						model: Region,
 						as: 'region'
+					},
+					{
+						model: Resource,
+						as: 'pictures'
+					},
+					{
+						model: Country.scope('mini'),
+						as: 'country'
 					}
 				]
 			})
+			
 			if (virtual) {
+				console.log('venue to set as zoom');
 				virtual.setDataValue('copy', false)
+				console.log(virtual.pictures);
+
 				const eventVenueSnapshot = await createVenueSnapshot(virtual, virtual, transaction)
 				fields.eventVenueId = eventVenueSnapshot.id
 				fields.regionId = virtual.region.id
 			}
+			else {
+				console.log('there is not virtual venue');
+			}
+
 		}
+		console.log('this are the fields to update', fields);
+		
 		await event.update({ ...fields }, { transaction })
 
 		let primarySpeakers: EventSpeaker[] = []
@@ -240,15 +262,15 @@ async function createVenueSnapshot(
 	}
 
 	if (venueEvent.copy === true) {
-		venueId: venueEvent.venueId
+		data.venueId = venueEvent.venueId
 	}
 	const venueSnapshot = await EventVenue.create(
 		data,
 		{ transaction }
 	)
-	venueSnapshot.setPictures(await venueEvent.pictures.map(e => e.id), { transaction })
-	venueSnapshot.setCountry(venueEvent.country.id, { transaction })
-	venueSnapshot.setRegion(venueEvent.region.id, { transaction })
+	await venueSnapshot.setPictures(await venueEvent.pictures.map(e => e.id), { transaction })
+	await venueSnapshot.setCountry(venueEvent.country.id, { transaction })
+	await venueSnapshot.setRegion(venueEvent.region.id, { transaction })
 	await venueSnapshot.save({ transaction })
 	return venueSnapshot
 }
