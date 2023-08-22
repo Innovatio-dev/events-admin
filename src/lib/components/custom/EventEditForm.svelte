@@ -83,19 +83,20 @@
 	// let organizerInfoEnabled: boolean = false
 	let loading = false
 	let isModalMainSpeaker = false
-	let venueSelected = null
+	export let venueSelected = null
 	let speakerSelected = null
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
-	let venues: any[] = []
+	let venues: any[] | null = null
 	let success: boolean = false
-	let originalPictures: any[] = []
 	export let organizerSelected: any[]
 	export let eventData: EventData
 	export let banner: string | null = null
 	export let mainSpeakers: any[] = []
 	export let secondarySpeakers: any[] = []
 	export let eventId: string | null = null
+	export let originalPictures: any[] = []
+	let newPictures: any[] = []
 
 	let venueColumns: Column[] = [
 		{
@@ -266,8 +267,8 @@
 		banner = null
 	}
 	function removeImage(index) {
-		eventData.pictures.splice(index, 1)
-		eventData.pictures = eventData.pictures
+		originalPictures.splice(index, 1)
+		originalPictures = originalPictures
 	}
 
 	function handleClose() {
@@ -280,18 +281,23 @@
 		isModalSecondarySpeaker = false
 	}
 
-	function extractPictureIds(pictures: PictureId[]): number[] {
-		return pictures.map((picture) => picture.id)
+	function extractPictureIds(array): number[] {
+		let combinedPictures = [...array]
+		let ids = combinedPictures.map((item) => item.id)
+		return ids
 	}
 
 	async function updateEvent() {
 		try {
 			eventData.slug = createSlug(eventData.title)
 			eventData.organizerId = eventData.organizerId
-			eventData.pictures = extractPictureIds(eventData.pictures)
+			let arrayIds = extractPictureIds(originalPictures)
+			eventData.pictures = [...arrayIds, ...newPictures]
 			eventData.speakers = mainSpeakers
 			eventData.speakersSecondary = secondarySpeakers
-			eventData.venue = venues
+			if (venues) {
+				eventData.venue = venues[0]
+			}
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
 			}
@@ -327,27 +333,16 @@
 	}
 
 	function handleCloseVenue() {
-		venues = venues
+		venues = [venues]
 		isModalVenue = false
 	}
-
-	function initData() {
-		originalPictures = eventData.pictures
-		venues = [eventData.venue]
-	}
-
-	onMount(async () => {
-		await initData()
-	})
-
-	console.log(venues)
 </script>
 
 <div class="content">
 	<div class="form-container">
 		<!-- Organizer -->
 		<div>
-			<LabelInput>Select Organizer</LabelInput>
+			<LabelInput>Select Organizer Aqui</LabelInput>
 			<div class="z-50">
 				<DropdownFetcher
 					selected={organizerSelected}
@@ -421,9 +416,14 @@
 				<SectionHeader>Event Photo</SectionHeader>
 				{#if originalPictures}
 					<div class="flex flex-wrap items-center justify-center gap-x-6">
-						{#each eventData.pictures as picture}
+						{#each originalPictures as picture, index}
 							<div class="flex w-fit py-6">
-								<UploadedImage image={picture.url} />
+								<UploadedImage
+									image={picture.url}
+									clickAction={() => {
+										removeImage(index)
+									}}
+								/>
 							</div>
 						{/each}
 					</div>
@@ -435,7 +435,7 @@
 					</div>
 				{/if}
 				<DragAndDrop
-					bind:uploaded={eventData.pictures}
+					bind:uploaded={newPictures}
 					url="/api/resources"
 					name="file"
 					title="Upload your image"
@@ -614,7 +614,7 @@
 									filterPlaceholder={'Search'}
 									itemGenerator={(item) => ({ title: item.name })}
 									valueGenerator={(item) => item.id}
-									selected={eventData.venue}
+									selected={venues ?? venueSelected}
 									selectedGenerator={(item) => ({ title: item.name })}
 									placeholder={'Choose a venue'}
 									url={'/api/venues'}
@@ -638,12 +638,13 @@
 								on:save={(event) => {
 									const venue = event.detail
 									venues = [venue]
+									console.log(venues)
 								}}
 							/>
 						</div>
 					</div>
 					<div>
-						<OrderableTable columns={venueColumns} data={venues} />
+						<OrderableTable columns={venueColumns} data={venues ?? [venueSelected]} />
 					</div>
 				{/if}
 			</div>

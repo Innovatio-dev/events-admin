@@ -20,6 +20,8 @@
 	let mainSpeakers: any[] = []
 	let secondarySpeakers: any[] = []
 	let organizerSelected: any[] = []
+	let originalPictures: any[] = []
+	let venueSelected: any = null
 
 	async function fetchEvents(id: string) {
 		loading = true
@@ -30,7 +32,7 @@
 			if (events.banner) {
 				bannerImage = events.banner.url
 			}
-			updateEventData(events)
+			await updateEventData(events)
 		}
 		loading = false
 	}
@@ -57,16 +59,18 @@
 		eventData.isFeatured = isFeatured
 		eventData.title = title
 		eventData.description = description
-		eventData.pictures = pictures ? pictures : []
 		eventData.schedule.startTime = new Date(schedule.startTime)
 		eventData.schedule.endTime = new Date(schedule.endTime)
 		eventData.schedule.visibleAt = new Date(schedule.visibleAt)
 		eventData.linkZoom = linkZoom
 		eventData.venue = venue
+		venueSelected = venue
 		eventData.language = language ? language : null
 		eventData.translation = translation ? translation : []
 		eventData.secondaryOrganizer = secondaryOrganizer
 		eventData.secondaryOrganizerDescription = secondaryOrganizerDescription
+		eventData.pictures = pictures
+		originalPictures = eventData.pictures
 		eventData.speakers = eventSpeakers.filter((speaker) => speaker.primary)
 		eventData.speakersSecondary = eventSpeakers.filter((speaker) => !speaker.primary)
 		mainSpeakers = eventData.speakers
@@ -114,7 +118,9 @@
 			{mainSpeakers}
 			{secondarySpeakers}
 			{eventId}
+			{originalPictures}
 			{organizerSelected}
+			{venueSelected}
 			banner={bannerImage}
 		/>
 	{/if}
