@@ -78,7 +78,7 @@
 		try {
 			const response = await fetch(`/api/events/${id}`, {
 				method: 'PUT',
-				body: JSON.stringify({ status: publishStatus, reason: '' })
+				body: JSON.stringify({ status: publishStatus, reason: '', publishingUpdate: true })
 			})
 			if (response.ok) {
 				events.status = publishStatus
