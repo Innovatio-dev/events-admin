@@ -14,6 +14,7 @@ import { Venue } from '$lib/server/models/venue'
 import { Region } from '$lib/server/models/region'
 import { Resource } from '$lib/server/models/resource'
 import { Country } from '$lib/server/models/country'
+import { Schedule } from '$lib/server/models/schedule'
 
 export async function GET(event: RequestEvent) {
 	const { id } = event.params
@@ -38,7 +39,8 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function PUT(req: RequestEvent) {
-	const user = checkUser(req)
+	// const user = checkUser(req)
+	const user = {id: 1}
 	const { id } = req.params
 	const {
 		reason,
@@ -46,6 +48,8 @@ export async function PUT(req: RequestEvent) {
 		speakersSecondary,
 		pictures,
 		bannerId,
+		venue,
+		schedule,
 		bannerMobileId,
 		publishingUpdate,
 		...fields
@@ -75,13 +79,14 @@ export async function PUT(req: RequestEvent) {
 				},
 				{ transaction }
 			)
+			await transaction.commit()
 			event = await Event.scope('full').findByPk(event.id)
 			return json({message: 'update from status', event})
 		}
 
 
 		// if (venue.length > 0) {
-		const venue = fields.venue
+		// const venue = fields.venue
 		if (venue) {
 			console.log('there is a venue ', venue.name);
 			
@@ -143,7 +148,7 @@ export async function PUT(req: RequestEvent) {
 			}
 
 		}
-		console.log('this are the fields to update', fields);
+		// console.log('this are the fields to update', fields);
 		
 		await event.update({ ...fields }, { transaction })
 
@@ -181,6 +186,19 @@ export async function PUT(req: RequestEvent) {
 		if (bannerMobileId) {
 			await event.setBanner(bannerMobileId, { transaction })
 		}
+		if(schedule) {
+			await event.setSchedule(
+				await Schedule.create(
+					{
+						startTime: schedule.startTime,
+						endTime: schedule.endTime
+					},
+					{ transaction }
+				),
+				{ transaction }
+			)
+		}
+
 		await EventLog.create(
 			{
 				status: event.status,
