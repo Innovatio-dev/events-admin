@@ -62,7 +62,12 @@
 <section class="w-full flex justify-center">
 	{#if loading}
 		<div class="w-full h-[50vh] flex items-center justify-center">
-			<Circle3 />
+			<Circle3
+				ballBottomLeft={'#14dcff'}
+				ballBottomRight={'#fd369d'}
+				ballTopRight={'#8863e08f'}
+				ballTopLeft={'#ffa5d3'}
+			/>
 		</div>
 	{:else if venue}
 		<div class="py-12">
