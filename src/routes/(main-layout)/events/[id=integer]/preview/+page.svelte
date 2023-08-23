@@ -217,8 +217,8 @@
 						{/each}
 					{/if}
 				</EventSection>
-				<!-- Language -->
 				{#if typeEvent === 0}
+					<!-- Language -->
 					<EventSection title={'Language'}>
 						{#if loading}
 							<div class="flex flex-col gap-y-4">
@@ -273,7 +273,7 @@
 					<EventSection title={typeTitle}>
 						{#if typeEvent === 1}
 							<VenueCard
-								image={events.venue.pictures[0].url}
+								image={events.venue.pictures[0]?.url}
 								title={events.venue.name}
 								content={events.venue.description}
 								continent={events.venue.region.name}
@@ -298,22 +298,24 @@
 											<Icon src={CgAdd} size={'2rem'} />
 											<div>invite</div>
 										</div>
-										<div
-											class="flex items-center bg-brand-gray border-[1px] border-neutral-4 py-2 px-4 rounded-lg h-[40px]"
-										>
-											<a
-												href="www.zoomlink"
-												target="_blank"
-												class="underline text-brand-cyan text-xs"
+										{#if events.linkZoom}
+											<div
+												class="flex items-center bg-brand-gray border-[1px] border-neutral-4 py-2 px-4 rounded-lg h-[40px]"
 											>
-												{events.linkZoom}
-											</a>
-										</div>
-										<div
-											class="flex items-center justify-center bg-brand-gray border-[1px] border-neutral-4 w-[40px] h-[40px] rounded-lg"
-										>
-											<Icon src={FiCopy} />
-										</div>
+												<a
+													href="www.zoomlink"
+													target="_blank"
+													class="underline text-brand-cyan text-xs"
+												>
+													{events.linkZoom}
+												</a>
+											</div>
+											<div
+												class="flex items-center justify-center bg-brand-gray border-[1px] border-neutral-4 w-[40px] h-[40px] rounded-lg"
+											>
+												<Icon src={FiCopy} />
+											</div>
+										{/if}
 									</div>
 								{/if}
 								{#if events.pictures}

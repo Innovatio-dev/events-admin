@@ -17,7 +17,13 @@
 		class="w-full flex flex-col lg:flex-row lg:max-h-[500px] h-fit bg-[#161718] lg:mx-auto my-4 rounded-lg"
 	>
 		<div class="flex lg:flex-col h-[200px] md:h-[400px] w-full lg:w-1/2 relative">
-			<img src={image} alt={image} class="object-cover rounded-lg" />
+			{#if image}
+				<img src={image} alt={image} class="object-cover rounded-lg" />
+			{:else}
+				<div class="flex w-full h-full items-center justify-center py-6 px-8">
+					No image found
+				</div>
+			{/if}
 		</div>
 		<div class="flex flex-col w-full lg:w-1/2 p-6 lg:p-12">
 			<h3 class="text-3xl mb-6">{title}</h3>
