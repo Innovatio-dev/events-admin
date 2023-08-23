@@ -8,6 +8,7 @@ import { Country } from '$lib/server/models/country'
 import sequelize, { type Order } from 'sequelize'
 import { orderSchema } from '$lib/utils/validation/schemas'
 import { getConnection } from '$lib/server/config/database'
+import { Resource } from '$lib/server/models/resource'
 
 const schema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
@@ -71,7 +72,14 @@ export async function GET(event: RequestEvent) {
 			{
 				model: Country,
 				as: 'country'
-			}
+			},
+			{
+					model: Resource.scope('mini'),
+					through: {
+						attributes: []
+					},
+					as: 'pictures'
+				}
 		]
 	})
 
