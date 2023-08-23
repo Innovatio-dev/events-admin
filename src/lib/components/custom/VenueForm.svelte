@@ -37,7 +37,6 @@
 	const onCancel = () => {}
 	export let onClose = () => {}
 	let originalVenue: any
-	let hasChanges
 	// State
 	let venue: Venue = {
 		name: '',
@@ -82,10 +81,8 @@
 			editedVenue.location.lat = geoData.location.lat
 			editedVenue.location.lng = geoData.location.lng
 			editedVenue.copy = false
-			console.log('edited', editedVenue)
 			await editAction(editedVenue)
 			$pageAlert = { message: 'Success! Changes saved', status: true }
-			onClose()
 		} else if (updateAction) {
 			loading = true
 			const formattedData = {
@@ -129,7 +126,6 @@
 	const deletePicture = () => {
 		addVenue.pictures = []
 	}
-	console.log('original', originalVenue)
 </script>
 
 <form
@@ -217,6 +213,6 @@
 	</div>
 	<div class="flex gap-10">
 		<MainButton type="submit" {loading}>Save</MainButton>
-		<MainButton on:click={onClose}>Cancel</MainButton>
+		<MainButton type="button" on:click={onClose}>Cancel</MainButton>
 	</div>
 </form>

@@ -11,7 +11,6 @@
 	// props
 	export let isOpen: boolean
 	export let handleClose: () => void
-	export let handleCloseModal: () => void
 	export let venue: any = null
 	export let loading: boolean = false
 
@@ -51,8 +50,12 @@
 		loading = false
 	}
 
-	async function updateEventVenue(updatedVenue) {
-		venue = updatedVenue
+	async function updateEventVenue(editedVenue) {
+		console.log('edited', editedVenue)
+		console.log(venue)
+		venue[0] = editedVenue
+		console.log(venue)
+		handleClose()
 	}
 
 	async function updateVenue(id, venue) {
@@ -93,11 +96,6 @@
 		<span class="pb-5">
 			{'Create the venue profile inside the event creation'}
 		</span>
-		<VenueForm
-			addVenue={venue}
-			submitAction={postVenue}
-			onClose={handleCloseModal}
-			editAction={updateEventVenue}
-		/>
+		<VenueForm addVenue={venue} onClose={handleClose} editAction={updateEventVenue} />
 	</div>
 </Modal>

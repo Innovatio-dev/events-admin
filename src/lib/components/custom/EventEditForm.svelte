@@ -16,17 +16,12 @@
 		secondaryOrganizerDescription: string
 		speakers: any[]
 		speakersSecondary: any[]
-		schedule: {
-			startTime: Date | null
-			endTime: Date | null
-			visibleAt: Date | null
-		}
+		schedule: { startTime: Date | null; endTime: Date | null; visibleAt: Date | null }
 	}
 </script>
 
 <script lang="ts">
 	// Utils
-	import { onMount } from 'svelte'
 	import { languages } from '$lib/utils/constants/Languages'
 	import { pageAlert } from '$lib/stores/pageStatus'
 	import { goto } from '$app/navigation'
@@ -133,9 +128,9 @@
 						venueSelected = item
 					},
 					onRemove: () => {
-						let index = venues.indexOf(item)
+						let index = venues?.indexOf(item) ?? 0
 						if (index >= 0) {
-							venues.splice(index, 1)
+							venues?.splice(index, 1)
 							venues = venues
 						}
 					}
@@ -296,7 +291,9 @@
 			eventData.speakers = mainSpeakers
 			eventData.speakersSecondary = secondarySpeakers
 			if (venues) {
+				console.log(venues)
 				eventData.venue = venues[0]
+				eventData.venue.pictures = []
 			}
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
@@ -304,7 +301,11 @@
 			loading = true
 			const res = await fetch(`/api/events/${eventId}`, {
 				method: 'PUT',
-				body: JSON.stringify({ ...eventData, reason: 'SIMPLE UPDATE' })
+				body: JSON.stringify({
+					...eventData,
+					reason: 'SIMPLE UPDATE',
+					publishingUpdate: false
+				})
 			})
 			if (res.ok) {
 				const data = await res.json()
@@ -330,11 +331,6 @@
 				status: false
 			}
 		}
-	}
-
-	function handleCloseVenue() {
-		venues = [venues]
-		isModalVenue = false
 	}
 </script>
 
@@ -564,7 +560,7 @@
 										(item) => item.id === speaker.id
 									)
 									if (!existingSpeaker) {
-										mainSpeakers = [
+										secondarySpeakers = [
 											...secondarySpeakers,
 											{ ...speaker, copy: false }
 										]
@@ -631,14 +627,12 @@
 							<VenuesFormModal
 								isOpen={isModalVenue}
 								venue={venueSelected}
-								handleCloseModal={handleCloseVenue}
 								handleClose={() => {
 									isModalVenue = false
 								}}
 								on:save={(event) => {
 									const venue = event.detail
-									venues = [venue]
-									console.log(venues)
+									console.log('save', venue)
 								}}
 							/>
 						</div>

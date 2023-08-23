@@ -564,7 +564,6 @@
 							<VenuesFormModal
 								isOpen={isModalVenue}
 								venue={venueSelected}
-								handleCloseModal={handleCloseVenue}
 								on:save={(event) => {
 									const venue = event.detail
 									venues = [venue]
