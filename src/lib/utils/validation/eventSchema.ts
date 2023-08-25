@@ -60,6 +60,7 @@ export const createSchema = Joi.object({
 	notes: Joi.string(),
 	linkZoom: Joi.string().allow(null, ""),
 	language: Joi.object(),
+	pinPhoto: Joi.object(),
 	translation: Joi.array(),
 	pictures: Joi.array().items(Joi.number()),
 	organizerId: Joi.number().required(),
