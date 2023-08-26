@@ -33,7 +33,6 @@
 	import Dropdown from '$lib/components/Dropdown.svelte'
 	import Badge from '$lib/components/Badge.svelte'
 	import SpeakersFormModal from '$lib/components/custom/SpeakersFormModal.svelte'
-	import VenuesFormModal from '$lib/components/custom/VenuesFormModal.svelte'
 	import DatePicker from '$lib/components/DatePicker.svelte'
 	import DragAndDrop from '$lib/components/DragAndDrop.svelte'
 	import DropdownFetcher from '$lib/components/DropdownFetcher.svelte'
@@ -48,6 +47,8 @@
 	// import ToggleButtton from '$lib/components/ToggleButtton.svelte'
 	// Icons
 	import CgMathEqual from 'svelte-icons-pack/cg/CgMathEqual'
+	import VenuesEditFormModal from '$lib/components/custom/VenuesEditFormModal.svelte'
+	import VenueFormModal from './VenueFormModal.svelte'
 
 	const typeEvents = [
 		{
@@ -82,7 +83,9 @@
 	let speakerSelected = null
 	let isModalSecondarySpeaker = false
 	let isModalVenue = false
+	let isCreateModalVenue = false
 	let venues: any[] | null = null
+	let editedVenue: any[] | null = null
 	let success: boolean = false
 	export let organizerSelected: any[]
 	export let eventData: EventData
@@ -276,10 +279,19 @@
 		isModalSecondarySpeaker = false
 	}
 
+	function handleCloseVenue() {
+		isModalVenue = false
+	}
+
 	function extractPictureIds(array): number[] {
 		let combinedPictures = [...array]
 		let ids = combinedPictures.map((item) => item.id)
 		return ids
+	}
+
+	function updateVenueData(venue) {
+		eventData.venue.name = venue.name
+		eventData.venue.description = venue.description
 	}
 
 	async function updateEvent() {
@@ -291,9 +303,10 @@
 			eventData.speakers = mainSpeakers
 			eventData.speakersSecondary = secondarySpeakers
 			if (venues) {
-				console.log(venues)
 				eventData.venue = venues[0]
-				eventData.venue.pictures = []
+			}
+			if (editedVenue) {
+				updateVenueData(editedVenue)
 			}
 			if (data.banner.length > 0) {
 				eventData.bannerId = createBanner(data.banner)
@@ -576,6 +589,7 @@
 							speaker={speakerSelected}
 							speakers={secondarySpeakers}
 							on:save={(event) => {
+								console.log('onsave')
 								const speaker = event.detail
 								if (!secondarySpeakers.some((item) => item.id == speaker.id)) {
 									secondarySpeakers = [...secondarySpeakers, speaker]
@@ -608,7 +622,9 @@
 							<div class="w-full">
 								<DropdownFetcher
 									filterPlaceholder={'Search'}
-									itemGenerator={(item) => ({ title: item.name })}
+									itemGenerator={(item) => ({
+										title: item.name
+									})}
 									valueGenerator={(item) => item.id}
 									selected={venues ?? venueSelected}
 									selectedGenerator={(item) => ({ title: item.name })}
@@ -617,22 +633,32 @@
 									multiselect={false}
 									on:change={(e) => {
 										const venue = e.detail.selected
+										console.log(venue)
 										venues = [venue]
 									}}
 								/>
 							</div>
-							<MainButton fit on:click={() => (isModalVenue = true)}
+							<MainButton fit on:click={() => (isCreateModalVenue = true)}
 								>Create</MainButton
 							>
-							<VenuesFormModal
-								isOpen={isModalVenue}
-								venue={venueSelected}
+							<VenueFormModal
+								isOpen={isCreateModalVenue}
 								handleClose={() => {
-									isModalVenue = false
+									isCreateModalVenue = false
 								}}
 								on:save={(event) => {
 									const venue = event.detail
 									console.log('save', venue)
+								}}
+							/>
+							<VenuesEditFormModal
+								isOpen={isModalVenue}
+								venue={venueSelected}
+								{venues}
+								handleClose={handleCloseVenue}
+								on:save={(event) => {
+									const savedVenue = event.detail
+									editedVenue = savedVenue
 								}}
 							/>
 						</div>

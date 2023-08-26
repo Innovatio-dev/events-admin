@@ -8,17 +8,14 @@ import { Country } from '$lib/server/models/country'
 import sequelize, { type Order } from 'sequelize'
 import { orderSchema } from '$lib/utils/validation/schemas'
 import { getConnection } from '$lib/server/config/database'
-import { Parser } from '@json2csv/plainjs'
-import { s3BucketName, s3Region } from '$lib/server/config/aws'
-import AWS from 'aws-sdk'
-import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
+import { Resource } from '$lib/server/models/resource'
 
 const schema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
 	regionId: Joi.number().min(0).optional(),
 	limit: Joi.number().min(-1).optional().default(10),
 	search: Joi.string().min(0).optional(),
-	order: orderSchema(['name', 'region', 'country']).optional()
+	order: orderSchema(['id', 'status', 'city']).optional()
 })
 
 export async function GET(event: RequestEvent) {
@@ -31,13 +28,7 @@ export async function GET(event: RequestEvent) {
 	}
 	if (filter.order) {
 		for (const col of filter.order) {
-			if (col.name == 'region') {
-				order.push([{ model: Region, as: 'region' }, 'id', col.type])
-			} else if (col.name == 'country') {
-				order.push([{ model: Country, as: 'country' }, 'name', col.type])
-			} else {
-				order.push([col.name, col.type])
-			}
+			order.push([col.name, col.type])
 		}
 	}
 	if (filter.search) {
@@ -81,55 +72,17 @@ export async function GET(event: RequestEvent) {
 			{
 				model: Country,
 				as: 'country'
+			},
+			{
+				model: Resource.scope('mini'),
+				through: {
+					attributes: []
+				},
+				as: 'pictures'
 			}
 		]
 	})
 
-	if (filter.export) {
-		const opts = {}
-		const parser = new Parser(opts)
-
-		const S3 = new AWS.S3({
-			accessKeyId: AS_ACCESS_KEY_ID,
-			secretAccessKey: AS_SECRET_ACCESS_KEY,
-			region: AS_REGION
-		})
-
-		const venues: Array<string | any> = []
-		for (const iterator of results) {
-			venues.push({
-				name: iterator.name,
-				city: iterator.city,
-				address: iterator.address,
-				country: iterator.country.nicename,
-				region: iterator.region.name
-			})
-		}
-
-		const csv = parser.parse(venues)
-
-		const data = {
-			Bucket: s3BucketName,
-			Key: 'data/dumpdata_venues.csv',
-			Body: csv,
-			ContentEncoding: 'base64'
-		}
-
-		S3.upload(data, function (err, data) {
-			if (err) {
-				console.log(err)
-				console.log('Error uploading data')
-			} else {
-				console.log('succesfully uploaded!!!')
-			}
-		})
-
-		return json({
-			count,
-			formedUrl: `https://${s3BucketName}.s3.${s3Region}.amazonaws.com/data/dumpdata_venues.csv`,
-			results
-		})
-	}
 	return json({
 		count,
 		results
@@ -164,7 +117,7 @@ export async function POST(event: RequestEvent) {
 		console.log(err)
 		await transaction.rollback()
 		throw error(HttpResponses.UNEXPECTED_ERROR, {
-			message: 'Something happend, try again later ' + err
+			message: 'Something happend, try again later'
 		})
 	}
 }

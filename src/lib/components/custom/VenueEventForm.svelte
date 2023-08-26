@@ -8,6 +8,8 @@
 		location: { lat: string; lng: string }
 		description: string
 		pictures: number[]
+		copy: boolean
+		region: { id: number | null; name: string }
 	}
 </script>
 
@@ -19,17 +21,20 @@
 	import MainButton from '../MainButton.svelte'
 	import LocationInput from './LocationInput.svelte'
 	import UploadedImage from './UploadedImage.svelte'
-	// Constants
+	import Editor from './Editor.svelte'
 	import ToggleButtton from '../ToggleButtton.svelte'
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
-	import Editor from './Editor.svelte'
-
+	import { pageAlert } from '$lib/stores/pageStatus'
 	// Props
 	export let addVenue: any = null
-	export let updateAction: any = null
-	export let submitAction = (venue) => {}
-
+	export let editAction: ((speaker) => Promise<void> | null) | null = null
+	let extraPictures = []
+	let updatedVenue = {}
+	let loading = false
+	const onCancel = () => {}
+	export let onClose = () => {}
+	let originalVenue: any
 	// State
 	let venue: Venue = {
 		name: '',
@@ -37,8 +42,10 @@
 		city: '',
 		address: '',
 		location: { lat: '', lng: '' },
+		region: { id: null, name: '' },
 		description: '',
-		pictures: []
+		pictures: [],
+		copy: false
 	}
 	let geoData = {
 		country: '',
@@ -46,47 +53,41 @@
 		address: '',
 		location: { lat: '', lng: '' }
 	}
-	let extraPictures = []
-	let updatedVenue = {}
-	let loading = false
 
 	if (addVenue) {
 		venue.id = addVenue.id
 		venue.name = addVenue.name
 		geoData.country = addVenue.country?.nicename
 		venue.name = addVenue.name
+		venue.region = addVenue.region
 		geoData.city = addVenue.city
 		geoData.address = addVenue.address
 		geoData.location.lng = addVenue.location.lng
 		geoData.location.lat = addVenue.location.lat
 		venue.description = addVenue.description
+		venue.copy = addVenue.copy
+		originalVenue = addVenue
 	}
 
 	const handleSubmit = async () => {
-		if (updateAction) {
-			loading = true
-			const formattedData = {
-				...updatedVenue,
-				pictures: [venue.pictures[0], ...extraPictures]
-			}
-			await updateAction(venue?.id ?? 0, formattedData)
-			// console.log(formattedData)
-			loading = false
-		} else {
-			loading = true
-			const formattedData = {
-				...venue,
-				...geoData,
-				pictures: [venue.pictures[0], ...extraPictures]
-			}
-			await submitAction(formattedData)
-			loading = false
+		loading = true
+		const editedVenue = await createEditedVenue()
+		editedVenue.city = geoData.city
+		editedVenue.address = geoData.address
+		editedVenue.country = geoData.country
+		editedVenue.location.lat = geoData.location.lat
+		editedVenue.location.lng = geoData.location.lng
+		if (editAction) {
+			await editAction(editedVenue)
 		}
+		$pageAlert = { message: 'Success! Changes saved', status: true }
 	}
 
 	const updateVenue = (e) => {
-		if (e.target.name.length) {
-			updatedVenue[e.target.name] = e.target.value
+		const { name, value } = e.target
+		updatedVenue = {
+			...updatedVenue,
+			[name]: value
 		}
 	}
 
@@ -94,40 +95,29 @@
 		updatedVenue[e.detail.name] = e.detail.value
 	}
 
+	function createEditedVenue() {
+		return {
+			...venue,
+			...updatedVenue
+		}
+	}
+
 	const deletePicture = () => {
 		addVenue.pictures = []
 	}
-
-	const onCancel = () => {}
 </script>
 
 <form
+	autocomplete="off"
 	on:change={updateVenue}
 	on:submit|preventDefault={handleSubmit}
 	class="flex min-w-[500px] max-w-[650px] flex-col w-full gap-5"
 >
 	<Input required label="Venue name" type="text" name="name" bind:value={venue.name} />
-	<LocationInput bind:data={geoData} />
-	<Input label="Venue country" type="text" name="country" bind:value={geoData.country} />
-	<Input label="Venue city" type="text" name="city" bind:value={geoData.city} />
-	<Input label="Venue address" type="text" name="address" bind:value={geoData.address} />
-	<Input
-		required
-		disabled
-		label="Venue location"
-		type="text"
-		value={`${geoData.location.lat}, ${geoData.location.lng}`}
-	/>
 	<div class="flex flex-col w-full gap-2 pb-12">
 		<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 			{'Venue Description'}
 		</span>
-		<!-- <textarea
-			required
-			class="min-h-[150px]"
-			name="description"
-			bind:value={venue.description}
-		/> -->
 		<Editor on:change={customUpdate} name="description" bind:value={venue.description} />
 	</div>
 	<div class="flex flex-col text-neutral-4 w-full gap-2">
@@ -184,7 +174,7 @@
 		</span>
 	</div>
 	<div class="flex gap-10">
-		<MainButton {loading}>Save</MainButton>
-		<MainButton type="button" on:click={onCancel}>cancel</MainButton>
+		<MainButton type="submit" {loading}>Save</MainButton>
+		<MainButton type="button" on:click={onClose}>Cancel</MainButton>
 	</div>
 </form>

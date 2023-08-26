@@ -35,7 +35,7 @@
 	import Badge from '$lib/components/Badge.svelte'
 	import ToggleButtton from '$lib/components/ToggleButtton.svelte'
 	import SpeakersFormModal from '$lib/components/custom/SpeakersFormModal.svelte'
-	import VenuesFormModal from '$lib/components/custom/VenuesFormModal.svelte'
+	import VenuesFormModal from '$lib/components/custom/VenuesEditFormModal.svelte'
 	import DatePicker from '$lib/components/DatePicker.svelte'
 	import DragAndDrop from '$lib/components/DragAndDrop.svelte'
 	import DropdownFetcher from '$lib/components/DropdownFetcher.svelte'

@@ -5,7 +5,7 @@
 	// Store
 	import { pageStatus, pageAlert } from '$lib/stores/pageStatus'
 	// Components
-	import VenueForm from '$lib/components/custom/VenueForm.svelte'
+	import VenueForm from '$lib/components/custom/VenueEditForm.svelte'
 	import { goto } from '$app/navigation'
 
 	const createNewVenue = async (venue) => {

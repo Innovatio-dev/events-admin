@@ -50,14 +50,6 @@
 		loading = false
 	}
 
-	async function updateEventVenue(editedVenue) {
-		console.log('edited', editedVenue)
-		console.log(venue)
-		venue[0] = editedVenue
-		console.log(venue)
-		handleClose()
-	}
-
 	async function updateVenue(id, venue) {
 		loading = true
 		try {
@@ -96,6 +88,10 @@
 		<span class="pb-5">
 			{'Create the venue profile inside the event creation'}
 		</span>
-		<VenueForm addVenue={venue} onClose={handleClose} editAction={updateEventVenue} />
+		<VenueForm
+			addVenue={venue}
+			updateAction={venue ? updateVenue : null}
+			submitAction={postVenue}
+		/>
 	</div>
 </Modal>
