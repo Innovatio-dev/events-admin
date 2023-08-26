@@ -169,6 +169,10 @@ export const init = (sequelize: Sequelize) => {
 				as: 'user'
 			},
 			{
+				model: Resource,
+				as: 'pinPhoto'
+			},
+			{
 				model: Schedule,
 				as: 'schedule'
 			},

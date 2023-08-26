@@ -224,6 +224,7 @@ export async function POST(event: RequestEvent) {
 		speakersSecondary,
 		bannerMobileId,
 		schedule,
+		pinPhoto,
 		venue,
 		...values
 	} = await validateBody(event, createSchema)
@@ -273,6 +274,10 @@ export async function POST(event: RequestEvent) {
 
 		const data = await apiInstance.createList(createList)
 		values.mailing = data.id
+
+		if(pinPhoto) {
+			values.pinphoto = pinPhoto.id 
+		}
 
 		let event = await Event.create(
 			{

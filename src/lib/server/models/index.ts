@@ -93,6 +93,9 @@ const init = (sequelize: Sequelize) => {
 
 	//Organizer->Resource associations (logo)
 	organizer.Organizer.belongsTo(resource.Resource, { foreignKey: 'logoId', as: 'logo' })
+	// ALTER TABLE public."Events" ADD pinphoto bigint NULL;
+
+	event.Event.belongsTo(resource.Resource, { foreignKey: 'pinphoto', as: 'pinPhoto' })
 
 	//Speaker->Resource Association (picture)
 	speaker.Speaker.belongsTo(resource.Resource, { foreignKey: 'pictureId', as: 'picture' })
