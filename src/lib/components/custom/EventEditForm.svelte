@@ -633,7 +633,6 @@
 									multiselect={false}
 									on:change={(e) => {
 										const venue = e.detail.selected
-										console.log(venue)
 										venues = [venue]
 									}}
 								/>
