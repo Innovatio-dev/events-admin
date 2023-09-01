@@ -9,7 +9,8 @@ export const corsHook: Handle = async ({ resolve, event }) => {
 			return new Response(null, {
 				headers: {
 					'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, DELETE',
-					'Access-Control-Allow-Origin': '*'
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Headers': 'Content-Type, Authorization'
 				}
 			})
 		}

@@ -8,6 +8,7 @@
 		description: string
 		bannerId: number | undefined
 		pictures: any[]
+		pinPhoto: any[]
 		linkZoom: any
 		language: any
 		venue: any
@@ -279,10 +280,6 @@
 		return bannerId
 	}
 
-	function extractSpeakerIds(speakers: Speaker[]): number[] {
-		return speakers.map((speaker) => speaker.id)
-	}
-
 	function handleClose() {
 		mainSpeakers = [...mainSpeakers]
 		isModalMainSpeaker = false
@@ -292,16 +289,12 @@
 		secondarySpeakers = [...secondarySpeakers]
 		isModalSecondarySpeaker = false
 	}
-
-	function handleCloseVenue() {
-		venues = [...venues]
-		isModalVenue = false
-	}
 </script>
 
 <div class="content">
 	<div class="form-container">
 		<LabelInput>Select Organizer</LabelInput>
+		<!-- Organizer -->
 		<div class="z-50">
 			<DropdownFetcher
 				name="organizerId"
@@ -317,6 +310,7 @@
 				<span class="text-xs text-alert-error">* Organizer is required</span>
 			{/if}
 		</div>
+		<!-- Event Type -->
 		<div class="flex flex-col gap-8 mt-4 sm:flex-row">
 			<div class="w-full">
 				<LabelInput>Your event is ...</LabelInput>
@@ -352,6 +346,7 @@
 			</div>
 		</div>
 		{#if eventData.typeEvent !== null}
+			<!-- Event Info -->
 			<div class="input-set">
 				<SectionHeader>Event Information</SectionHeader>
 				<div>
@@ -376,6 +371,7 @@
 					{/if}
 				</div>
 			</div>
+			<!-- Event Photo -->
 			<div>
 				<SectionHeader>Event Photo</SectionHeader>
 				<DragAndDrop
@@ -388,18 +384,23 @@
 					multiple={true}
 				/>
 			</div>
+			<!-- PinPhoto -->
 			<div>
 				<SectionHeader>Pin Photo</SectionHeader>
 				<DragAndDrop
-					bind:uploaded={data.banner}
+					bind:uploaded={eventData.pinPhoto}
 					url="/api/resources"
 					name="file"
 					title="Upload your image"
 					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 					body="600x500"
 					multiple={false}
+					on:change={(e) => {
+						console.log(e)
+					}}
 				/>
 			</div>
+			<!-- Schedule -->
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
 				<div>
@@ -434,6 +435,7 @@
 					{/if}
 				</div>
 			</div>
+			<!-- Speakers -->
 			<div class="input-set">
 				<SectionHeader>Speakers</SectionHeader>
 				<div>
@@ -537,6 +539,7 @@
 				{/if}
 			</div>
 			{#if eventData?.typeEvent == '1'}
+				<!-- Venue -->
 				<div class="input-set">
 					<SectionHeader>Venue</SectionHeader>
 					<div>
@@ -579,6 +582,7 @@
 					</div>
 				</div>
 			{/if}
+			<!-- Language -->
 			<div class="input-set">
 				<SectionHeader>Language</SectionHeader>
 				<div>

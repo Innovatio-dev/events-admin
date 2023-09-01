@@ -16,6 +16,7 @@
 		description: '',
 		bannerId: undefined,
 		pictures: [],
+		pinPhoto: [],
 		linkZoom: null,
 		language: null,
 		venue: null,

@@ -164,13 +164,15 @@
 			itemViewer={LadaViewer}
 			bind:value={phoneCode}
 			itemGenerator={(item) => ({ title: item.title, iso: item.iso })}
-			items={countries.map((country) => {
-				return {
-					value: country.phonecode,
-					title: '+' + country.phonecode,
-					iso: country.iso
-				}
-			})}
+			items={countries
+				.sort((a, b) => (a.phonecode > b.phonecode ? 1 : -1))
+				.map((country) => {
+					return {
+						value: country.phonecode,
+						title: '+' + country.phonecode,
+						iso: country.iso
+					}
+				})}
 			selected={{ title: '+' + phoneCode, value: phoneCode }}
 		/>
 		<Input label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
