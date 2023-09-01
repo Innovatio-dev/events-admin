@@ -276,7 +276,7 @@ export async function POST(event: RequestEvent) {
 		values.mailing = data.id
 
 		if(pinPhoto && pinPhoto.length > 0) {
-			values.pinphoto = pinPhoto[0].id 
+			values.pinphoto = pinPhoto[0]
 		}
 
 		let event = await Event.create(

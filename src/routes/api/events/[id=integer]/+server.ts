@@ -151,7 +151,7 @@ export async function PUT(req: RequestEvent) {
 		}
 		// console.log('this are the fields to update', fields);
 		if(pinPhoto && pinPhoto.length > 0) {
-			fields.pinphoto = pinPhoto[0].id 
+			fields.pinphoto = pinPhoto[0]
 		}
 		await event.update({ ...fields }, { transaction })
 
