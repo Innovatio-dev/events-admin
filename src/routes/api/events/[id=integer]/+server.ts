@@ -51,6 +51,7 @@ export async function PUT(req: RequestEvent) {
 		venue,
 		schedule,
 		bannerMobileId,
+		pinPhoto,
 		publishingUpdate,
 		...fields
 	} = await validateBody(req, updateSchema)
@@ -149,7 +150,9 @@ export async function PUT(req: RequestEvent) {
 
 		}
 		// console.log('this are the fields to update', fields);
-		
+		if(pinPhoto && pinPhoto.length > 0) {
+			fields.pinphoto = pinPhoto[0].id 
+		}
 		await event.update({ ...fields }, { transaction })
 
 		let primarySpeakers: EventSpeaker[] = []

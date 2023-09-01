@@ -275,8 +275,8 @@ export async function POST(event: RequestEvent) {
 		const data = await apiInstance.createList(createList)
 		values.mailing = data.id
 
-		if(pinPhoto) {
-			values.pinphoto = pinPhoto.id 
+		if(pinPhoto && pinPhoto.length > 0) {
+			values.pinphoto = pinPhoto[0].id 
 		}
 
 		let event = await Event.create(
