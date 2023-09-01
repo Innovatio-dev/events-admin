@@ -199,7 +199,7 @@
 		</div>
 	</div>
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
-		{'Where are you from?'}
+		{'Where is the organizer from?'}
 	</span>
 	<Dropdown
 		required
@@ -207,7 +207,7 @@
 		name="country"
 		selected={{
 			value: organizer.countryId ?? 0,
-			title: countries[organizer.countryId - 1]?.nicename ?? 'Choose the country organizer'
+			title: countries[organizer.countryId - 1]?.nicename ?? ' Choose the organizer’s country'
 		}}
 		width="100%"
 		bind:value={organizer.countryId}
