@@ -27,7 +27,6 @@ export const updateSchema = Joi.object({
 	youtube: Joi.string(),
 	country: Joi.object(),
 	description: Joi.string(),
-	pictureId: Joi.number().optional(),
 	countryId: Joi.number().optional()
 })
 
