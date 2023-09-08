@@ -17,7 +17,7 @@
 		{#if loading}
 			<Skeleton width={87} height={87} />
 		{:else if events.schedule}
-			<div class="flex justify-center items-center min-w-[90px]">
+			<div class="flex lg:justify-center h-16 lg:items-center @lg:min-w-[90px]">
 				<DateSquare
 					date={events.schedule.startTime}
 					className="@lg:w-[90px] @lg:h-[90px]"
@@ -50,15 +50,22 @@
 									<Skeleton width={100} height={15} />
 								</div>
 							{:else if events}
-								<LocalTimeEvent dateString={events.schedule.startTime} />
+								<LocalTimeEvent dateString={events.schedule.stsartTime} />
 							{/if}
 						</div>
-						<div class="flex items-center text-white! gap-x-3">
+						<div class="flex py-2 -ml-[20px] @lg:ml-0 items-center text-white! gap-x-3">
 							{#if loading}
 								<Skeleton width={100} height={15} />
 							{:else if events.typeEvent === 0}
-								<Icon src={BiSolidVideo} color="#fff" size="1.5em" />
-								<span class="w-max underline text-brand-cyan">Zoom Link</span>
+								{#if events.linkZoom}
+									<Icon src={BiSolidVideo} color="#fff" size="1.5em" />
+									<a
+										href={events.linkZoom}
+										target="_blank"
+										class="cursor-pointer w-max underline text-brand-cyan"
+										>Zoom Link</a
+									>
+								{/if}
 							{:else if events.typeEvent === 1}
 								<Icon src={TiLocation} color="#fff" size="1.5em" />
 								<span class="w-max">{events.venue.name}-{events.venue.city}</span>

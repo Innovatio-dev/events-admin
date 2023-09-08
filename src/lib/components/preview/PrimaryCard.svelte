@@ -46,6 +46,10 @@
 				<TextBadge item={item.jobRole} />
 			{/if}
 		</div>
-		<p class="font-dm text-sm @lg:text-xl text-center @md:text-start">{item.description}</p>
+		{#if item.description}
+			<p class="font-dm text-sm @lg:text-xl text-center @md:text-start">
+				{@html item.description}
+			</p>
+		{/if}
 	</div>
 </div>

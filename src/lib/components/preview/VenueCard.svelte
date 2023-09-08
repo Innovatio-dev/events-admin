@@ -14,9 +14,9 @@
 
 <div class="flex flex-col w-full py-4">
 	<div
-		class="w-full flex flex-col lg:flex-row lg:max-h-[500px] h-fit bg-[#161718] lg:mx-auto my-4 rounded-lg"
+		class="w-full flex flex-col lg:flex-row flex-wrap lg:max-h-[500px] h-fit bg-[#161718] lg:mx-auto my-4 rounded-lg"
 	>
-		<div class="flex lg:flex-col h-[200px] md:h-[400px] w-full lg:w-1/2 relative">
+		<div class="flex lg:flex-col h-fit w-full @lg:w-1/2 relative">
 			{#if image}
 				<img src={image} alt={image} class="object-cover rounded-lg" />
 			{:else}
@@ -25,7 +25,7 @@
 				</div>
 			{/if}
 		</div>
-		<div class="flex flex-col w-full lg:w-1/2 p-6 lg:p-12">
+		<div class="flex flex-col w-full p-6 @lg:w-1/2 @lg:p-12">
 			<h3 class="text-3xl mb-6">{title}</h3>
 			<div class="flex flex-col">
 				<span class="flex flex-row items-center">
@@ -36,7 +36,7 @@
 					<p class="text-lg font-light">{location}</p>
 				</span>
 			</div>
-			<p class="my-4 text-lg line-clamp-3">{content}</p>
+			<p class="my-4 text-lg line-clamp-3">{@html content}</p>
 			<div class="flex gap-2 flex-wrap">
 				<TextBadge item={city} />
 				<TextBadge item={continent} />

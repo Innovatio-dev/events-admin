@@ -6,10 +6,10 @@
 </script>
 
 <div class="w-full h-full flex items-center justify-center gap-2 text-primary-purple">
-	{#if value == 1}
+	{#if value == 0}
 		<VirtualEvent />
 		<span> Virtual </span>
-	{:else if value == 0}
+	{:else if value == 1}
 		<LiveEvent />
 		<span> Live </span>
 	{:else}
