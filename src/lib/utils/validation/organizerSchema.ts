@@ -59,7 +59,7 @@ export const updateSchema = Joi.object({
 	mavieId: Joi.string().allow(null, ""),
 	regions: Joi.array().items(Joi.number()),
 	countryId: Joi.number(),
-	logoId: Joi.number(),
+	logo: Joi.array().items(Joi.number()),
 	reason: Joi.string().required()
 })
 

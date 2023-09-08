@@ -23,7 +23,7 @@ export async function GET(event: RequestEvent) {
 export async function PUT(event: RequestEvent) {
 	const user = checkUser(event)
 	const { id } = event.params
-	const { reason, regions, countryId, ...fields } = await validateBody(
+	const { reason, regions, countryId, logo, ...fields } = await validateBody(
 		event,
 		updateSchema.keys({
 			email: uniqueKeyOf(Organizer, 'email')
@@ -53,6 +53,10 @@ export async function PUT(event: RequestEvent) {
 	// Iniciar una transacción
 	const transaction = await connection.transaction()
 	try {
+		fields.logoId = organizer.logoId
+		if (logo && logo.length > 0) {
+			fields.logoId = logo[0]
+		}
 		// Actualizar el organizador con los campos proporcionados, excluyendo el campo 'region'
 		await organizer.update({ ...fields }, { transaction })
 
