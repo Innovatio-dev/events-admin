@@ -70,13 +70,13 @@
 			isMember = true
 		}
 	}
-
 	const handleSubmit = async () => {
 		if (updateAction) {
 			loading = true
 			await updateAction(organizer?.id ?? 0, updatedOrganizer)
 			loading = false
 		} else {
+			s
 			loading = true
 			const formattedData = {
 				...organizer,
@@ -126,7 +126,7 @@
 	on:submit|preventDefault={handleSubmit}
 	class="flex flex-col w-full gap-5 max-w-[650px]"
 >
-	<div class="flex justify-between items-center">
+	<div class="flex justify-between items-center h-16">
 		<div
 			class="flex w-full items-center gap-12 text-neutral-4 font-light text-sm tracking-[0.5px]"
 		>
@@ -135,15 +135,17 @@
 			</span>
 			<ToggleButtton bind:checked={isMember} id="tid1" text right="Yes" left="No" />
 		</div>
-		<div>
-			<Input
-				required={isMember}
-				label="Mavie Id:"
-				type="number"
-				name="mavieId"
-				bind:value={organizer.mavieId}
-			/>
-		</div>
+		{#if isMember}
+			<div>
+				<Input
+					required={isMember}
+					label="Mavie Id:"
+					type="number"
+					name="mavieId"
+					bind:value={organizer.mavieId}
+				/>
+			</div>
+		{/if}
 	</div>
 	<Input
 		required
@@ -175,7 +177,7 @@
 				})}
 			selected={{ title: '+' + phoneCode, value: phoneCode }}
 		/>
-		<Input label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
+		<Input required label="Phone:" type="tel" name="phone" bind:value={organizer.phone} />
 		<Input required label="E-mail:" type="email" name="email" bind:value={organizer.email} />
 	</div>
 	<div class="flex flex-col w-full">
@@ -237,7 +239,12 @@
 		</h2>
 	</div>
 	{#if addOrganizer}
-		<UploadedImage image={addOrganizer.logo?.url ?? ''} />
+		<UploadedImage
+			image={addOrganizer.logo?.url ?? ''}
+			clickAction={() => {
+				addOrganizer = null
+			}}
+		/>
 	{:else}
 		<DragAndDrop
 			bind:uploaded={organizer.logo}

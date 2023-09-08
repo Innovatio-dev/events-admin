@@ -14,12 +14,13 @@
 	import SpeakerBadge from '$lib/components/SpeakerBadge.svelte'
 	import Modal from '$lib/components/Modal.svelte'
 	import SuspendOrganizer from '$lib/components/SuspendOrganizer.svelte'
+	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
 	// Icons
 	import Icon from 'svelte-icons-pack'
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
 	import IoClose from 'svelte-icons-pack/io/IoClose'
-	import ApprovedModal from '$lib/components/ApprovedModal.svelte'
 	import AiOutlineCloudDownload from 'svelte-icons-pack/ai/AiOutlineCloudDownload'
+	import AiOutlineEye from 'svelte-icons-pack/ai/AiOutlineEye'
 
 	// State
 	let events: any = null
@@ -95,6 +96,9 @@
 		let response = await fetch(`/api/events/${id}`)
 		if (response.ok) {
 			events = await response.json()
+			if (events.pictures > 0) {
+				eventPhoto = events.pictures[0].url
+			}
 			if (events.venue && events.venue.pictures) {
 				pictures = events.venue.pictures
 				if (pictures.length > 0) {
@@ -255,7 +259,9 @@
 					<p>Country:</p>
 					<p>City:</p>
 					<p>Event Photo:</p>
-					<p>Pin Photo:</p>
+					{#if events?.typeEvent !== 0}
+						<p>Pin Photo:</p>
+					{/if}
 					<p>Date Starts:</p>
 					<p>Date Ends:</p>
 					<p>Time Starts:</p>
@@ -277,9 +283,9 @@
 						{:else}
 							<p>{'---'}</p>
 						{/if}
-						{#if eventPhoto}
+						{#if events?.pinPhoto && events?.typeEvent !== 0}
 							<div class="text-ellipsis underline">
-								<a target="_blank" href={`${eventPhoto}`}> Pin Photo </a>
+								<a target="_blank" href={`${events.pinPhoto}`}> Pin Photo </a>
 							</div>
 						{:else}
 							<p>{'---'}</p>
@@ -544,6 +550,12 @@
 						/>
 					</Modal>
 				{/if}
+				<MainButton href={`/events/${$page.params.id}/preview`}>
+					<div class="flex gap-3 items-center">
+						<Icon size="20" src={AiOutlineEye} />
+						{'Preview'}
+					</div>
+				</MainButton>
 			</div>
 			<Modal {isOpen} handleClose={handleCloseModal} title="">
 				<SuspendOrganizer

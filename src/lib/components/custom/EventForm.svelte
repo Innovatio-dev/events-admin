@@ -385,21 +385,23 @@
 				/>
 			</div>
 			<!-- PinPhoto -->
-			<div>
-				<SectionHeader>Pin Photo</SectionHeader>
-				<DragAndDrop
-					bind:uploaded={eventData.pinPhoto}
-					url="/api/resources"
-					name="file"
-					title="Upload your image"
-					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-					body="600x500"
-					multiple={false}
-					on:change={(e) => {
-						console.log(e)
-					}}
-				/>
-			</div>
+			{#if eventData.typeEvent}
+				<div>
+					<SectionHeader>Pin Photo</SectionHeader>
+					<DragAndDrop
+						bind:uploaded={eventData.pinPhoto}
+						url="/api/resources"
+						name="file"
+						title="Upload your image"
+						subtitle="PNG, JPG, WEBP, 2MB files are allowed"
+						body="600x500"
+						multiple={false}
+						on:change={(e) => {
+							console.log(e)
+						}}
+					/>
+				</div>
+			{/if}
 			<!-- Schedule -->
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>

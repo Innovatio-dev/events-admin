@@ -24,7 +24,7 @@
 				$pageAlert = { message: 'Success! Organizer added correctly.', status: true }
 				goto('/organizers')
 			} else {
-				console.log(await res.json())
+				// console.log(await res.json())
 				$pageAlert = {
 					message: 'Oops! An error has occurred. try again later.',
 					status: false

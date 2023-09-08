@@ -24,14 +24,12 @@
 <style lang="scss">
 	.active {
 		background-color: var(--alert-success);
-		box-shadow: 0px 4px 4px #8bc510;
 	}
 	.active > :first-child {
 		left: -60%;
 	}
 	.suspended {
 		background-color: var(--alert-error);
-		box-shadow: 0px 4px 4px #d33030;
 	}
 	.suspended > :first-child {
 		left: -110%;
