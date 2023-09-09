@@ -30,7 +30,6 @@ export async function DELETE(event: RequestEvent) {
 export async function PUT(event: RequestEvent) {
 	checkUser(event, User.ADMIN)
 	const { id } = event.params
-	const { picture } = await event.request.json()
 	const data = await validateBody(event, updateSchema)
 	const speaker = await Speaker.findByPk(id)
 	if (!speaker) {
@@ -39,8 +38,8 @@ export async function PUT(event: RequestEvent) {
 	data.countryId = data.country.id
 	data.pictureId = speaker.pictureId
 
-	if (picture && picture.length > 0) {
-		data.pictureId = picture[0]
+	if (data.picture && data.picture.length > 0) {
+		data.pictureId = data.picture[0]
 	}
 
 	await Speaker.update(data, {
