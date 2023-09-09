@@ -27,7 +27,8 @@ export const updateSchema = Joi.object({
 	youtube: Joi.string(),
 	country: Joi.object(),
 	description: Joi.string(),
-	countryId: Joi.number().optional()
+	countryId: Joi.number().optional(),
+	picture: Joi.array()
 })
 
 export const filterSchema = Joi.object({
