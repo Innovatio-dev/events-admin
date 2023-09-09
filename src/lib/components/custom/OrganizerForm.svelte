@@ -76,7 +76,6 @@
 			await updateAction(organizer?.id ?? 0, updatedOrganizer)
 			loading = false
 		} else {
-			s
 			loading = true
 			const formattedData = {
 				...organizer,

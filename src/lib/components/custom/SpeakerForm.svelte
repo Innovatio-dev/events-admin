@@ -15,6 +15,10 @@
 		description: string
 		country?: { id: number | null; nicename: '' }
 	}
+
+	interface SpeakerPic {
+		picture?: any
+	}
 </script>
 
 <script lang="ts">
@@ -35,9 +39,10 @@
 	export let editAction: ((speaker) => Promise<void> | null) | null = null
 	export let submitAction = (speaker) => {}
 	export let onClose = () => {}
-	let updatedSpeaker = {}
+	let updatedSpeaker: SpeakerPic = {}
 	let loading = false
 	let hasChanges: boolean = false
+	let newSpeaker: []
 	const originalSpeaker = addSpeaker
 
 	// State
@@ -90,6 +95,20 @@
 		}
 	}
 
+	function handleFileChange(event) {
+		const fileInput = event.target
+
+		if (fileInput.files.length > 0) {
+			// Se ha cargado una nueva imagen
+			const newFile = fileInput.files[0]
+
+			// Actualiza el estado del componente solo si es necesario
+			if (speaker.picture[0] !== newFile) {
+				speaker.picture = [newFile]
+			}
+		}
+	}
+
 	const handleSubmit = async () => {
 		try {
 			loading = true
@@ -101,6 +120,10 @@
 				$pageAlert = { message: 'Success! Changes saved', status: true }
 				onClose()
 			} else if (updateAction) {
+				if ('file' in updatedSpeaker) {
+					delete updatedSpeaker.file
+				}
+				console.log(updatedSpeaker)
 				await updateAction(speaker?.id ?? 0, updatedSpeaker)
 				goto(`/speakers`)
 			} else {
@@ -191,17 +214,25 @@
 			</h2>
 		</div>
 		{#if addSpeaker}
-			<UploadedImage image={addSpeaker.picture?.url ?? ''} />
-		{:else}
-			<DragAndDrop
-				bind:uploaded={speaker.picture}
-				url="/api/resources"
-				name="file"
-				title="Upload your image"
-				subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-				body="1000x1000"
-				multiple={false}
+			<UploadedImage
+				image={addSpeaker.picture?.url ?? ''}
+				clickAction={() => {
+					addSpeaker = null
+				}}
 			/>
+		{:else}
+			<div id="speakerFileInput">
+				<DragAndDrop
+					bind:uploaded={newSpeaker}
+					url="/api/resources"
+					name="file"
+					on:change={handleFileChange}
+					title="Upload your image"
+					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
+					body="1000x1000"
+					multiple={false}
+				/>
+			</div>
 		{/if}
 	</div>
 	<div class="flex gap-10">

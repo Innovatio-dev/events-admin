@@ -34,6 +34,7 @@
 	let loading = false
 	const onCancel = () => {}
 	export let onClose = () => {}
+	let additionalPhotos = false
 	let originalVenue: any
 	// State
 	let venue: Venue = {
@@ -147,31 +148,39 @@
 				{'Show additional photos?'}
 			</span>
 			<div class="w-fit">
-				<ToggleButtton checked={false} id="id1" text right="Yes" left="No" />
+				<ToggleButtton
+					bind:checked={additionalPhotos}
+					id="id1"
+					text
+					right="Yes"
+					left="No"
+				/>
 			</div>
 		</div>
 		<span class="text-neutral-3 font-normal text-sm tracking-[0.5px] max-w-[500px] my-3">
 			{'A minimum of 3 photos needs to be uploaded & a maximum of 5 photos. If not there will be instead by default random pictures there.'}
 		</span>
-		<div class="text-neutral-4 w-full flex justify-center py-3">
-			<h2 class="text-2xl">
-				{'Venue optional photos'}
-			</h2>
-		</div>
-		<DragAndDrop
-			bind:uploaded={extraPictures}
-			url="/api/resources"
-			name="pictures"
-			title="Upload your image"
-			subtitle="PNG, JPG, WEBP, 2MB files are allowed"
-			body="700x410"
-		/>
-		<span
-			class="w-full h-10 rounded-xl bg-alert-warning my-3 text-sm flex items-center pl-5 gap-3"
-		>
-			<Icon src={FiAlertOctagon} />
-			{'Remember It is mandatory to upload at least 3 photos'}
-		</span>
+		{#if additionalPhotos}
+			<div class="text-neutral-4 w-full flex justify-center py-3">
+				<h2 class="text-2xl">
+					{'Venue optional photos'}
+				</h2>
+			</div>
+			<DragAndDrop
+				bind:uploaded={extraPictures}
+				url="/api/resources"
+				name="pictures"
+				title="Upload your image"
+				subtitle="PNG, JPG, WEBP, 2MB files are allowed"
+				body="700x410"
+			/>
+			<span
+				class="w-full h-10 rounded-xl bg-alert-warning my-3 text-sm flex items-center pl-5 gap-3"
+			>
+				<Icon src={FiAlertOctagon} />
+				{'Remember It is mandatory to upload at least 3 photos'}
+			</span>
+		{/if}
 	</div>
 	<div class="flex gap-10">
 		<MainButton type="submit" {loading}>Save</MainButton>
