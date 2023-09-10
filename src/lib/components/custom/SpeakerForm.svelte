@@ -95,20 +95,6 @@
 		}
 	}
 
-	function handleFileChange(event) {
-		const fileInput = event.target
-
-		if (fileInput.files.length > 0) {
-			// Se ha cargado una nueva imagen
-			const newFile = fileInput.files[0]
-
-			// Actualiza el estado del componente solo si es necesario
-			if (speaker.picture[0] !== newFile) {
-				speaker.picture = [newFile]
-			}
-		}
-	}
-
 	const handleSubmit = async () => {
 		try {
 			loading = true
@@ -123,7 +109,8 @@
 				if ('file' in updatedSpeaker) {
 					delete updatedSpeaker.file
 				}
-				console.log(updatedSpeaker)
+				speaker.picture = newSpeaker
+				updatedSpeaker = speaker
 				await updateAction(speaker?.id ?? 0, updatedSpeaker)
 				goto(`/speakers`)
 			} else {
@@ -226,7 +213,6 @@
 					bind:uploaded={newSpeaker}
 					url="/api/resources"
 					name="file"
-					on:change={handleFileChange}
 					title="Upload your image"
 					subtitle="PNG, JPG, WEBP, 2MB files are allowed"
 					body="1000x1000"

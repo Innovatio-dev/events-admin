@@ -32,10 +32,20 @@
 		countryId: any
 	}
 
+	interface updateOrganizer {
+		status: any
+		reason: string
+		logo?: any[]
+	}
+
 	// Props
 	export let addOrganizer: Organizer | null = null
 	export let updateAction: ((id: number, speaker) => Promise<void> | null) | null = null
 	export let submitAction = (organizer) => {}
+	let newLogo = []
+	let loading = false
+	let phoneCode = '705'
+	let isMember = false
 
 	// State
 	let organizer: Organizer = {
@@ -54,14 +64,11 @@
 		countryId: '',
 		logo: null
 	}
-	let isMember = false
-	let phoneCode = '705'
 
-	let updatedOrganizer = {
+	let updatedOrganizer: updateOrganizer = {
 		status: addOrganizer?.status,
 		reason: 'Organizer updated'
 	}
-	let loading = false
 
 	if (addOrganizer) {
 		organizer = JSON.parse(JSON.stringify(addOrganizer))
@@ -70,9 +77,16 @@
 			isMember = true
 		}
 	}
+
 	const handleSubmit = async () => {
 		if (updateAction) {
 			loading = true
+			if ('file' in updatedOrganizer) {
+				delete updatedOrganizer.file
+			}
+			if (newLogo.length > 0) {
+				updatedOrganizer.logo = newLogo
+			}
 			await updateAction(organizer?.id ?? 0, updatedOrganizer)
 			loading = false
 		} else {
@@ -246,7 +260,7 @@
 		/>
 	{:else}
 		<DragAndDrop
-			bind:uploaded={organizer.logo}
+			bind:uploaded={newLogo}
 			url="/api/resources"
 			name="file"
 			title="Upload your image"
