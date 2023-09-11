@@ -126,7 +126,7 @@ export const init = (sequelize: Sequelize) => {
 		}
 	})
 	Organizer.addScope('mini', () => ({
-		attributes: ['id', 'status', 'name', 'company', 'city', 'email', 'mavieId'],
+		attributes: ['id', 'status', 'name', 'company', 'city', 'email', 'mavieId', 'createdAt'],
 		include: [
 			{
 				model: Resource.scope('mini'),
