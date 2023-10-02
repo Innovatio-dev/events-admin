@@ -41,12 +41,12 @@ export const init = (sequelize: Sequelize) => {
 			scopes: {
 				public: {
 					attributes: {
-						exclude: ['role', 'cognitoId', 'createdAt', 'updatedAt', 'deletedAt']
+						exclude: ['role', 'cognitoId', 'updatedAt', 'deletedAt']
 					}
 				},
 				list: {
 					attributes: {
-						exclude: ['cognitoId', 'createdAt', 'updatedAt', 'deletedAt']
+						exclude: ['cognitoId', 'updatedAt', 'deletedAt']
 					}
 				}
 			}
