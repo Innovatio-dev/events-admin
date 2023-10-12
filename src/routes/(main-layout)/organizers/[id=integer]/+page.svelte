@@ -30,6 +30,7 @@
 	import IoClose from 'svelte-icons-pack/io/IoClose'
 	import AiOutlineReload from 'svelte-icons-pack/ai/AiOutlineReload'
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
+	import { sendEmail } from '$lib/utils/brevo/sendMail'
 
 	// State
 	let organizer: any = null
@@ -212,6 +213,30 @@
 		loading = false
 	}
 
+	const suspendMessage = `<html>
+					<body>
+						<h1>Dear {{params.name}}</h1><br/>
+						<p>We hope this message finds you well. We are reaching out to inform you that, following a thorough review, your status as a MaVie Organizer has been temporarily suspended.</p><br/>
+						<p>Reason:</p><br/>
+						<p>{{params.reason}}</p><br/>
+						<p>We understand the implications of this decision, and it wasn't made lightly. To move forward, please carefully consider the feedback provided. If you wish to be reinstated, you will need to address the reasons for suspension and demonstrate alignment with our platform's guidelines.</p><br/>
+						<p>For further questions or clarification, feel free to reply to this email or write us on whatsapp. We're here to assist and guide you through this process.</p><br/>
+						<p>Warmly,The MaVie Team</p>
+					</body>
+				</html>`
+
+	const revoqueMessage = `<html>
+					<body>
+						<h1>Dear {{params.name}}</h1><br/>
+						<p>We hope this message finds you well. We are reaching out to inform you that, following a thorough review, your status as a MaVie Organizer has been temporarily suspended.</p><br/>
+						<p>Reason:</p><br/>
+						<p>{{params.reason}}</p><br/>
+						<p>We understand the implications of this decision, and it wasn't made lightly. To move forward, please carefully consider the feedback provided. If you wish to be reinstated, you will need to address the reasons for suspension and demonstrate alignment with our platform's guidelines.</p><br/>
+						<p>For further questions or clarification, feel free to reply to this email or write us on whatsapp. We're here to assist and guide you through this process.</p><br/>
+						<p>Warmly,The MaVie Team</p>
+					</body>
+				</html>`
+
 	const suspendOrganizer = async (id, suspendReason, action = 1) => {
 		fetchLoading = true
 		try {
@@ -219,9 +244,20 @@
 				method: 'PUT',
 				body: JSON.stringify({ status: action, reason: suspendReason })
 			})
+			const emailData = {
+				subject:
+					action == 1
+						? 'Important Update on Your MaVie Organizer Status'
+						: 'Welcome Back: Your Organizer Status is Reinstated!',
+				name: organizer.name.toString(),
+				email: organizer.email.toString(),
+				reason: suspendReason.toString(),
+				content: action == 1 ? suspendMessage : revoqueMessage
+			}
 			if (res.ok) {
 				const data = await res.json()
 				// console.log(data)
+				sendEmail(emailData)
 				$pageAlert = {
 					message: action ? 'Organizer suspended.' : "Organizer's suspension removed.",
 					status: true
