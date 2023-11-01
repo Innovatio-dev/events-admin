@@ -116,8 +116,7 @@ export class CognitoFacade {
 				Username: email,
 				TemporaryPassword: password,
 				DesiredDeliveryMediums: ['EMAIL'],
-				UserAttributes: [{ Name: 'email', Value: email }],
-				MessageAction: "RESEND"
+				UserAttributes: [{ Name: 'email', Value: email }]
 			})
 			const response = await this.client.send(command)
 			return response
