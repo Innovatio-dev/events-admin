@@ -103,6 +103,7 @@ export async function POST(event: RequestEvent) {
 			countryId: foreignKeyOf(Country)
 		})
 	)
+	data.pictureId = data.pictureId[0]
 	const result = await Speaker.create(data)
 	const speaker = await Speaker.scope('full').findByPk(result.id)
 	return json(speaker)

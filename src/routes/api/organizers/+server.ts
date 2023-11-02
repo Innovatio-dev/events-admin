@@ -194,6 +194,7 @@ export async function POST(event: RequestEvent) {
 			logoId: foreignKeyOf(Resource)
 		})
 	)
+	values.logoId = values.logoId[0]
 	const connection = await getConnection()
 	const transaction = await connection.transaction()
 
