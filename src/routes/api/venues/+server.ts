@@ -13,22 +13,30 @@ import { Resource } from '$lib/server/models/resource'
 const schema = Joi.object({
 	offset: Joi.number().min(0).optional().default(0),
 	regionId: Joi.number().min(0).optional(),
-	limit: Joi.number().min(-1).optional().default(10),
+	limit: Joi.number().min(-1).optional().default(20),
 	search: Joi.string().min(0).optional(),
-	order: orderSchema(['id', 'status', 'city']).optional()
+	order: orderSchema(['id', 'status', 'city', 'country', 'region']).optional()
 })
 
 export async function GET(event: RequestEvent) {
 	const where: any = {}
 	const order: Order = []
 	const filter = validateSearchParam(event, schema)
-
+	// return json(filter)
 	if (filter.regionId) {
 		where.regionId = filter.regionId
 	}
 	if (filter.order) {
 		for (const col of filter.order) {
-			order.push([col.name, col.type])
+			if (col.name == 'country') {
+				console.log('adding country');
+				order.push(['country', 'name', col.type])
+			} else if (col.name == 'region') {
+				console.log('adding region');
+				order.push(['region', 'name', col.type])
+			} else {
+				order.push([col.name, col.type])
+			}
 		}
 	}
 	if (filter.search) {
@@ -59,11 +67,15 @@ export async function GET(event: RequestEvent) {
 			  ]
 			: []
 	})
-	const results = await Venue.scope('list').findAll({
+	// const count = 10
+	// return json(where)
+	// const results = await Venue.scope('list').findAll()
+	const results = await Venue.findAll({
 		where,
-		limit: filter.limit >= 0 ? filter.limit : undefined,
+		limit: filter.limit >= 0 ? filter.limit : 20,
 		offset: filter.offset,
 		order,
+		subQuery: false,
 		include: [
 			{
 				model: Region,
