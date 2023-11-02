@@ -244,16 +244,20 @@ export async function POST(event: RequestEvent) {
 		values.userId = user.id
 
 		if (venue.length > 0) {
-			const tempVenue = await Venue.findByPk(venue[0].id)
+			const tempVenue = await Venue.findByPk(venue[0].id, {transaction})
 			if (!tempVenue) {
 				throw error(HttpResponses.NOT_FOUND, {
 					message: 'Validation Error:  Venue does not exists'
 				})
 			}
 			const eventVenueSnapshot = await createVenueSnapshot(tempVenue, venue[0], transaction)
+			// console.log(eventVenueSnapshot)
 			values.eventVenueId = eventVenueSnapshot.id
-			values.regionId = venue[0].region.id
+			if (venue[0].region) {
+				values.regionId = venue[0].region.id
+			}
 		} else {
+			console.log('inside else venue lenght > 0')
 			const virtual = await Venue.findOne({
 				where: {
 					address: 'Online'
@@ -271,21 +275,18 @@ export async function POST(event: RequestEvent) {
 				values.regionId = virtual.region.id
 			}
 		}
-
 		const data = await apiInstance.createList(createList)
 		values.mailing = data.id
 
 		if(pinPhoto && pinPhoto.length > 0) {
 			values.pinphoto = pinPhoto[0]
 		}
-
 		let event = await Event.create(
 			{
 				...values
 			},
 			{ transaction, include: [{ model: Schedule, as: 'schedule' }] }
 		)
-
 		if (pictures) {
 			await event.setPictures(pictures, { transaction })
 		}
@@ -344,6 +345,7 @@ export async function POST(event: RequestEvent) {
 		event = (await Event.scope('full').findByPk(event.id)) as Event
 		return json(event)
 	} catch (err: any) {
+		console.log(err);
 		await transaction.rollback()
 		if (err.name === 'SequelizeUniqueConstraintError') {
 			if (err.errors[0].path === 'slug') {
@@ -417,9 +419,21 @@ async function createVenueSnapshot(
 		},
 		{ transaction }
 	)
-	venueSnapshot.setPictures(image, { transaction })
-	venueSnapshot.setCountry(country, { transaction })
-	venueSnapshot.setRegion(region, { transaction })
+	if (!venueSnapshot) {
+		throw error(HttpResponses.UNIQUE_CONSTRAINT, {
+			message: 'Can not create a venue snapshot'
+		})
+	}
+
+	if(image) {
+		venueSnapshot.setPictures(image, { transaction })
+	}
+	if(country) {
+		venueSnapshot.setCountry(country, { transaction })
+	}
+	if(region) {
+		venueSnapshot.setRegion(region, { transaction })
+	}
 	await venueSnapshot.save({ transaction })
 	return venueSnapshot
 }
