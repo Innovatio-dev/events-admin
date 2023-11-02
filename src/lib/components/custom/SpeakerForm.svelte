@@ -114,6 +114,7 @@
 				await updateAction(speaker?.id ?? 0, updatedSpeaker)
 				goto(`/speakers`)
 			} else {
+				console.log(newSpeaker)
 				const formattedData = {
 					...speaker,
 					twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
@@ -121,7 +122,7 @@
 					instagram: 'https://instagram.com/' + speaker.instagram.replace(/\s/g, '_'),
 					linkedin: 'https://linkedin.com/' + speaker.linkedin.replace(/\s/g, '_'),
 					youtube: 'https://youtube.com/' + speaker.youtube.replace(/\s/g, '_'),
-					pictureId: speaker.picture[0]
+					pictureId: newSpeaker
 				}
 				delete formattedData.country
 				await submitAction(formattedData)
@@ -150,7 +151,7 @@
 		name="country"
 		selected={{
 			value: speaker.countryId ?? 0,
-			title: countries[speaker.countryId - 1]?.nicename ?? 'Choose the country speaker'
+			title: countries[speaker.countryId]?.nicename ?? 'Choose the country speaker'
 		}}
 		width="100%"
 		bind:value={speaker.countryId}

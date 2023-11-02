@@ -98,7 +98,7 @@
 				facebook: 'https://facebook.com/' + organizer.facebook.replace(/\s/g, '_'),
 				instagram: 'https://instagram.com/' + organizer.instagram.replace(/\s/g, '_'),
 				youtube: 'https://youtube.com/' + organizer.youtube.replace(/\s/g, '_'),
-				logoId: organizer.logo[0]
+				logoId: newLogo
 			}
 			await submitAction(formattedData)
 			// console.log(formattedData)
