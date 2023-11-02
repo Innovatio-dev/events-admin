@@ -114,7 +114,6 @@
 				await updateAction(speaker?.id ?? 0, updatedSpeaker)
 				goto(`/speakers`)
 			} else {
-				console.log(newSpeaker)
 				const formattedData = {
 					...speaker,
 					twitter: 'https://twitter.com/' + speaker.twitter.replace(/\s/g, '_'),
