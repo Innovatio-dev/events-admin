@@ -51,7 +51,7 @@
 
 	let tableColumns: Column[] = [
 		{
-			title: 'Organizer Name',
+			title: 'Name',
 			sortable: true,
 			dataKey: 'name'
 		},
