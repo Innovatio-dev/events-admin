@@ -15,7 +15,7 @@ const schema = Joi.object({
 	regionId: Joi.number().min(0).optional(),
 	limit: Joi.number().min(-1).optional().default(20),
 	search: Joi.string().min(0).optional(),
-	order: orderSchema(['id', 'status', 'city', 'country', 'region']).optional()
+	order: orderSchema(['id', 'status', 'city', 'country', 'region', 'name']).optional()
 })
 
 export async function GET(event: RequestEvent) {
