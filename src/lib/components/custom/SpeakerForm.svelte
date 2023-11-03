@@ -101,6 +101,10 @@
 			if (editAction) {
 				loading = true
 				const editedSpeaker = await createEditedSpeaker()
+				editedSpeaker.picture = newSpeaker
+				if ('file' in editedSpeaker) {
+					delete editedSpeaker.file
+				}
 				validateChanges(editedSpeaker)
 				await editAction(editedSpeaker)
 				$pageAlert = { message: 'Success! Changes saved', status: true }

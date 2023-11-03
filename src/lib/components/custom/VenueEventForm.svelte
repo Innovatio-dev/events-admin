@@ -79,8 +79,10 @@
 		editedVenue.location.lat = geoData.location.lat
 		editedVenue.location.lng = geoData.location.lng
 		if (editAction) {
+			editedVenue.pictures = venue.pictures
 			await editAction(editedVenue)
 		}
+		console.log(editedVenue)
 		$pageAlert = { message: 'Success! Changes saved', status: true }
 	}
 

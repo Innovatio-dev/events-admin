@@ -292,6 +292,9 @@
 	function updateVenueData(venue) {
 		eventData.venue.name = venue.name
 		eventData.venue.description = venue.description
+		if (venue.pictures && venue.pictures.length >= 1) {
+			eventData.venue.pictures = venue.pictures
+		}
 	}
 
 	async function updateEvent() {
@@ -658,6 +661,7 @@
 								on:save={(event) => {
 									const savedVenue = event.detail
 									editedVenue = savedVenue
+									console.log('saved :', editedVenue)
 								}}
 							/>
 						</div>
