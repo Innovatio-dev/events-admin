@@ -15,7 +15,7 @@ import AWS from 'aws-sdk'
 import { AS_ACCESS_KEY_ID, AS_SECRET_ACCESS_KEY, AS_REGION } from '$env/static/private'
 import { SENDINBLUE_API_KEY } from '$env/static/private'
 import SibApiV3Sdk from 'sib-api-v3-sdk'
-import type { Speaker } from '$lib/server/models/speaker'
+import { Speaker } from '$lib/server/models/speaker'
 import { EventSpeaker } from '$lib/server/models/eventSpeaker'
 import { HttpResponses } from '$lib/server/constants/httpResponses'
 import { EventVenue } from '$lib/server/models/eventVenue'
@@ -216,7 +216,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function POST(event: RequestEvent) {
-	const user = checkUser(event)
+	// const user = checkUser(event)
 	const {
 		pictures,
 		bannerId,
@@ -228,7 +228,7 @@ export async function POST(event: RequestEvent) {
 		venue,
 		...values
 	} = await validateBody(event, createSchema)
-
+	// return json(await event.request.json())
 	const connection = await getConnection()
 	const transaction = await connection.transaction()
 	try {
@@ -240,11 +240,22 @@ export async function POST(event: RequestEvent) {
 		const createList = new SibApiV3Sdk.CreateList()
 
 		createList.name = values.title
-		createList.folderId = 5
-		values.userId = user.id
+		createList.folderId = 1
+		values.userId = 1 //user.id
 
 		if (venue.length > 0) {
-			const tempVenue = await Venue.findByPk(venue[0].id, {transaction})
+			let tempVenue: Venue | null = null 
+			if(venue[0].hasOwnProperty('id')) {
+				tempVenue = await Venue.findByPk(venue[0].id, {transaction})
+			}
+			else {
+				const { pictures, data } = venue[0]
+				tempVenue = await Venue.create({
+					...data
+				})
+				await tempVenue.setPictures(pictures, {transaction})
+			}
+			
 			if (!tempVenue) {
 				throw error(HttpResponses.NOT_FOUND, {
 					message: 'Validation Error:  Venue does not exists'
@@ -256,8 +267,11 @@ export async function POST(event: RequestEvent) {
 			if (venue[0].region) {
 				values.regionId = venue[0].region.id
 			}
+			if(tempVenue.regionId) {
+				values.regionId = tempVenue.regionId
+			}
+			
 		} else {
-			console.log('inside else venue lenght > 0')
 			const virtual = await Venue.findOne({
 				where: {
 					address: 'Online'
@@ -281,34 +295,55 @@ export async function POST(event: RequestEvent) {
 		if(pinPhoto && pinPhoto.length > 0) {
 			values.pinphoto = pinPhoto[0]
 		}
+		if (pictures.length > 0) {
+			// await event.setPictures(pictures, { transaction })
+			values.bannerId = pictures[0]
+		}
+		if (bannerId) {
+			// await event.setBanner(bannerId, { transaction })
+			values.bannerId = bannerId
+		}
+		if (bannerMobileId) {
+			// await event.setBannerMobile(bannerMobileId, { transaction })
+			values.bannerMobileId = bannerMobileId
+		}
+
 		let event = await Event.create(
 			{
 				...values
 			},
 			{ transaction, include: [{ model: Schedule, as: 'schedule' }] }
 		)
-		if (pictures) {
+
+		if (pictures.length > 0) {
 			await event.setPictures(pictures, { transaction })
 		}
-		if (bannerId) {
-			await event.setBanner(bannerId, { transaction })
-		}
-		if (bannerMobileId) {
-			await event.setBannerMobile(bannerMobileId, { transaction })
-		}
-
-		// let speakersMap: Array<Speaker> = []
-
 		if (speakers && speakers.length > 0) {
-			// for (const iterator of speakers) {
-			// 	const element = await Speaker.findByPk(iterator)
-			// 	if (element) {
-			// 		speakersMap.push(element)
-			// 	}
-			// }
 			const snapshotSpeakers = await Promise.all(
-				speakers.map((speaker: Speaker, index: number) =>
-					createSpeakerSnapshot(speaker, event, true, index, transaction)
+				speakers.map(async (speaker: Speaker, index: number) => {
+					if(speaker.hasOwnProperty('id')) {
+						// check if the want to update the image
+						if (Array.isArray(speaker.picture)) {
+							//? then the speaker has a new photo
+							speaker.picture = {
+								id: speaker.picture[0]
+							}
+						}
+						return createSpeakerSnapshot(speaker, event, true, index, transaction)
+					}
+					else {
+						// its a new speaker not in the db
+						// await create new speaker
+						const { picture, ...data } = speaker
+						const newSpeaker = await Speaker.create({
+							...data,
+							pictureId: picture[0]
+						})
+						// await create and add the snapshot
+						return createSpeakerSnapshot(newSpeaker, event, true, index, transaction)
+					}
+					// return createSpeakerSnapshot(speaker, event, true, index, transaction)
+				}
 				)
 			)
 			await event.setEventSpeakers(snapshotSpeakers)
@@ -316,15 +351,36 @@ export async function POST(event: RequestEvent) {
 
 		// speakersMap = []
 		if (speakersSecondary && speakersSecondary.length > 0) {
-			// for (const iterator of speakersSecondary) {
-			// 	const element = await Speaker.findByPk(iterator)
-			// 	if (element) {
-			// 		speakersMap.push(element)
-			// 	}
-			// }
+			// const snapshotSpeakers = await Promise.all(
+			// 	speakersSecondary.map((speaker: Speaker, index: number) =>
+			// 		createSpeakerSnapshot(speaker, event, false, index, transaction)
+			// 	)
+			// )
 			const snapshotSpeakers = await Promise.all(
-				speakersSecondary.map((speaker: Speaker, index: number) =>
-					createSpeakerSnapshot(speaker, event, false, index, transaction)
+				speakersSecondary.map(async (speaker: Speaker, index: number) => {
+					if(speaker.hasOwnProperty('id')) {
+						// check if the want to update the image
+						if (Array.isArray(speaker.picture)) {
+							//? then the speaker has a new photo
+							speaker.picture = {
+								id: speaker.picture[0]
+							}
+						}
+						return createSpeakerSnapshot(speaker, event, true, index, transaction)
+					}
+					else {
+						// its a new speaker not in the db
+						// await create new speaker
+						const { picture, ...data } = speaker
+						const newSpeaker = await Speaker.create({
+							...data,
+							pictureId: picture[0]
+						})
+						// await create and add the snapshot
+						return createSpeakerSnapshot(newSpeaker, event, true, index, transaction)
+					}
+					// return createSpeakerSnapshot(speaker, event, true, index, transaction)
+				}
 				)
 			)
 			await event.setEventSpeakers(snapshotSpeakers)
@@ -370,6 +426,21 @@ async function createSpeakerSnapshot(
 	order: number,
 	transaction: sequelize.Transaction
 ) {
+	let pictureId = null
+	let countryId = null
+	if (speaker.picture) {
+		pictureId = speaker.picture.id
+	}
+	if (speaker.pictureId) {
+		pictureId = speaker.pictureId
+	}
+	if (speaker.country) {
+		countryId = speaker.country.id
+	}
+	if (speaker.countryId) {
+		countryId = speaker.countryId
+	}
+
 	const speakerSnapshot = await EventSpeaker.create(
 		{
 			status: speaker.status,
@@ -384,16 +455,18 @@ async function createSpeakerSnapshot(
 			speakerId: speaker.id,
 			primary,
 			order,
-			eventId: event.id
+			eventId: event.id,
+			pictureId,
+			countryId
 		},
 		{ transaction }
 	)
-	if (speaker.picture) {
-		speakerSnapshot.setPicture(speaker.picture.id, { transaction })
-	}
-	if (speaker.country) {
-		speakerSnapshot.setCountry(speaker.country.id, { transaction })
-	}
+	// if (speaker.picture) {
+	// 	speakerSnapshot.setPicture(speaker.picture.id, { transaction })
+	// }
+	// if (speaker.country) {
+	// 	speakerSnapshot.setCountry(speaker.country.id, { transaction })
+	// }
 	await speakerSnapshot.save()
 	return speakerSnapshot
 }
