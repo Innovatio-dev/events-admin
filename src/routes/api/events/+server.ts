@@ -216,7 +216,7 @@ export async function GET(event: RequestEvent) {
 }
 
 export async function POST(event: RequestEvent) {
-	// const user = checkUser(event)
+	const user = checkUser(event)
 	const {
 		pictures,
 		bannerId,
@@ -240,8 +240,8 @@ export async function POST(event: RequestEvent) {
 		const createList = new SibApiV3Sdk.CreateList()
 
 		createList.name = values.title
-		createList.folderId = 1
-		values.userId = 1 //user.id
+		createList.folderId = 5
+		values.userId = user.id
 
 		if (venue.length > 0) {
 			let tempVenue: Venue | null = null 
