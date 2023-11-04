@@ -8,6 +8,7 @@
 		location: { lat: string; lng: string }
 		description: string
 		pictures: number[]
+		regionId: string
 	}
 </script>
 
@@ -24,6 +25,7 @@
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
 	import Editor from './Editor.svelte'
+	import { REGIONS } from '$lib/utils/constants/Regions'
 
 	// Props
 	export let addVenue: any = null
@@ -38,7 +40,8 @@
 		address: '',
 		location: { lat: '', lng: '' },
 		description: '',
-		pictures: []
+		pictures: [],
+		regionId: ''
 	}
 	let geoData = {
 		country: '',
@@ -61,6 +64,7 @@
 		geoData.location.lng = addVenue.location.lng
 		geoData.location.lat = addVenue.location.lat
 		venue.description = addVenue.description
+		venue.regionId = addVenue.regionId
 	}
 
 	const handleSubmit = async () => {
@@ -108,6 +112,19 @@
 	class="flex min-w-[500px] max-w-[650px] flex-col w-full gap-5"
 >
 	<Input required label="Venue name" type="text" name="name" bind:value={venue.name} />
+	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
+		{'Venue region'}
+	</span>
+	<div class="grid grid-cols-3 gap-y-5 pb-5">
+		{#each REGIONS as region}
+			<label class="flex w-full gap-2">
+				<input name="regionId" value={region.id} type="radio" />
+				<span class="text-neutral-4 font-light text-sm tracking-[0.5px]">
+					{region.name}
+				</span>
+			</label>
+		{/each}
+	</div>
 	<LocationInput bind:data={geoData} />
 	<Input label="Venue country" type="text" name="country" bind:value={geoData.country} />
 	<Input label="Venue city" type="text" name="city" bind:value={geoData.city} />
