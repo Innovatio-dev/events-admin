@@ -2,13 +2,13 @@
 	interface Venue {
 		id?: number
 		name: string
-		country: string
 		city: string
 		address: string
 		location: { lat: string; lng: string }
 		description: string
 		pictures: number[]
-		regionId: string
+		regionId: number | undefined
+		countryId: number | any
 	}
 </script>
 
@@ -25,7 +25,9 @@
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
 	import Editor from './Editor.svelte'
+	import { countries } from '$lib/utils/constants/Regions'
 	import { REGIONS } from '$lib/utils/constants/Regions'
+	import Dropdown from '../Dropdown.svelte'
 
 	// Props
 	export let addVenue: any = null
@@ -35,13 +37,13 @@
 	// State
 	let venue: Venue = {
 		name: '',
-		country: '',
 		city: '',
 		address: '',
 		location: { lat: '', lng: '' },
 		description: '',
 		pictures: [],
-		regionId: ''
+		countryId: 0,
+		regionId: undefined
 	}
 	let geoData = {
 		country: '',
@@ -65,6 +67,7 @@
 		geoData.location.lat = addVenue.location.lat
 		venue.description = addVenue.description
 		venue.regionId = addVenue.regionId
+		venue.countryId = addVenue.countryId
 	}
 
 	const handleSubmit = async () => {
@@ -97,6 +100,7 @@
 
 	const customUpdate = (e) => {
 		updatedVenue[e.detail.name] = e.detail.value
+		console.log(e.detail)
 	}
 
 	const deletePicture = () => {
@@ -118,15 +122,39 @@
 	<div class="grid grid-cols-3 gap-y-5 pb-5">
 		{#each REGIONS as region}
 			<label class="flex w-full gap-2">
-				<input name="regionId" value={region.id} type="radio" />
+				<input
+					name="regionId"
+					bind:value={region.id}
+					on:change={() => {
+						venue.regionId = region.id
+					}}
+					type="radio"
+				/>
 				<span class="text-neutral-4 font-light text-sm tracking-[0.5px]">
 					{region.name}
 				</span>
 			</label>
 		{/each}
 	</div>
+	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
+		{'Country'}
+	</span>
+	<Dropdown
+		required
+		on:change={customUpdate}
+		name="country"
+		selected={{
+			value: venue.countryId ?? 0,
+			title: countries[venue.countryId - 1]?.nicename ?? 'Choose the Venue country'
+		}}
+		width="100%"
+		bind:value={venue.countryId}
+		items={countries.map((country) => {
+			return { value: country.id, title: country.nicename ?? '' }
+		})}
+	/>
 	<LocationInput bind:data={geoData} />
-	<Input label="Venue country" type="text" name="country" bind:value={geoData.country} />
+	<!-- <Input label="Venue country" type="text" name="country" bind:value={geoData.country} /> -->
 	<Input label="Venue city" type="text" name="city" bind:value={geoData.city} />
 	<Input label="Venue address" type="text" name="address" bind:value={geoData.address} />
 	<Input
