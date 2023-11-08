@@ -21,7 +21,7 @@ export async function GET(event: RequestEvent) {
 	const whereCountry: any = {} // Object for country model's filter conditions
 	const whereSchedule: any = {}
 	let order: Order = [
-		['schedule', 'startTime', 'ASC']	
+		//['schedule', 'startTime', 'ASC']	
 	] 
 	let flag = false 
 
@@ -51,6 +51,7 @@ export async function GET(event: RequestEvent) {
 		whereSchedule.startTime = {
 			[Op.gte]: filter.dateMin
 		}
+		where['$schedule.startTime$'] = { [Op.gte]: filter.dateMin }
 	} else if (filter.dateMax) {
 		whereSchedule.startTime = {
 			[Op.lte]: filter.dateMax
@@ -62,7 +63,7 @@ export async function GET(event: RequestEvent) {
 	}
 
 	where.status = eventStatuses.PUBLISHED
-	
+
 	if (filter.order) {
 		for (const col of filter.order) {
 			let name = col.name
@@ -94,7 +95,8 @@ export async function GET(event: RequestEvent) {
 		]
 	}
 	if (filter.countryId) {
-		whereCountry.id = filter.countryId
+		// whereCountry.id = filter.countryId
+		where['$venue.country.id$'] = filter.countryId
 	}
 	
 	// Count events based on filter conditions and associations
@@ -115,6 +117,10 @@ export async function GET(event: RequestEvent) {
 						where: whereCountry
 					}
 				]
+			},
+			{
+				model: Schedule,
+				as: 'schedule'
 			}
 		]
 	})
@@ -138,7 +144,7 @@ export async function GET(event: RequestEvent) {
 						as: 'region',
 					},
 					{
-						model: Country.scope('full'),
+						model: Country,
 						as: 'country',
 						where: whereCountry // Apply country filter conditions
 					}
