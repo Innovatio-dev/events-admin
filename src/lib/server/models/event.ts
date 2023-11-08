@@ -119,7 +119,7 @@ export const init = (sequelize: Sequelize) => {
 						as: 'region'
 					},
 					{
-						model: Country.scope('mini'),
+						model: Country,
 						as: 'country'
 					}
 				]
