@@ -25,9 +25,16 @@
 	// Icons
 	import FiAlertOctagon from 'svelte-icons-pack/fi/FiAlertOctagon'
 	import Editor from './Editor.svelte'
-	import { countries } from '$lib/utils/constants/Regions'
+	let countries: CountryData[] = []
+	interface CountryData {
+		id: number
+		iso: string
+		iso3: string
+		nicename: string
+	}
 	import { REGIONS } from '$lib/utils/constants/Regions'
 	import Dropdown from '../Dropdown.svelte'
+	import { onMount } from 'svelte'
 
 	// Props
 	export let addVenue: any = null
@@ -70,11 +77,24 @@
 		venue.countryId = addVenue.countryId
 	}
 
+	async function fetchCountries() {
+		try {
+			const response = await fetch('/api/countries')
+			if (response.ok) {
+				countries = await response.json()
+			} else {
+				console.error('Error')
+			}
+		} catch (error) {
+			console.error('Error', error)
+		}
+	}
 	const handleSubmit = async () => {
 		if (updateAction) {
 			loading = true
 			const formattedData = {
 				...updatedVenue,
+				countryId: venue.countryId,
 				pictures: [venue.pictures[0], ...extraPictures]
 			}
 			await updateAction(venue?.id ?? 0, formattedData)
@@ -100,7 +120,6 @@
 
 	const customUpdate = (e) => {
 		updatedVenue[e.detail.name] = e.detail.value
-		console.log(e.detail)
 	}
 
 	const deletePicture = () => {
@@ -108,6 +127,10 @@
 	}
 
 	const onCancel = () => {}
+
+	onMount(async () => {
+		await fetchCountries()
+	})
 </script>
 
 <form
@@ -145,7 +168,9 @@
 		name="country"
 		selected={{
 			value: venue.countryId ?? 0,
-			title: countries[venue.countryId - 1]?.nicename ?? 'Choose the Venue country'
+			title: venue.countryId
+				? countries[venue.countryId + 1]?.nicename
+				: 'Choose the Venue country'
 		}}
 		width="100%"
 		bind:value={venue.countryId}
