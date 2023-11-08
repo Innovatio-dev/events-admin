@@ -40,6 +40,9 @@ export async function GET(event: RequestEvent) {
 
 export async function PUT(req: RequestEvent) {
 	// const user = checkUser(req)
+	// throw error(404, {
+	// 	message: 'Event with id  does not exist in our records'
+	// })
 	const user = {id: 1}
 	const { id } = req.params
 	const {
@@ -258,24 +261,32 @@ async function createSpeakerSnapshot(
 		primary,
 		order,
 		eventId: event.id,
-		speakerId: speaker.id
+		speakerId: speaker.id,
+		pictureId: speaker.picture.id,
+		countryId: speaker.countryId
 	}
-	
-	if (speaker.copy === true) {
-		data.speakerId = speaker.speakerId 
+	// Just assume that when there is the value of speakerId its already a copy
+	if (speaker.hasOwnProperty('speakerId')) {
+		data.speakerId = speaker.speakerId
+	}
+	if (speaker.picture) {
+		if (Array.isArray(speaker.picture)) {
+			//? then the speaker has a new photo
+			data.pictureId = speaker.picture[0]
+		}
 	}
 
 	const speakerSnapshot = await EventSpeaker.create(
 		data,
 		{ transaction }
 	)
-	if (speaker.picture) {
-		await speakerSnapshot.setPicture(speaker.picture.id, { transaction })
-	}
+	// if (speaker.picture) {
+	// 	await speakerSnapshot.setPicture(speaker.picture.id, { transaction })
+	// }
 	if (speaker.country) {
 		await speakerSnapshot.setCountry(speaker.country.id, { transaction })
 	}
-	await speakerSnapshot.save()
+	// await speakerSnapshot.save({transaction})
 	
 	return speakerSnapshot
 }
