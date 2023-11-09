@@ -11,7 +11,11 @@
 		linkZoom: any
 		language: any
 		venue: any
-		translation: { name: string; flagIso: string }[]
+		translation: {
+			iso: string
+			isoLang: string
+			nicename: string
+		}[]
 		secondaryOrganizer: string | null
 		secondaryOrganizerDescription: string
 		speakers: any[]
@@ -723,8 +727,8 @@
 						>
 							<CountryViewer
 								value={{
-									iso: translation.flagIso,
-									nicename: translation.name,
+									iso: translation.iso,
+									nicename: translation.nicename,
 									padding: '0'
 								}}
 							/>
