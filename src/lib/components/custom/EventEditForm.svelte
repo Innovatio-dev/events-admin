@@ -12,9 +12,8 @@
 		language: any
 		venue: any
 		translation: {
-			iso: string
-			isoLang: string
-			nicename: string
+			flagIso: string
+			name: string
 		}[]
 		secondaryOrganizer: string | null
 		secondaryOrganizerDescription: string
@@ -727,8 +726,8 @@
 						>
 							<CountryViewer
 								value={{
-									iso: translation.iso,
-									nicename: translation.nicename,
+									iso: translation.flagIso,
+									nicename: translation.name,
 									padding: '0'
 								}}
 							/>
