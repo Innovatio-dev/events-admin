@@ -66,7 +66,7 @@ export const init = (sequelize: Sequelize) => {
 	}))
 	Speaker.addScope('full', () => ({
 		attributes: {
-			exclude: ['deletedAt', 'updatedAt', 'countryId', 'pictureId']
+			exclude: ['deletedAt', 'updatedAt', 'pictureId']
 		},
 		include: [
 			{

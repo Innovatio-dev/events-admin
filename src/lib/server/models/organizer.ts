@@ -135,7 +135,7 @@ export const init = (sequelize: Sequelize) => {
 		]
 	}))
 	Organizer.addScope('full', () => ({
-		attributes: { exclude: ['countryId', 'deletedAt', 'logoId'] },
+		attributes: { exclude: ['deletedAt', 'logoId'] },
 		include: [
 			{
 				model: Region,
