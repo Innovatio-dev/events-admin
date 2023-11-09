@@ -217,6 +217,10 @@ export async function GET(event: RequestEvent) {
 
 export async function POST(event: RequestEvent) {
 	const user = checkUser(event)
+	// const user = { id: 1 }
+	// throw error(HttpResponses.NOT_FOUND, {
+	// 	message: 'Validation Error:  Venue does not exists'
+	// })
 	const {
 		pictures,
 		bannerId,
@@ -249,7 +253,7 @@ export async function POST(event: RequestEvent) {
 				tempVenue = await Venue.findByPk(venue[0].id, {transaction})
 			}
 			else {
-				const { pictures, data } = venue[0]
+				const { pictures, ...data } = venue[0]
 				tempVenue = await Venue.create({
 					...data
 				})
@@ -476,9 +480,8 @@ async function createVenueSnapshot(
 	venueEvent: { [x: string]: any },
 	transaction: sequelize.Transaction
 ) {
-	const image = await venue.getPictures()
-	const country = await venue.getCountry()
-	const region = await venue.getRegion()
+	// const country = await venue.getCountry()
+	// const region = await venue.getRegion()
 	const venueSnapshot = await EventVenue.create(
 		{
 			status: venueEvent.status,
@@ -488,7 +491,9 @@ async function createVenueSnapshot(
 			location: venueEvent.location,
 			email: venueEvent.email,
 			description: venueEvent.description,
-			venueId: venue.id
+			venueId: venue.id,
+			regionId: venueEvent.regionId,
+			countryId: venueEvent.countryId
 		},
 		{ transaction }
 	)
@@ -497,16 +502,22 @@ async function createVenueSnapshot(
 			message: 'Can not create a venue snapshot'
 		})
 	}
-
-	if(image) {
-		venueSnapshot.setPictures(image, { transaction })
+	
+	if (venueEvent.pictures.length > 0 && typeof venueEvent.pictures[0] === 'number') {
+		await venueSnapshot.setPictures(venueEvent.pictures, { transaction })
+	} else {
+		const image = await venue.getPictures()
+		if (image) {
+			await venueSnapshot.setPictures(image, { transaction })
+		}
 	}
-	if(country) {
-		venueSnapshot.setCountry(country, { transaction })
-	}
-	if(region) {
-		venueSnapshot.setRegion(region, { transaction })
-	}
+	// this will come as numbers?
+	// if(country) {
+	// 	venueSnapshot.setCountry(country, { transaction })
+	// }
+	// if(region) {
+	// 	venueSnapshot.setRegion(region, { transaction })
+	// }
 	await venueSnapshot.save({ transaction })
 	return venueSnapshot
 }
