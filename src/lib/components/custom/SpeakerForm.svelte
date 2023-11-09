@@ -154,7 +154,7 @@
 		name="country"
 		selected={{
 			value: speaker.countryId ?? 0,
-			title: countries[speaker.countryId]?.nicename ?? 'Choose the country speaker'
+			title: countries[speaker.countryId - 1]?.nicename ?? 'Choose the country speaker'
 		}}
 		width="100%"
 		bind:value={speaker.countryId}
