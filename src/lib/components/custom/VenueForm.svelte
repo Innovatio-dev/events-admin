@@ -7,8 +7,8 @@
 		location: { lat: string; lng: string }
 		description: string
 		pictures: number[]
-		regionId: number | undefined
-		countryId: number | any
+		regionId?: number | undefined
+		countryId?: number | any
 	}
 </script>
 
@@ -48,9 +48,7 @@
 		address: '',
 		location: { lat: '', lng: '' },
 		description: '',
-		pictures: [],
-		countryId: 0,
-		regionId: undefined
+		pictures: []
 	}
 	let geoData = {
 		country: '',
@@ -73,7 +71,7 @@
 		geoData.location.lng = addVenue.location.lng
 		geoData.location.lat = addVenue.location.lat
 		venue.description = addVenue.description
-		venue.regionId = addVenue.regionId
+		venue.regionId = addVenue.region.id
 		venue.countryId = addVenue.countryId
 	}
 
@@ -131,6 +129,8 @@
 	onMount(async () => {
 		await fetchCountries()
 	})
+
+	console.log(venue)
 </script>
 
 <form
@@ -147,7 +147,8 @@
 			<label class="flex w-full gap-2">
 				<input
 					name="regionId"
-					bind:value={region.id}
+					checked={region.id == venue.regionId}
+					bind:value={venue.regionId}
 					on:change={() => {
 						venue.regionId = region.id
 					}}
