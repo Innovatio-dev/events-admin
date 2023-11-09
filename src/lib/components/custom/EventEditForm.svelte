@@ -292,6 +292,8 @@
 	function updateVenueData(venue) {
 		eventData.venue.name = venue.name
 		eventData.venue.description = venue.description
+		eventData.venue.countryId = venue.countryId
+		eventData.venue.regionId = venue.regionId
 		if (venue.pictures && venue.pictures.length >= 1) {
 			eventData.venue.pictures = venue.pictures
 		}
