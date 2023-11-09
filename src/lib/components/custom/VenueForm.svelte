@@ -169,7 +169,7 @@
 		selected={{
 			value: venue.countryId ?? 0,
 			title: venue.countryId
-				? countries[venue.countryId + 1]?.nicename
+				? countries[venue.countryId - 1]?.nicename
 				: 'Choose the Venue country'
 		}}
 		width="100%"
