@@ -33,6 +33,7 @@
 	--input-bg: #fff;
 	--input-bg-error: #ffefef;
 	--input-text: #5a5a5a;
+	--color-info-900: var(--input-text);
 	--input-text-error: #ef4444;
 	--input-placeholder: #a9a9a9;
 	--borderColor: #46e1fc;
@@ -123,6 +124,9 @@ p {
 	font-style: normal !important;
 }
 
+.timeZone span {
+	text-decoration: none !important;
+}
 @font-face {
 	font-family: 'EestiPro';
 	src: url('/fonts/GTEestiProDisplay-UltraBold.woff') format('truetype');

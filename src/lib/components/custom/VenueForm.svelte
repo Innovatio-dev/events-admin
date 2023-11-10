@@ -133,11 +133,7 @@
 	console.log(venue)
 </script>
 
-<form
-	on:change={updateVenue}
-	on:submit|preventDefault={handleSubmit}
-	class="flex min-w-[500px] max-w-[650px] flex-col w-full gap-5"
->
+<form on:change={updateVenue} class="flex min-w-[500px] max-w-[650px] flex-col w-full gap-5">
 	<Input required label="Venue name" type="text" name="name" bind:value={venue.name} />
 	<span class="text-neutral-4 font-normal text-sm tracking-[0.5px]">
 		{'Venue region'}
@@ -264,7 +260,7 @@
 		{/if}
 	</div>
 	<div class="flex gap-10">
-		<MainButton {loading}>Save</MainButton>
+		<MainButton {loading} on:click={handleSubmit}>Save</MainButton>
 		<MainButton type="button" on:click={onCancel}>cancel</MainButton>
 	</div>
 </form>

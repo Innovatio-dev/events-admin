@@ -21,6 +21,7 @@
 			startTime: Date | null
 			endTime: Date | null
 			visibleAt: Date | null
+			timeZone: string | any
 		}
 	}
 </script>
@@ -45,6 +46,8 @@
 	import SectionHeader from '$lib/components/SectionHeader.svelte'
 	import TextWithIcon from '$lib/components/table_cell/TextWithIcon.svelte'
 	import OrderableTable, { type Column } from '$lib/components/OrderableTable.svelte'
+	import TimezonePicker from 'svelte-timezone-picker'
+
 	import TextWithImageViewer from '$lib/components/custom/data_viewer/TextWithImageViewer.svelte'
 	// Utils
 	import { languages } from '$lib/utils/constants/Languages'
@@ -289,6 +292,10 @@
 		secondarySpeakers = [...secondarySpeakers]
 		isModalSecondarySpeaker = false
 	}
+
+	const customUpdate = (e) => {
+		eventData.schedule.timeZone = e.detail.timezone
+	}
 </script>
 
 <div class="content">
@@ -405,6 +412,21 @@
 			<!-- Schedule -->
 			<div class="input-set">
 				<SectionHeader>Schedule</SectionHeader>
+				<div>
+					<LabelInput>Event UTC zone</LabelInput>
+					<div
+						class="bg-white h-fit w-fit px-6 py-2 border-2 rounded-lg border-input-outline timeZone"
+					>
+						<TimezonePicker
+							bind:value={eventData.schedule.timeZone}
+							on:update={customUpdate}
+							style={{ bgColor: 'white' }}
+						/>
+					</div>
+					{#if eventData?.schedule.timeZone == null && validate}
+						<span class="text-xs text-alert-error">* UTC time is required</span>
+					{/if}
+				</div>
 				<div>
 					<LabelInput>Date starts</LabelInput>
 					<DatePicker
