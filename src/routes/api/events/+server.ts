@@ -394,7 +394,9 @@ export async function POST(event: RequestEvent) {
 			await Schedule.create(
 				{
 					startTime: schedule.startTime,
-					endTime: schedule.endTime
+					endTime: schedule.endTime,
+					timeZone: schedule.timeZone,
+					visibleAt: schedule.visibleAt
 				},
 				{ transaction }
 			),
