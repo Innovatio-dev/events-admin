@@ -34,11 +34,12 @@ const schema = Joi.object({
 })
 
 const postSchema = Joi.object({
-	name: Joi.string(),
-	company: Joi.string(),
+	name: Joi.string().required(),
+	regions: Joi.array().required(),
 	countryId: Joi.number().required(),
+	email: Joi.string().required(),
+	company: Joi.string(),
 	city: Joi.string(),
-	email: Joi.string(),
 	phone: Joi.string(),
 	website: Joi.string(),
 	twitter: Joi.string(),
@@ -48,8 +49,7 @@ const postSchema = Joi.object({
 	youtube: Joi.string(),
 	mavieId: Joi.string(),
 	description: Joi.string(),
-	logoId: Joi.number(),
-	regions: Joi.array().required()
+	logoId: Joi.number().required()
 })
 
 export async function GET(event: RequestEvent) {

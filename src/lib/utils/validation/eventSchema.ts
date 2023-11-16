@@ -67,7 +67,8 @@ export const createSchema = Joi.object({
 	schedule: Joi.object({
 		startTime: Joi.date().required(),
 		endTime: Joi.date(),
-		visibleAt: Joi.date()
+		visibleAt: Joi.date(),
+		timeZone: Joi.string()
 	}).required()
 })
 
