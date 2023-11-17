@@ -8,6 +8,7 @@ import { OrganizerLog } from '$lib/server/models/organizerLog'
 import { deleteSchema, updateSchema } from '$lib/utils/validation/organizerSchema'
 import { uniqueKeyOf } from '$lib/server/validation/schemas'
 import { error, json, type RequestEvent } from '@sveltejs/kit'
+import { sendEmail } from '$lib/utils/brevo/sendMail'
 
 export async function GET(event: RequestEvent) {
 	const { id } = event.params
@@ -40,8 +41,46 @@ export async function PUT(event: RequestEvent) {
 				}
 			]
 		})
+		const emailData = {
+			subject: 'Important Update on Your MaVie Organizer Status',
+			name: organizer?.name,
+			email: organizer?.email,
+			reason: organizer?.reason,
+			templateId: 4,
+			content: `<html>
+			<body>
+				<h1>Dear {{params.name}}</h1><br/>
+				<p>We hope this message finds you well. We are reaching out to inform you that, following a thorough review, your status as a MaVie Organizer has been temporarily suspended.</p><br/>
+				<p>Reason:</p><br/>
+				<p>{{params.reason}}</p><br/>
+				<p>We understand the implications of this decision, and it wasn't made lightly. To move forward, please carefully consider the feedback provided. If you wish to be reinstated, you will need to address the reasons for suspension and demonstrate alignment with our platform's guidelines.</p><br/>
+				<p>For further questions or clarification, feel free to reply to this email or write us on whatsapp. We're here to assist and guide you through this process.</p><br/>
+				<p>Warmly,The MaVie Team</p>
+			</body>
+		</html>`
+		}
+		sendEmail(emailData)
 	} else {
 		organizer = await Organizer.findByPk(id)
+		const emailData = {
+			subject: 'Welcome Back: Your Organizer Status is Reinstated!',
+			name: organizer?.name,
+			email: organizer?.email,
+			reason: organizer?.reason,
+			templateId: 3,
+			content: `<html>
+			<body>
+				<h1>Dear {{params.name}}</h1><br/>
+				<p>We hope this message finds you well. We are reaching out to inform you that, following a thorough review, your status as a MaVie Organizer has been temporarily suspended.</p><br/>
+				<p>Reason:</p><br/>
+				<p>{{params.reason}}</p><br/>
+				<p>We understand the implications of this decision, and it wasn't made lightly. To move forward, please carefully consider the feedback provided. If you wish to be reinstated, you will need to address the reasons for suspension and demonstrate alignment with our platform's guidelines.</p><br/>
+				<p>For further questions or clarification, feel free to reply to this email or write us on whatsapp. We're here to assist and guide you through this process.</p><br/>
+				<p>Warmly,The MaVie Team</p>
+			</body>
+		</html>`
+		}
+		sendEmail(emailData)
 	}
 	const connection = await getConnection()
 	if (organizer == null) {
