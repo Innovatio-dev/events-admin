@@ -16,7 +16,6 @@
 	import VscClose from 'svelte-icons-pack/vsc/VscClose'
 	import BsCheck2 from 'svelte-icons-pack/bs/BsCheck2'
 	import Icon from 'svelte-icons-pack/Icon.svelte'
-	import { sendEmail } from '$lib/utils/brevo/sendMail'
 
 	// Modal Approved
 	let isOpenApproved = false
@@ -66,29 +65,8 @@
 					reason: reason
 				})
 			})
-			const emailData = {
-				subject: 'MaVie Organizer Application Update',
-				name: organizer.name.toString(),
-				email: organizer.email.toString(),
-				reason: reason.toString(),
-				content: `<html>
-					<body>
-						<h1>Dear {{params.name}}</h1><br/>
-						<p>Thank you for applying to be a MaVie Organizer.</p><br/>
-						<p>Regrettably, after our review, we can't proceed with your application at this time.</p><br/>
-						<p>Reason:</p><br/>
-						<p>{{params.reason}}</p><br/>
-						<p>To move forward, kindly review the feedback provided, make necessary adjustments, and re-apply using our application form. Your understanding and proactive approach will be valuable in future considerations.</p><br/>
-						<p>If you have further questions or need clarification, please reply to this email.</p><br/>
-						<p>Warm regards,</p><br/>	
-						<p>The MaVie Team</p>	
-					</body>
-				</html>`
-			}
 			if (res.ok) {
 				const data = await res.json()
-				sendEmail(emailData)
-				// console.log(data)
 				$pageAlert = { message: 'Organizer request dennied', status: true }
 			} else {
 				console.log(await res.json())
@@ -118,29 +96,8 @@
 					reason: `Approved in ${day}`
 				})
 			})
-			const emailData = {
-				subject: 'Congratulations! You&apos;re Now a MaVie Organizer',
-				name: organizer.name.toString(),
-				email: organizer.email.toString(),
-				content: `<html>
-					<body>
-						<h1>Dear {{params.name}}</h1><br/>
-						<p>We are thrilled to inform you that after a thorough review, your application to become a MaVie Organizer has been approved! Welcome to our community of elite organizers.</p><br/>
-						<p><strong>Connect with Our Team on WhatsApp!</stong></p><br/>
-						<p>To kickstart your journey, we'd love for you to connect with our team directly via Business WhatsApp. This will be your primary channel for event proposals, discussions, and more.</p><br/>
-						<p>All your event proposals and discussions will be managed through this platform to ensure efficient and direct communication.</p><br/>
-						<p>Once again, congratulations on joining MaVie! We're excited to see the fantastic events you'll bring to our platform.</p><br/>
-						<p>If you have any questions or need further clarification on any aspect, do not hesitate to reach out on whatsapp or here.</p><br/>
-						<p>We're here to help and guide you every step of the way.</p><br/>	
-						<p>Warm regards,</p><br/>	
-						<p>The MaVie Team</p>	
-					</body>
-				</html>`
-			}
 			if (res.ok) {
 				const data = await res.json()
-				sendEmail(emailData)
-				// console.log(data)
 				$pageAlert = { message: 'Organizer request approved', status: true }
 			} else {
 				console.log(await res.json())

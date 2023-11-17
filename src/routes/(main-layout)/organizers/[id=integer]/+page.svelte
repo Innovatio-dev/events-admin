@@ -30,7 +30,6 @@
 	import IoClose from 'svelte-icons-pack/io/IoClose'
 	import AiOutlineReload from 'svelte-icons-pack/ai/AiOutlineReload'
 	import BiEditAlt from 'svelte-icons-pack/bi/BiEditAlt'
-	import { sendEmail } from '$lib/utils/brevo/sendMail'
 
 	// State
 	let organizer: any = null
@@ -257,7 +256,6 @@
 			if (res.ok) {
 				const data = await res.json()
 				// console.log(data)
-				sendEmail(emailData)
 				$pageAlert = {
 					message: action ? 'Organizer suspended.' : "Organizer's suspension removed.",
 					status: true

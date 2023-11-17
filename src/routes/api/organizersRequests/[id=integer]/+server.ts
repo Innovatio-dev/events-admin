@@ -9,6 +9,7 @@ import { checkUser } from '$lib/server/middlewares/permission'
 import { User } from '$lib/server/models/user'
 import { validateBody } from '$lib/server/middlewares/validator'
 import { Region } from '$lib/server/models/region'
+import { sendEmail } from '$lib/utils/brevo/sendMail'
 
 export async function GET(event: RequestEvent) {
 	const { id } = event.params
@@ -97,7 +98,7 @@ export async function PUT(event: RequestEvent) {
 			}
 		})
 
-		if(!virtual) {
+		if (!virtual) {
 			throw error(HttpResponses.BAD_REQUEST, {
 				message: 'There must be a region on the db to fill the virtual'
 			})
@@ -105,13 +106,12 @@ export async function PUT(event: RequestEvent) {
 
 		let typeEvent = Organizer.TYPE_EVENT_LIVE
 		const regions = (await organizerRequest.getRegions()).map((region) => region.id)
-		if(regions.length > 1 && regions.includes(virtual.id)) {
+		if (regions.length > 1 && regions.includes(virtual.id)) {
 			typeEvent = Organizer.TYPE_EVENT_BOTH
-		}
-		else if(regions.length === 1 && regions.includes(8)) {
+		} else if (regions.length === 1 && regions.includes(8)) {
 			typeEvent = Organizer.TYPE_EVENT_VIRTUAL
 		}
-		
+
 		// Create a new organizer
 		newOrganizer = await Organizer.create({
 			status: organizerStatuses.ACTIVE,
@@ -133,10 +133,51 @@ export async function PUT(event: RequestEvent) {
 			countryId: organizerRequest.countryId,
 			dateOfRequest: organizerRequest.createdAt
 		})
-		
+		const emailData = {
+			subject: 'Congratulations! You&apos;re Now a MaVie Organizer',
+			name: organizerRequest.name,
+			email: organizerRequest.email,
+			templateId: 3,
+			content: `<html>
+				<body>
+					<h1>Dear {{params.name}}</h1><br/>
+					<p>We are thrilled to inform you that after a thorough review, your application to become a MaVie Organizer has been approved! Welcome to our community of elite organizers.</p><br/>
+					<p><strong>Connect with Our Team on WhatsApp!</stong></p><br/>
+					<p>To kickstart your journey, we'd love for you to connect with our team directly via Business WhatsApp. This will be your primary channel for event proposals, discussions, and more.</p><br/>
+					<p>All your event proposals and discussions will be managed through this platform to ensure efficient and direct communication.</p><br/>
+					<p>Once again, congratulations on joining MaVie! We're excited to see the fantastic events you'll bring to our platform.</p><br/>
+					<p>If you have any questions or need further clarification on any aspect, do not hesitate to reach out on whatsapp or here.</p><br/>
+					<p>We're here to help and guide you every step of the way.</p><br/>	
+					<p>Warm regards,</p><br/>	
+					<p>The MaVie Team</p>	
+				</body>
+			</html>`
+		}
+		sendEmail(emailData)
 		newOrganizer.setRegions(regions)
 	} else if (data.status === organizerRequestStatuses.DENIED) {
-		//TODO: Send email with reason of denied
+		const emailData = {
+			name: organizerRequest.name,
+			email: organizerRequest.email,
+			reason: organizerRequest.reason,
+			subject: 'MaVie Organizer Application Update',
+			templateId: 4,
+			content: `<html>
+					<body>
+						<h1>Dear {{params.name}}</h1><br/>
+						<p>Thank you for applying to be a MaVie Organizer.</p><br/>
+						<p>Regrettably, after our review, we can't proceed with your application at this time.</p><br/>
+						<p>Reason:</p><br/>
+						<p>{{params.reason}}</p><br/>
+						<p>To move forward, kindly review the feedback provided, make necessary adjustments, and re-apply using our application form. Your understanding and proactive approach will be valuable in future considerations.</p><br/>
+						<p>If you have further questions or need clarification, please reply to this email.</p><br/>
+						<p>Warm regards,</p><br/>
+						<p>The MaVie Team</p>
+					</body>
+				</html>`
+		}
+
+		sendEmail(emailData)
 	}
 	organizerRequest.status = data.status
 	await organizerRequest.save()

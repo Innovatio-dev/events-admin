@@ -348,7 +348,7 @@
 		} catch (error) {
 			console.error('Error:', error)
 			$pageAlert = {
-				message: 'Oops! Ha ocurrido un error. Intenta de nuevo más tarde.',
+				message: 'Oops!',
 				status: false
 			}
 		}
