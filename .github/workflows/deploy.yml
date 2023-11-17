@@ -25,6 +25,7 @@ jobs:
                   echo AS_SECRET_ACCESS_KEY=${{ secrets.AS_SECRET_ACCESS_KEY }} >> .env
                   echo SECRET_HASH=${{ secrets.SECRET_HASH }} >> .env
                   echo SENDINBLUE_API_KEY=${{ secrets.SENDINBLUE_API_KEY }} >> .env
+                  echo BREVO_API_KEY=${{ secrets.BREVO_API_KEY }} >> .env
             - name: Configure AWS Credentials
               uses: aws-actions/configure-aws-credentials@v2
               with:
