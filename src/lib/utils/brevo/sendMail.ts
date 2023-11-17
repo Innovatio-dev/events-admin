@@ -3,7 +3,6 @@ import brevo from '@getbrevo/brevo/src'
 
 const defaultClient = brevo.ApiClient.instance
 const apiKey = defaultClient.authentications['api-key']
-// apiKey.apiKey = `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`
 apiKey.apiKey = BREVO_API_KEY
 
 const apiInstance = new brevo.TransactionalEmailsApi()
